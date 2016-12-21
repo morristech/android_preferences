@@ -35,7 +35,5 @@ android {
  * Library Module dependencies =====================================================================
  */
 dependencies {
-    final String supportVersion = project.property('android.support.version')
-    compile 'com.android.support:support-annotations:' + supportVersion
-    compile 'com.albedinsky.android:preferences-core:1.4.1@aar'
+    compile 'universum.studios.android:preferences-core:1.0.0@aar'
 }
