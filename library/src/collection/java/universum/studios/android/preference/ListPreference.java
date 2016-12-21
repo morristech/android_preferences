@@ -28,11 +28,11 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * A {@link SharedPreference} implementation that can be used to manage (store + obtain) an
- * {@link List} preference value within {@link SharedPreferences}.
+ * A {@link SharedPreference} implementation that may be used to manage (store/retrieve) a {@link List}
+ * preference value within {@link SharedPreferences}.
  *
  * @param <T> A type of the items within a list that can this implementation of preference hold and
- *            manage its saving/obtaining.
+ *            manage its storing/retrieving.
  * @author Martin Albedinsky
  * @see ArrayPreference
  */
@@ -120,39 +120,38 @@ public final class ListPreference<T> extends SharedPreference<List<T>> {
 	}
 
 	/**
-	 * @see #obtainFromPreferences(SharedPreferences, String, List)
+	 * @see #getFromPreferences(SharedPreferences, String, List)
 	 */
 	@Nullable
 	@Override
-	protected List<T> onObtainFromPreferences(@NonNull SharedPreferences preferences) {
-		return obtainFromPreferences(preferences, mKey, mDefaultValue);
+	protected List<T> onGetFromPreferences(@NonNull SharedPreferences preferences) {
+		return getFromPreferences(preferences, mKey, mDefaultValue);
 	}
 
 	/**
-	 * Returns a {@link List} mapped in the given shared <var>preferences</var> under
-	 * the specified <var>key</var>.
+	 * Returns a {@link List} mapped in the given shared <var>preferences</var> under the specified
+	 * <var>key</var>.
 	 *
-	 * @param preferences   The instance of shared preferences into which was the requested list
-	 *                      before saved.
-	 * @param key           The key under which is the saved list mapped in the shared preferences.
-	 * @param defValue      Default list to return if there is no mapping for the specified <var>key</var>
-	 *                      yet.
-	 * @param <T>           Type of an items which should be presented within the obtained list.
+	 * @param preferences The instance of shared preferences into which was the requested list
+	 *                    before saved.
+	 * @param key         The key under which is the saved list mapped in the shared preferences.
+	 * @param defValue    Default list to return if there is no mapping for the specified <var>key</var>
+	 *                    yet.
+	 * @param <T>         Type of an items which should be presented within the obtained list.
 	 * @return An instance of the requested list or <var>defValue</var> if there is no mapping
 	 * for the specified key.
 	 * @throws ClassCastException       If value stored under the specified key does not represents
 	 *                                  an array/a list.
 	 * @throws IllegalArgumentException If type of the requested list is not supported by the
 	 *                                  Preferences library.
-	 * @throws IllegalStateException    If the requested list was not stored by the Preferences
-	 *                                  library.
+	 * @throws IllegalStateException    If the requested list was not stored by the Preferences  library.
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> List<T> obtainFromPreferences(@NonNull SharedPreferences preferences, @NonNull String key, @Nullable List<T> defValue) {
+	public static <T> List<T> getFromPreferences(@NonNull SharedPreferences preferences, @NonNull String key, @Nullable List<T> defValue) {
 		final String value = preferences.getString(key, null);
 		if (value != null) {
 			try {
-				final T[] array = ArrayPreference.obtainFromPreferences(preferences, key, null);
+				final T[] array = ArrayPreference.getFromPreferences(preferences, key, null);
 				return Arrays.asList(array);
 			} catch (ClassCastException e) {
 				final String arrayValue = ArrayPreference.extractArrayValueFromPreferenceValue(value);

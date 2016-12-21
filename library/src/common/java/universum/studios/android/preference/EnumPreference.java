@@ -26,8 +26,8 @@ import android.support.annotation.StringRes;
 import android.text.TextUtils;
 
 /**
- * A {@link SharedPreference} implementation that can be used to manage (store + obtain) an
- * {@link Enum} preference value within {@link SharedPreferences}.
+ * A {@link SharedPreference} implementation that may be used to manage (store/retrieve) an {@link Enum}
+ * preference value within {@link SharedPreferences}.
  *
  * @param <E> A type of the enum implementation of which value will this preference manage.
  * @author Martin Albedinsky
@@ -78,7 +78,7 @@ public final class EnumPreference<E extends Enum> extends SharedPreference<E> {
 	@Nullable
 	@Override
 	@SuppressWarnings("unchecked")
-	protected E onObtainFromPreferences(@NonNull SharedPreferences preferences) {
+	protected E onGetFromPreferences(@NonNull SharedPreferences preferences) {
 		final String enumName = preferences.getString(mKey, mDefaultValue != null ? mDefaultValue.name() : "");
 		return !TextUtils.isEmpty(enumName) ? (E) E.valueOf(mDefaultValue.getClass(), enumName) : null;
 	}

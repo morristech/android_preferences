@@ -33,11 +33,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * A {@link SharedPreference} implementation that can be used to manage (store + obtain) an
- * {@code array} preference value within {@link SharedPreferences}.
+ * A {@link SharedPreference} implementation that may be used to manage (store/retrieve) an {@code array}
+ * preference value within {@link SharedPreferences}.
  *
  * @param <T> A type of the items within an array that can this implementation of preference hold and
- *            manage its saving/obtaining.
+ *            manage its storing/retrieving.
  * @author Martin Albedinsky
  * @see ListPreference
  */
@@ -50,7 +50,7 @@ public final class ArrayPreference<T> extends SharedPreference<T> {
 	/**
 	 * Matcher used to validate array preference value.
 	 */
-	private static final Matcher PREFERENCE_VALUE_MATCHER = Pattern.compile("^\\<(.+)\\[\\]\\>\\[(.*)\\]$").matcher("");
+	private static final Matcher VALUE_MATCHER = Pattern.compile("^\\<(.+)\\[\\]\\>\\[(.*)\\]$").matcher("");
 
 	/**
 	 * Constructors ================================================================================
@@ -118,13 +118,11 @@ public final class ArrayPreference<T> extends SharedPreference<T> {
 			return preferences.edit().putString(key, null).commit();
 		}
 		ensureIsArrayOrThrow(array);
-
 		final int n = Array.getLength(array);
 		final JSONArray jsonArray = new JSONArray();
 		for (int i = 0; i < n; i++) {
 			jsonArray.put(Array.get(array, i));
 		}
-
 		// Save also class of the array, so when obtaining it we will know exactly of which type it is.
 		final Class<?> arrayClass = resolveArrayClass(array);
 		if (arrayClass == null) {
@@ -182,21 +180,21 @@ public final class ArrayPreference<T> extends SharedPreference<T> {
 	}
 
 	/**
-	 * @see #obtainFromPreferences(SharedPreferences, String, Object)
+	 * @see #getFromPreferences(SharedPreferences, String, Object)
 	 */
 	@Nullable
 	@Override
 	@SuppressWarnings("unchecked")
-	protected T onObtainFromPreferences(@NonNull SharedPreferences preferences) {
-		return obtainFromPreferences(preferences, mKey, mDefaultValue);
+	protected T onGetFromPreferences(@NonNull SharedPreferences preferences) {
+		return getFromPreferences(preferences, mKey, mDefaultValue);
 	}
 
 	/**
-	 * Returns an <b>array</b> mapped in the given shared <var>preferences</var> under the
-	 * specified <var>key</var>.
+	 * Returns an <b>array</b> mapped in the given shared <var>preferences</var> under the specified
+	 * <var>key</var>.
 	 *
-	 * @param preferences The instance of shared preferences into which was the requested array
-	 *                    before saved.
+	 * @param preferences The instance of shared preferences into which was the requested array before
+	 *                    saved.
 	 * @param key         The key under which is the saved list mapped in the shared preferences.
 	 * @param defValue    Default array to return if there is no mapping for the specified <var>key</var>
 	 *                    yet.
@@ -207,19 +205,18 @@ public final class ArrayPreference<T> extends SharedPreference<T> {
 	 *                                  an array.
 	 * @throws IllegalArgumentException If type of the requested array is not supported by the
 	 *                                  Preferences library.
-	 * @throws IllegalStateException    If the requested array was not stored by the Preferences
-	 *                                  library.
+	 * @throws IllegalStateException    If the requested array was not stored by the Preferences library.
 	 */
 	@SuppressWarnings("unchecked")
-	public static <A> A obtainFromPreferences(@NonNull SharedPreferences preferences, @NonNull String key, @Nullable Object defValue) {
+	public static <A> A getFromPreferences(@NonNull SharedPreferences preferences, @NonNull String key, @Nullable Object defValue) {
 		Object array = defValue;
 		final String value = preferences.getString(key, null);
 		if (!TextUtils.isEmpty(value)) {
-			if (PREFERENCE_VALUE_MATCHER.reset(value).matches()) {
-				final String arrayClassName = PREFERENCE_VALUE_MATCHER.group(1) + "[]";
+			if (VALUE_MATCHER.reset(value).matches()) {
+				final String arrayClassName = VALUE_MATCHER.group(1) + "[]";
 				final Class<?> arrayClass = resolveArrayClassByName(arrayClassName);
 				if (arrayClass != null) {
-					final String jsonArrayValue = "[" + PREFERENCE_VALUE_MATCHER.group(2) + "]";
+					final String jsonArrayValue = "[" + VALUE_MATCHER.group(2) + "]";
 					JSONArray jsonArray;
 					try {
 						jsonArray = new JSONArray(jsonArrayValue);
@@ -229,7 +226,6 @@ public final class ArrayPreference<T> extends SharedPreference<T> {
 										"Value(" + jsonArrayValue + ") is not an array!"
 						);
 					}
-
 					final int n = jsonArray.length();
 					array = createArrayInSize(arrayClass.getComponentType(), n);
 					for (int i = 0; i < n; i++) {
@@ -252,21 +248,6 @@ public final class ArrayPreference<T> extends SharedPreference<T> {
 	}
 
 	/**
-	 * Extracts part with class name of array elements from the specified array preference <var>value</var>.
-	 *
-	 * @param value The array preference value.
-	 * @return Extracted class name of array elements or {@code null} if the specified value is empty
-	 * or does not match array preference structure.
-	 */
-	@Nullable
-	static String extractArrayClassNameFromPreferenceValue(String value) {
-		if (!TextUtils.isEmpty(value) && PREFERENCE_VALUE_MATCHER.reset(value).matches()) {
-			return PREFERENCE_VALUE_MATCHER.group(1);
-		}
-		return null;
-	}
-
-	/**
 	 * Extracts part with array elements from the specified array preference <var>value</var>.
 	 *
 	 * @param value The array preference value.
@@ -275,8 +256,8 @@ public final class ArrayPreference<T> extends SharedPreference<T> {
 	 */
 	@Nullable
 	static String extractArrayValueFromPreferenceValue(String value) {
-		if (!TextUtils.isEmpty(value) && PREFERENCE_VALUE_MATCHER.reset(value).matches()) {
-			return PREFERENCE_VALUE_MATCHER.group(2);
+		if (!TextUtils.isEmpty(value) && VALUE_MATCHER.reset(value).matches()) {
+			return VALUE_MATCHER.group(2);
 		}
 		return null;
 	}

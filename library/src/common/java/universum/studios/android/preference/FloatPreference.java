@@ -25,8 +25,8 @@ import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 
 /**
- * A {@link SharedPreference} implementation that can be used to manage (store + obtain) a
- * {@link Float} preference value within {@link SharedPreferences}.
+ * A {@link SharedPreference} implementation that may be used to manage (store/retrieve) a {@link Float}
+ * preference value within {@link SharedPreferences}.
  *
  * @author Martin Albedinsky
  * @see BooleanPreference
@@ -75,7 +75,7 @@ public final class FloatPreference extends SharedPreference<Float> {
 	 */
 	@Nullable
 	@Override
-	protected Float onObtainFromPreferences(@NonNull SharedPreferences preferences) {
+	protected Float onGetFromPreferences(@NonNull SharedPreferences preferences) {
 		return preferences.getFloat(mKey, mDefaultValue);
 	}
 }
