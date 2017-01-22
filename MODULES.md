@@ -24,18 +24,18 @@ as usually.
 
 **[Core](https://github.com/universum-studios/android_preferences/tree/master/library/src/main)**
 
-    compile 'universum.studios.android:preferences-core:1.0.0@aar'
+    compile 'universum.studios.android:preferences-core:1.0.1@aar'
 
 **[Common](https://github.com/universum-studios/android_preferences/tree/master/library/src/common)**
 
-    compile 'universum.studios.android:preferences-common:1.0.0@aar'
+    compile 'universum.studios.android:preferences-common:1.0.1@aar'
 
 _depends on:_
 [preferences-core](https://github.com/universum-studios/android_preferences/tree/master/library/src/main)
 
 **[Collection](https://github.com/universum-studios/android_preferences/tree/master/library/src/collection)**
 
-    compile 'universum.studios.android:preferences-collection:1.0.0@aar'
+    compile 'universum.studios.android:preferences-collection:1.0.1@aar'
 
 _depends on:_
 [preferences-core](https://github.com/universum-studios/android_preferences/tree/master/library/src/main)
