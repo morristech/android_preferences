@@ -18,6 +18,9 @@
  */
 apply plugin: 'maven'
 
+// Add ARTIFACTS tasks.
+apply from: '../artifacts.gradle'
+
 /**
  * Maven configuration =============================================================================
  */
@@ -54,6 +57,7 @@ afterEvaluate { project ->
                 }
                 developers {
                     developer {
+                        id 'albedinsky'
                         name 'Martin Albedinsky'
                         email 'martin.albedinsky@gmail.com'
                         roles {
@@ -63,71 +67,5 @@ afterEvaluate { project ->
                 }
             }
         }
-    }
-
-    /**
-     * Bundles project's classes into a .jar! file.
-     */
-    task classesJar(type: Jar) {
-        description 'Bundles classes into a .jar! file'
-        from 'build\\intermediates\\classes\\release'
-    }
-
-    /**
-     * Generates javadoc documentation for the current project.
-     */
-    //noinspection GroovyAssignabilityCheck
-    task generateJavadoc(type: Javadoc) {
-        source android.sourceSets.main.java.sourceFiles
-        final Properties properties = new Properties()
-        properties.load(project.rootProject.file('local.properties').newDataInputStream())
-        final String sdkDir = properties.getProperty('sdk.dir')
-        options {
-            author = true
-            memberLevel = JavadocMemberLevel.PROTECTED
-            header = project.property('maven.pom.project.name') + ' ' + project.property('maven.pom.version') + ' Documentation'
-            links 'http://docs.oracle.com/javase/8/docs/api/'
-            linksOffline 'http://developer.android.com/reference', sdkDir + '\\docs\\reference'
-        }
-        if (JavaVersion.current().isJava8Compatible()) {
-            // Uncomment this when Javadoc tool outputs some (not resolvable) errors like 'reference not found for R.attr#...'.
-            //options.addStringOption('Xdoclint:none', '-quiet')
-        }
-        // Append class path with dependencies.
-        final String supportVersion = project.property('android.support.version')
-        classpath += files(
-                android.getBootClasspath(),
-                sdkDir + '\\extras\\android\\m2repository\\com\\android\\support\\support-annotations\\' + supportVersion + '\\support-annotations-' + supportVersion + '.jar'
-        )
-        failOnError false
-    }
-
-    /**
-     * Bundles project's Javadoc into a .jar! file.
-     */
-    task javadocJar(type: Jar) {
-        classifier = 'javadoc'
-        description 'Bundles Javadoc into a .jar! file.'
-        from generateJavadoc
-    }
-
-    /**
-     * Bundles project's Raw sources into a .jar! file.
-     */
-    task sourcesJar(type: Jar) {
-        classifier = 'sources'
-        description 'Bundles Raw sources into a .jar! file.'
-        from android.sourceSets.main.java.sourceFiles
-        // Uncomment if this project contains res/ folder.
-        // from android.sourceSets.main.res.sourceFiles
-    }
-
-    /**
-     * Set of artifacts to be generated.
-     */
-    artifacts {
-        archives classesJar
-        archives javadocJar
-        archives sourcesJar
     }
 }

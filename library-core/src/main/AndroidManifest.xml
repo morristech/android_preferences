@@ -2,7 +2,7 @@
 <!--
 /*
  * =================================================================================================
- *                             Copyright (C) 2016 Universum Studios
+ *                             Copyright (C) 2017 Universum Studios
  * =================================================================================================
  *         Licensed under the Apache License, Version 2.0 or later (further "License" only).
  * *************************************************************************************************
@@ -19,6 +19,6 @@
  * =================================================================================================
  */
 -->
-<manifest package="universum.studios.android.preference.common">
+<manifest package="universum.studios.android.preference.core">
 	<application/>
 </manifest>

@@ -223,8 +223,8 @@ public abstract class PreferencesManager {
 	 */
 	protected PreferencesManager(@NonNull Context context, @NonNull String preferencesName, @Mode int mode) {
 		this.mContext = context.getApplicationContext();
-		setSharedPreferencesName(preferencesName);
 		setMode(mode);
+		setSharedPreferencesName(preferencesName);
 	}
 
 	/**
