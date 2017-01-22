@@ -90,5 +90,5 @@ dependencies {
     }
 }
 
-// Apply MAVEN script.
-apply from: '../maven.gradle'
+// Apply PUBLISH script.
+apply from: '../publish/publish.gradle'

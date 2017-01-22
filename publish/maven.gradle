@@ -18,9 +18,6 @@
  */
 apply plugin: 'maven'
 
-// Add ARTIFACTS tasks.
-apply from: '../artifacts.gradle'
-
 /**
  * Maven configuration =============================================================================
  */
@@ -48,6 +45,10 @@ afterEvaluate { project ->
                 description project.property('maven.pom.project.description')
                 url project.property('maven.pom.project.url')
                 inceptionYear project.property('maven.pom.project.inceptionYear')
+                issueManagement {
+                    system 'GitHub Issues'
+                    url project.property('maven.pom.project.issueManagement.url')
+                }
                 licenses {
                     license {
                         name 'The Apache Software License, Version 2.0'
@@ -55,13 +56,17 @@ afterEvaluate { project ->
                         distribution 'repo'
                     }
                 }
+                organization {
+                    name 'Universum Studios'
+                    url 'https://universum-studios.github.io'
+                }
                 developers {
                     developer {
                         id 'albedinsky'
                         name 'Martin Albedinsky'
                         email 'martin.albedinsky@gmail.com'
                         roles {
-                            role 'Android Designer &ampersand; Developer'
+                            role 'Android Software Engineer'
                         }
                     }
                 }

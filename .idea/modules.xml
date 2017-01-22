@@ -4,7 +4,6 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Preferences.iml" filepath="$PROJECT_DIR$/Preferences.iml" />
       <module fileurl="file://$PROJECT_DIR$/library/library.iml" filepath="$PROJECT_DIR$/library/library.iml" />
-      <module fileurl="file://$PROJECT_DIR$/library/library.iml" filepath="$PROJECT_DIR$/library/library.iml" />
       <module fileurl="file://$PROJECT_DIR$/library-collection/library-collection.iml" filepath="$PROJECT_DIR$/library-collection/library-collection.iml" />
       <module fileurl="file://$PROJECT_DIR$/library-common/library-common.iml" filepath="$PROJECT_DIR$/library-common/library-common.iml" />
       <module fileurl="file://$PROJECT_DIR$/library-core/library-core.iml" filepath="$PROJECT_DIR$/library-core/library-core.iml" />
