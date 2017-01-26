@@ -22,20 +22,9 @@ as usually.
         }
     }
 
-**[Core](https://github.com/universum-studios/android_preferences/tree/master/library/src/main)**
+## Available modules ##
+> Following modules are available in the [latest](https://github.com/universum-studios/android_preferences/releases "Latest Releases page") library version.
 
-    compile 'universum.studios.android:preferences-core:1.0.1@aar'
-
-**[Common](https://github.com/universum-studios/android_preferences/tree/master/library/src/common)**
-
-    compile 'universum.studios.android:preferences-common:1.0.1@aar'
-
-_depends on:_
-[preferences-core](https://github.com/universum-studios/android_preferences/tree/master/library/src/main)
-
-**[Collection](https://github.com/universum-studios/android_preferences/tree/master/library/src/collection)**
-
-    compile 'universum.studios.android:preferences-collection:1.0.1@aar'
-
-_depends on:_
-[preferences-core](https://github.com/universum-studios/android_preferences/tree/master/library/src/main)
+- **[Core](https://github.com/universum-studios/android_preferences/tree/master/library-core/src/main)**
+- **[Common](https://github.com/universum-studios/android_preferences/tree/master/library-common/src/main)**
+- **[Collection](https://github.com/universum-studios/android_preferences/tree/master/library-collection/src/main)**
