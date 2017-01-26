@@ -25,6 +25,6 @@ as usually.
 ## Available modules ##
 > Following modules are available in the [latest](https://github.com/universum-studios/android_preferences/releases "Latest Releases page") library version.
 
-- **[Core](https://github.com/universum-studios/android_preferences/tree/master/library-core/src/main)**
-- **[Common](https://github.com/universum-studios/android_preferences/tree/master/library-common/src/main)**
-- **[Collection](https://github.com/universum-studios/android_preferences/tree/master/library-collection/src/main)**
+- **[Core](https://github.com/universum-studios/android_preferences/tree/master/library-core)**
+- **[Common](https://github.com/universum-studios/android_preferences/tree/master/library-common)**
+- **[Collection](https://github.com/universum-studios/android_preferences/tree/master/library-collection)**
