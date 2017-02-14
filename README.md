@@ -1,17 +1,22 @@
 Preferences
 ===============
 
-## Download ##
+[![Build Status](https://travis-ci.org/universum-studios/android_preferences.svg?branch=master)](https://travis-ci.org/universum-studios/android_preferences)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/91c3d1fb4ee541daa46fd2a62ba7d910)](https://www.codacy.com/app/universum-studios/android_preferences?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=universum-studios/android_preferences&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Coverage/91c3d1fb4ee541daa46fd2a62ba7d910)](https://www.codacy.com/app/universum-studios/android_preferences?utm_source=github.com&utm_medium=referral&utm_content=universum-studios/android_preferences&utm_campaign=Badge_Coverage)
 
-Download the latest **[release](https://github.com/universum-studios/android_preferences/releases/tag/1.0.1 "Latest Releases page")** or **add as dependency** in your project via:
+## Download ##
+[![Bintray Badge](https://api.bintray.com/packages/universum-studios/android/universum.studios.android%3Apreferences/images/download.svg)](https://bintray.com/universum-studios/android/universum.studios.android%3Apreferences/_latestVersion)
+
+Download the latest **[release](https://github.com/universum-studios/android_preferences/releases "Latest Releases page")** or **add as dependency** in your project via:
 
 ### Gradle ###
 
-    compile 'universum.studios.android:preferences:1.0.1@aar'
+    compile 'universum.studios.android:preferences:${DESIRED_VERSION}@aar'
 
 ## Compatibility ##
 
-Available from the **Android [API Level 1](http://developer.android.com/about/versions/android-1.1.html "See API highlights")**.
+Supported down to the **Android [API Level 1](http://developer.android.com/about/versions/android-1.1.html "See API highlights")**.
 
 ### Dependencies ###
 
