@@ -12,7 +12,7 @@ Download the latest **[release](https://github.com/universum-studios/android_pre
 
 ### Gradle ###
 
-    compile 'universum.studios.android:preferences:${DESIRED_VERSION}@aar'
+    compile "universum.studios.android:preferences:${DESIRED_VERSION}@aar"
 
 ## Compatibility ##
 
