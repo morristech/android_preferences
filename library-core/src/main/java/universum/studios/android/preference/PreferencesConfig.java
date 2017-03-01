@@ -42,4 +42,10 @@ public final class PreferencesConfig {
 	 * @see Log#d(String, String)
 	 */
 	public static boolean DEBUG_LOG_ENABLED = false;
+
+	/**
+	 */
+	private PreferencesConfig() {
+		// Creation of instances of this class is not publicly allowed.
+	}
 }
