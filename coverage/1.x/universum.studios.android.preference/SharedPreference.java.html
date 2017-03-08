@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>SharedPreference.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debugAndroidTest</a> &gt; <a href="index.source.html" class="el_package">universum.studios.android.preference</a> &gt; <span class="el_source">SharedPreference.java</span></div><h1>SharedPreference.java</h1><pre class="source lang-java linenums">/*
+ * =================================================================================================
+ *                             Copyright (C) 2016 Universum Studios
+ * =================================================================================================
+ *         Licensed under the Apache License, Version 2.0 or later (further &quot;License&quot; only).
+ * -------------------------------------------------------------------------------------------------
+ * You may use this file only in compliance with the License. More details and copy of this License
+ * you may obtain at
+ *
+ * 		http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * You can redistribute, modify or publish any part of the code written within this file but as it
+ * is described in the License, the software distributed under the License is distributed on an
+ * &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES or CONDITIONS OF ANY KIND.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ * =================================================================================================
+ */
+package universum.studios.android.preference;
+
+import android.content.SharedPreferences;
+import android.content.res.Resources;
+import android.support.annotation.CheckResult;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
+import android.text.TextUtils;
+
+/**
+ * Base implementation of shared preference object used by {@link PreferencesManager} to manage
+ * simplified storing and retrieving values from shared preferences.
+ * &lt;p&gt;
+ * This class implements API necessary to save its current value into {@link SharedPreferences}
+ * via {@link #updateValue(Object)} followed by {@link #save(SharedPreferences)} and to retrieve such
+ * saved value from the preferences via {@link #retrieve(SharedPreferences)} followed by {@link #getValue()}.
+ * &lt;p&gt;
+ * The key for shared preference must be passed during initialization to one of constructors and can
+ * be later obtained via {@link #getKey()} or {@link #getKeyRes()}. &lt;b&gt;Note&lt;/b&gt;, that if you will use
+ * resource ids as keys, the raw string key need to be attached via {@link #attachKey(Resources)},
+ * before any initial storing/obtaining.
+ *
+ * @param &lt;Type&gt; A type of the value that can this implementation of preference hold and manage its
+ *               saving/obtaining.
+ * @author Martin Albedinsky
+ */
+public abstract class SharedPreference&lt;Type&gt; {
+
+	/**
+	 * Interface ===================================================================================
+	 */
+
+	/**
+	 * Callback that can be used to listen for changes in value of a specific {@link SharedPreference}
+	 * implementation.
+	 *
+	 * @param &lt;PreferenceType&gt; A type of the preference, for which is this callback created.
+	 * @author Martin Albedinsky
+	 */
+	public interface PreferenceChangeCallback&lt;PreferenceType&gt; {
+
+		/**
+		 * Invoked whenever a value of the specified &lt;var&gt;preference&lt;/var&gt; has been changed. The passed
+		 * preference already contains new value parsed from shared preferences which can be obtained
+		 * via {@link SharedPreference#getValue()}.
+		 * &lt;p&gt;
+		 * The preference can be identified by {@link SharedPreference#getKey()} or
+		 * {@link SharedPreference#getKeyRes()}.
+		 *
+		 * @param preference The preference, of which value was changed.
+		 */
+		void onPreferenceChanged(@NonNull SharedPreference&lt;PreferenceType&gt; preference);
+	}
+
+	/**
+	 * Constants ===================================================================================
+	 */
+
+	/**
+	 * Log TAG.
+	 */
+	// private static final String TAG = &quot;SharedPreference&quot;;
+
+	/**
+	 * Static members ==============================================================================
+	 */
+
+	/**
+	 * Members =====================================================================================
+	 */
+
+	/**
+	 * The key under which will be the value of this preference mapped within shared preferences.
+	 */
+<span class="fc" id="L94">	String mKey = &quot;&quot;;</span>
+
+	/**
+	 * Default value of this preference for case, when there is no value saved withing
+	 * shared preference yet.
+	 */
+	Type mDefaultValue;
+
+	/**
+	 * Actual value of this shared preference to save.
+	 */
+	Type mValue;
+
+	/**
+	 * Xml resource
+	 */
+<span class="fc" id="L110">	private int mKeyRes = -1;</span>
+
+	/**
+	 * Flag indicating whether the {@link #mValue} is same as value saved within shared
+	 * preferences.
+	 */
+	private boolean mAlreadyParsed;
+
+	/**
+	 * Constructors ================================================================================
+	 */
+
+	/**
+	 * Creates a new instance of SharedPreference with the given key and default value.
+	 *
+	 * @param key      The key under which will be the value of this preference mapped within
+	 *                 shared preferences.
+	 * @param defValue Default value of this preference to return in case, when there is no value
+	 *                 saved withing shared preference yet.
+	 * @throws IllegalArgumentException If the specified &lt;var&gt;key&lt;/var&gt; is empty.
+	 */
+<span class="fc" id="L131">	protected SharedPreference(@NonNull String key, @Nullable Type defValue) {</span>
+<span class="fc bfc" id="L132" title="All 2 branches covered.">		if (TextUtils.isEmpty(key)) {</span>
+<span class="fc" id="L133">			throw new IllegalArgumentException(&quot;Preference key cannot be empty.&quot;);</span>
+		}
+<span class="fc" id="L135">		this.mKey = key;</span>
+<span class="fc" id="L136">		this.mDefaultValue = mValue = defValue;</span>
+<span class="fc" id="L137">	}</span>
+
+	/**
+	 * Creates a new instance of SharedPreference with the given key resource and default value.
+	 *
+	 * @param keyResId     Resource id of the desired key under which will be the value of this preference
+	 *                     mapped within shared preferences.
+	 * @param defaultValue Default value of this preference for case, when there is no value saved withing
+	 *                     shared preference yet.
+	 * @throws IllegalArgumentException If the specified &lt;var&gt;keyResId&lt;/var&gt; is invalid.
+	 * @see #attachKey(Resources)
+	 */
+<span class="fc" id="L149">	protected SharedPreference(@StringRes int keyResId, @Nullable Type defaultValue) {</span>
+<span class="fc bfc" id="L150" title="All 2 branches covered.">		if (keyResId &lt;= 0) {</span>
+<span class="fc" id="L151">			throw new IllegalArgumentException(&quot;Resource id(&quot; + keyResId + &quot;) for preference key is not valid.&quot;);</span>
+		}
+<span class="fc" id="L153">		this.mKeyRes = keyResId;</span>
+<span class="fc" id="L154">		this.mDefaultValue = defaultValue;</span>
+<span class="fc" id="L155">	}</span>
+
+	/**
+	 * Methods =====================================================================================
+	 */
+
+	/**
+	 * Returns the key of this preference.
+	 *
+	 * @return Same key as passed to {@link #SharedPreference(String, Object)} constructors.
+	 */
+	@NonNull
+	public final String getKey() {
+<span class="fc" id="L168">		return mKey;</span>
+	}
+
+	/**
+	 * Return the resource id of the key of this preference.
+	 *
+	 * @return Same resource id as passed to {@link #SharedPreference(int, Object)} constructor.
+	 */
+	@StringRes
+	public final int getKeyRes() {
+<span class="fc" id="L178">		return mKeyRes;</span>
+	}
+
+	/**
+	 * Attaches the key for this preference from the given resources using the current key's resource
+	 * id specified via {@link #SharedPreference(int, Object)}.
+	 *
+	 * @param resources An application's resources to obtain key.
+	 * @return This preference to allow methods chaining.
+	 * @throws IllegalArgumentException If key obtained from the resources for the resource id is empty.
+	 */
+	public SharedPreference&lt;Type&gt; attachKey(@NonNull Resources resources) {
+<span class="fc bfc" id="L190" title="All 2 branches covered.">		if (mKeyRes != -1) {</span>
+<span class="fc" id="L191">			this.mKey = resources.getString(mKeyRes);</span>
+<span class="fc bfc" id="L192" title="All 2 branches covered.">			if (TextUtils.isEmpty(mKey)) {</span>
+<span class="fc" id="L193">				throw new IllegalArgumentException(&quot;Preference key cannot be empty.&quot;);</span>
+			}
+		}
+<span class="fc" id="L196">		return this;</span>
+	}
+
+	/**
+	 * Returns the default value of this preference.
+	 *
+	 * @return Same value as passed to {@link #SharedPreference(String, Object)}.
+	 */
+	@Nullable
+	public final Type getDefaultValue() {
+<span class="fc" id="L206">		return mDefaultValue;</span>
+	}
+
+	/**
+	 * Retrieves the current value of this preference from the given shared preferences.
+	 *
+	 * @param preferences The instance of shared preferences into which was the value of this preference
+	 *                    before saved.
+	 * @return This preference to allow methods chaining.
+	 * @see #getValue()
+	 */
+	public SharedPreference&lt;Type&gt; retrieve(@NonNull SharedPreferences preferences) {
+<span class="fc" id="L218">		this.mValue = getFromPreferences(preferences);</span>
+<span class="fc" id="L219">		return this;</span>
+	}
+
+	/**
+	 * Performs obtaining of the actual value of this preference from the given shared preferences.
+	 *
+	 * @param preferences The instance of shared preferences into which was the value of this preference
+	 *                    before saved.
+	 * @return The actual value obtained from the given shared preferences or {@code null} if this
+	 * preference's key is invalid.
+	 */
+	final Type getFromPreferences(SharedPreferences preferences) {
+<span class="fc" id="L231">		this.ensureValidKeyOrThrow();</span>
+<span class="fc bfc" id="L232" title="All 2 branches covered.">		if (!mAlreadyParsed) {</span>
+<span class="fc" id="L233">			this.mValue = onGetFromPreferences(preferences);</span>
+<span class="fc" id="L234">			this.mAlreadyParsed = true;</span>
+		}
+<span class="fc" id="L236">		return mValue;</span>
+	}
+
+	/**
+	 * Ensures that the key of this preference is valid (not empty). If not throws an IllegalStateException.
+	 */
+	private void ensureValidKeyOrThrow() {
+<span class="fc bfc" id="L243" title="All 2 branches covered.">		if (TextUtils.isEmpty(mKey)) {</span>
+<span class="fc" id="L244">			final String preferenceType = getClass().getSimpleName();</span>
+<span class="fc" id="L245">			throw new IllegalStateException(</span>
+					&quot;Key for preference(&quot; + preferenceType + &quot;) is not properly initialized. &quot; +
+							&quot;Didn't you forget to set it up via SharedPreference.attachKey(Resources)?&quot;
+			);
+		}
+<span class="fc" id="L250">	}</span>
+
+	/**
+	 * Invoked to retrieve the actual value of this preference from the given shared preferences.
+	 *
+	 * @param preferences The instance of shared preferences into which was the value of this preference
+	 *                    before saved.
+	 * @return The actual value of this preference from the given shared preferences.
+	 */
+	@Nullable
+	protected abstract Type onGetFromPreferences(@NonNull SharedPreferences preferences);
+
+	/**
+	 * Saves the current value of this preference into the given shared preferences.
+	 *
+	 * @param preferences The instance of shared preferences into which will be the current value of
+	 *                    this preference saved.
+	 * @return {@code True} if saving operation succeed, {@code false} otherwise.
+	 * @see #updateValue(Object)
+	 */
+	@CheckResult
+	public boolean save(@NonNull SharedPreferences preferences) {
+<span class="fc" id="L272">		return putIntoPreferences(preferences);</span>
+	}
+
+	/**
+	 * Performs saving of the actual value of this preference into the given shared preferences.
+	 *
+	 * @param preferences The instance of shared preferences into which should be the current value of
+	 *                    this preference saved.
+	 * @return {@code True} if saving operation succeed, {@code false} otherwise.
+	 */
+	final boolean putIntoPreferences(SharedPreferences preferences) {
+<span class="fc" id="L283">		this.ensureValidKeyOrThrow();</span>
+<span class="fc" id="L284">		return mAlreadyParsed = onPutIntoPreferences(preferences);</span>
+	}
+
+	/**
+	 * Invoked to save the actual value into the given shared preferences.
+	 *
+	 * @param preferences The instance of shared preferences into which should be the current value of
+	 *                    this preference saved.
+	 * @return {@code True} if saving operation succeed, {@code false} otherwise.
+	 */
+	@CheckResult
+	protected abstract boolean onPutIntoPreferences(@NonNull SharedPreferences preferences);
+
+	/**
+	 * Creates new instance of {@link SharedPreferences.OnSharedPreferenceChangeListener} which can
+	 * be used to listen on changes provided up on the value of this preference within shared preferences.
+	 * &lt;p&gt;
+	 * &lt;b&gt;Note&lt;/b&gt;, that here created listener will fire the given callback only in case, that the
+	 * key received in the callback from shared preferences will match the key of this preference.
+	 *
+	 * @param callback Callback to be invoked when the value of this preference changes.
+	 * @return New instance of OnSharedPreferenceListener.
+	 * @see SharedPreferences
+	 */
+	@NonNull
+	public SharedPreferences.OnSharedPreferenceChangeListener createOnChangeListener(@NonNull final PreferenceChangeCallback&lt;Type&gt; callback) {
+<span class="fc" id="L310">		return new SharedPreferences.OnSharedPreferenceChangeListener() {</span>
+
+			/**
+			 */
+			@Override
+			public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+<span class="nc bnc" id="L316" title="All 2 branches missed.">				if (mKey.equals(key)) {</span>
+					// Parse actual value.
+<span class="nc" id="L318">					retrieve(sharedPreferences);</span>
+<span class="nc" id="L319">					callback.onPreferenceChanged(SharedPreference.this);</span>
+				}
+<span class="nc" id="L321">			}</span>
+		};
+	}
+
+	/**
+	 * Returns the value, which is currently being hold by this preference object. &lt;b&gt;Note&lt;/b&gt;, that
+	 * this isn't current value from shared preferences if this preference wasn't parsed or
+	 * {@link #retrieve(SharedPreferences)}) before this call.
+	 * &lt;p&gt;
+	 * To obtain always an actual value from shared preferences, perform this calls on the instance
+	 * of SharedPreference of which value you want to obtain:
+	 * &lt;pre&gt;
+	 * {@code &lt;b&gt;SharedPreference.parse(SharedPreferences).getActualValue()&lt;/b&gt;} or
+	 * {@code &lt;b&gt;SharedPreference.parse(PreferencesManager).getActualValue()&lt;/b&gt;}
+	 * &lt;/pre&gt;
+	 *
+	 * @return The actual value of this preference or {@code null} if this preference's key is
+	 * invalid.
+	 * @see #retrieve(SharedPreferences)
+	 */
+	@Nullable
+	public final Type getValue() {
+<span class="fc" id="L343">		return mValue;</span>
+	}
+
+	/**
+	 * Updates the actual value of this preference to the given one. &lt;b&gt;Note&lt;/b&gt;, that
+	 * this doesn't updates the value within shared preferences.
+	 * &lt;p&gt;
+	 * To immediately save the given new value of this preference into shared preferences, perform
+	 * this calls on the instance of SharedPreference of which value you want to save:
+	 * &lt;pre&gt;
+	 * {@code &lt;b&gt;SharedPreference.updateValue(Type).save(SharedPreferences)&lt;/b&gt;} or
+	 * {@code &lt;b&gt;SharedPreference.updateValue(Type).save(PreferencesManager)&lt;/b&gt;}
+	 * &lt;/pre&gt;
+	 *
+	 * @param newValue New value for this preference.
+	 * @return This preference to allow methods chaining.
+	 * @see #save(SharedPreferences)
+	 */
+	public SharedPreference&lt;Type&gt; updateValue(@Nullable Type newValue) {
+<span class="fc bfc" id="L362" title="All 4 branches covered.">		if (mValue == null || !mValue.equals(newValue)) {</span>
+<span class="fc" id="L363">			this.mValue = newValue;</span>
+<span class="fc" id="L364">			this.mAlreadyParsed = true;</span>
+		}
+<span class="fc" id="L366">		return this;</span>
+	}
+
+	/**
+	 * Clears the actual value of this preference.
+	 */
+	final void clear() {
+<span class="fc" id="L373">		this.mValue = null;</span>
+<span class="fc" id="L374">		this.mAlreadyParsed = false;</span>
+<span class="fc" id="L375">	}</span>
+
+	/**
+	 * Inner classes ===============================================================================
+	 */
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span>Generated by the Android Gradle plugin 2.3.0</div></body></html>

@@ -1,0 +1,721 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>PreferencesManager.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debugAndroidTest</a> &gt; <a href="index.source.html" class="el_package">universum.studios.android.preference</a> &gt; <span class="el_source">PreferencesManager.java</span></div><h1>PreferencesManager.java</h1><pre class="source lang-java linenums">/*
+ * =================================================================================================
+ *                             Copyright (C) 2016 Universum Studios
+ * =================================================================================================
+ *         Licensed under the Apache License, Version 2.0 or later (further &quot;License&quot; only).
+ * -------------------------------------------------------------------------------------------------
+ * You may use this file only in compliance with the License. More details and copy of this License
+ * you may retrieve at
+ *
+ * 		http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * You can redistribute, modify or publish any part of the code written within this file but as it
+ * is described in the License, the software distributed under the License is distributed on an
+ * &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES or CONDITIONS OF ANY KIND.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ * =================================================================================================
+ */
+package universum.studios.android.preference;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
+import android.text.TextUtils;
+import android.util.Log;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
+/**
+ * Manager that may be used to simplify management (storing + obtaining) of values presented within
+ * a {@link SharedPreferences} of an Android application.
+ *
+ * &lt;h3&gt;Primitive types&lt;/h3&gt;
+ * The following methods can be used to store primitive types within shared preferences:
+ * &lt;ul&gt;
+ * &lt;li&gt;{@link #putInt(String, int)} - {@link #getInt(String, int)}&lt;/li&gt;
+ * &lt;li&gt;{@link #putFloat(String, float)} - {@link #getInt(String, int)}&lt;/li&gt;
+ * &lt;li&gt;{@link #putLong(String, long)} - {@link #getLong(String, long)}&lt;/li&gt;
+ * &lt;li&gt;{@link #putBoolean(String, boolean)} - {@link #getBoolean(String, boolean)}&lt;/li&gt;
+ * &lt;li&gt;{@link #putString(String, String)} - {@link #getString(String, String)}&lt;/li&gt;
+ * &lt;/ul&gt;
+ *
+ * &lt;h3&gt;Arrays + Lists&lt;/h3&gt;
+ * See {@code ArrayPreference} and {@code ListPreference}.
+ *
+ * &lt;h3&gt;Shared preferences&lt;/h3&gt;
+ * The PreferencesManager is closely related with {@link SharedPreference}. You can use any implementation
+ * of SharedPreference class to represent any of your shared preference values. The following methods
+ * can be used to store/retrieve actual values of these preferences:
+ * &lt;ul&gt;
+ * &lt;li&gt;{@link #putPreference(SharedPreference, Object)} - {@link #getPreference(SharedPreference)}&lt;/li&gt;
+ * &lt;/ul&gt;
+ *
+ * &lt;h3&gt;Sample implementation&lt;/h3&gt;
+ * &lt;pre&gt;
+ * public class AppPreferences extends PreferencesManager {
+ *
+ *      // Key for the first app launch preference.
+ *      private static final String KEY_APP_FIRST_LAUNCH = &quot;.AppFirstLaunch&quot;;
+ *
+ *      // Name of the shared preferences.
+ *      private final String mPrefsName;
+ *
+ *      // Creates a new instance of AppPreferences manager.
+ *      public AppPreferences(Context context) {
+ *          super(context);
+ *          this.mPrefsName = getSharedPreferencesName();
+ *      }
+ *
+ *      // Stores a boolean flag into shared preferences indicating whether this is a first launch
+ *      // of this app or not.
+ *      public void saveIsAppFirstLaunch(boolean first) {
+ *          putBoolean(mPrefsName + KEY_APP_FIRST_LAUNCH, first);
+ *      }
+ *
+ *      // Returns a boolean flag from shared preferences indicating whether this is a first launch
+ *      // of this app or not.
+ *      public boolean isAppFirstLaunch() {
+ *          return getBoolean(mPrefsName + KEY_APP_FIRST_LAUNCH, true);
+ *      }
+ * }
+ * &lt;/pre&gt;
+ *
+ * @author Martin Albedinsky
+ */
+public abstract class PreferencesManager {
+
+	/**
+	 * Constants ===================================================================================
+	 */
+
+	/**
+	 * Log TAG.
+	 */
+	private static final String TAG = &quot;PreferencesManager&quot;;
+
+	/**
+	 * Wrapped mode: {@link Context#MODE_PRIVATE}
+	 */
+	public static final int MODE_PRIVATE = Context.MODE_PRIVATE;
+
+	/**
+	 * Wrapped mode: {@link Context#MODE_MULTI_PROCESS}
+	 */
+	public static final int MODE_MULTI_PROCESS = 0x0004;
+
+	/**
+	 * Wrapped mode: {@link Context#MODE_ENABLE_WRITE_AHEAD_LOGGING}
+	 */
+	public static final int MODE_ENABLE_WRITE_AHEAD_LOGGING = 0x0008;
+
+	/**
+	 * Wrapped mode: {@link Context#MODE_APPEND}
+	 */
+	public static final int MODE_APPEND = Context.MODE_APPEND;
+
+	/**
+	 * Defines an annotation for determining set of allowed flags for {@link #setMode(int)} method.
+	 */
+	@Retention(RetentionPolicy.SOURCE)
+	@IntDef({MODE_PRIVATE, MODE_MULTI_PROCESS, MODE_ENABLE_WRITE_AHEAD_LOGGING, MODE_APPEND})
+	public @interface Mode {
+	}
+
+	/**
+	 * Flag for generic preference type.
+	 */
+	private static final int GENERIC = 0x00;
+
+	/**
+	 * Flag for integer preference type.
+	 */
+	private static final int INTEGER = 0x01;
+
+	/**
+	 * Flag for float preference type.
+	 */
+	private static final int FLOAT = 0x02;
+
+	/**
+	 * Flag for long preference type.
+	 */
+	private static final int LONG = 0x03;
+
+	/**
+	 * Flag for boolean preference type.
+	 */
+	private static final int BOOLEAN = 0x04;
+
+	/**
+	 * Flag for string preference type.
+	 */
+	private static final int STRING = 0x05;
+
+	/**
+	 * Interface ===================================================================================
+	 */
+
+	/**
+	 * Static members ==============================================================================
+	 */
+
+	/**
+	 * Members =====================================================================================
+	 */
+
+	/**
+	 * Application context used to access preferences.
+	 */
+	protected final Context mContext;
+
+	/**
+	 * Name of the current context's shared preferences into which will be data saved.
+	 * Can be set during runtime or can depends on the type of the saving data.
+	 */
+<span class="fc" id="L181">	private String mSharedPreferencesName = &quot;&quot;;</span>
+
+	/**
+	 * Mode for the current context's shared preferences.
+	 */
+<span class="fc" id="L186">	private int mMode = MODE_PRIVATE;</span>
+
+	/**
+	 * Flag indicating whether caching of the actual values of each shared preference is enabled.
+	 * This means that, if shared preference holds actual value which is same as in shared preferences,
+	 * parsing of that value will be not performed, instead actual value will be obtained from that
+	 * preference object.
+	 */
+<span class="fc" id="L194">	private boolean mCachingEnabled = false;</span>
+
+	/**
+	 * Constructors ================================================================================
+	 */
+
+	/**
+	 * Same as {@link #PreferencesManager(Context, String)} with default name for
+	 * preferences (like the one provided by Android framework).
+	 */
+	protected PreferencesManager(@NonNull Context context) {
+<span class="fc" id="L205">		this(context, defaultSharedPreferencesName(context));</span>
+<span class="fc" id="L206">	}</span>
+
+	/**
+	 * Same as {@link #PreferencesManager(Context, String, int)} with {@link Context#MODE_PRIVATE}
+	 * creation mode.
+	 */
+	protected PreferencesManager(@NonNull Context context, @NonNull String preferencesName) {
+<span class="fc" id="L213">		this(context, preferencesName, MODE_PRIVATE);</span>
+<span class="fc" id="L214">	}</span>
+
+	/**
+	 * Creates a new instance of PreferencesManager with the given shared preferences name and
+	 * preferences file creation mode.
+	 *
+	 * @param context         Valid context to access shared preferences.
+	 * @param preferencesName Name for shared preferences file.
+	 * @param mode            Shared preferences will be created in this mode.
+	 */
+<span class="fc" id="L224">	protected PreferencesManager(@NonNull Context context, @NonNull String preferencesName, @Mode int mode) {</span>
+<span class="fc" id="L225">		this.mContext = context.getApplicationContext();</span>
+<span class="fc" id="L226">		setMode(mode);</span>
+<span class="fc" id="L227">		setSharedPreferencesName(preferencesName);</span>
+<span class="fc" id="L228">	}</span>
+
+	/**
+	 * Methods =====================================================================================
+	 */
+
+	/**
+	 * Creates a default name for shared preferences (like the one created by {@link PreferenceManager}).
+	 *
+	 * @param context Context for which the name should be created.
+	 * @return Default name for shared preferences.
+	 */
+	@NonNull
+	public static String defaultSharedPreferencesName(@NonNull Context context) {
+<span class="fc" id="L242">		return context.getPackageName() + &quot;_preferences&quot;;</span>
+	}
+
+	/**
+	 * Returns the actual file creation mode for shared preferences.
+	 *
+	 * @return The shared preferences file creation mode. {@link #MODE_PRIVATE} by default.
+	 * @see Context
+	 * @see #setMode(int)
+	 */
+	@Mode
+	protected final int getMode() {
+<span class="fc" id="L254">		return mMode;</span>
+	}
+
+	/**
+	 * Sets the actual file creation mode for shared preferences. This mode is used whenever the
+	 * instance of shared preferences is obtained to put/retrieve data to/from them.
+	 *
+	 * @param mode Preferences creation mode.
+	 * @see #getMode()
+	 */
+	protected final void setMode(@Mode int mode) {
+		// Check valid mode.
+<span class="fc bfc" id="L266" title="All 2 branches covered.">		switch (mode) {</span>
+			case MODE_APPEND:
+			case MODE_ENABLE_WRITE_AHEAD_LOGGING:
+			case MODE_MULTI_PROCESS:
+			case MODE_PRIVATE:
+<span class="fc" id="L271">				this.mMode = mode;</span>
+<span class="fc" id="L272">				break;</span>
+			default:
+<span class="fc" id="L274">				Log.e(TAG, &quot;Invalid file creation mode(&quot; + mode + &quot;) for shared preferences.&quot;);</span>
+		}
+<span class="fc" id="L276">	}</span>
+
+	/**
+	 * Sets the actual name for shared preferences. This name is used whenever the instance of shared
+	 * preferences is needed to put/retrieve data to/from it.
+	 * &lt;p&gt;
+	 * &lt;b&gt;Note&lt;/b&gt;, that you can set this to {@code null} to retrieve always default shared preferences.
+	 *
+	 * @param name The desired name for shared preferences.
+	 * @see #getSharedPreferencesName()
+	 * @see #getSharedPreferences()
+	 */
+	protected final void setSharedPreferencesName(@Nullable String name) {
+<span class="fc" id="L289">		this.mSharedPreferencesName = name;</span>
+<span class="fc" id="L290">	}</span>
+
+	/**
+	 * Returns the actual name for shared preferences.
+	 *
+	 * @return Name used to retrieve shared preferences.
+	 * @see #setSharedPreferencesName(String)
+	 */
+	@Nullable
+	protected final String getSharedPreferencesName() {
+<span class="fc" id="L300">		return mSharedPreferencesName;</span>
+	}
+
+	/**
+	 * Returns the instance of SharedPreferences depends on the current file creation mode and
+	 * preferences name. If there is not currently provided name for shared preferences, the default
+	 * one will be used.
+	 *
+	 * @return Instance of shared preferences.
+	 * @see #setMode(int)
+	 * @see #setSharedPreferencesName(String)
+	 */
+	@NonNull
+	public SharedPreferences getSharedPreferences() {
+<span class="fc" id="L314">		return preferences(mContext);</span>
+	}
+
+	/**
+	 * Returns the instance of shared preferences for the actual preferences name and mode. If there
+	 * isn't currently provided name for shared preferences, package name of the given context will
+	 * be used as name for shared preferences.
+	 *
+	 * @param context Actual context.
+	 * @return Shared preferences instance.
+	 */
+	private SharedPreferences preferences(Context context) {
+<span class="fc bfc" id="L326" title="All 2 branches covered.">		if (!TextUtils.isEmpty(mSharedPreferencesName)) {</span>
+<span class="fc" id="L327">			return context.getSharedPreferences(mSharedPreferencesName, mMode);</span>
+		}
+		// Return default shared preferences for the given context.
+<span class="fc" id="L330">		return PreferenceManager.getDefaultSharedPreferences(context);</span>
+	}
+
+	/**
+	 * Enables/disables the caching {@link universum.studios.android.preference.SharedPreference}'s values.
+	 *
+	 * @param enabled {@code True} to enable caching, {@code false} to disable.
+	 * @see #isCachingEnabled()
+	 */
+	protected final void setCachingEnabled(boolean enabled) {
+<span class="fc" id="L340">		this.mCachingEnabled = enabled;</span>
+<span class="fc" id="L341">	}</span>
+
+	/**
+	 * Returns flag indicating whether the caching of {@link universum.studios.android.preference.SharedPreference}'s
+	 * values is enabled or not.
+	 *
+	 * @return {@code True} if caching is enabled, {@code false} otherwise.
+	 * @see #setCachingEnabled(boolean)
+	 */
+	protected final boolean isCachingEnabled() {
+<span class="fc" id="L351">		return mCachingEnabled;</span>
+	}
+
+	/**
+	 * Returns a string key for the specified &lt;var&gt;resId&lt;/var&gt;.
+	 *
+	 * @param resId Resource id of the desired preference key.
+	 * @return String key obtained from the current context.
+	 */
+	@NonNull
+	protected final String key(@StringRes int resId) {
+<span class="fc" id="L362">		return mContext.getString(resId);</span>
+	}
+
+	/**
+	 * Same as {@link SharedPreferences#registerOnSharedPreferenceChangeListener(SharedPreferences.OnSharedPreferenceChangeListener)}.
+	 *
+	 * @param listener Listener callback to register up on the current shared preferences.
+	 * @see #getSharedPreferences()
+	 * @see #unregisterOnSharedPreferenceChangeListener(SharedPreferences.OnSharedPreferenceChangeListener)
+	 */
+	public void registerOnSharedPreferenceChangeListener(@NonNull SharedPreferences.OnSharedPreferenceChangeListener listener) {
+<span class="fc" id="L373">		preferences(mContext).registerOnSharedPreferenceChangeListener(listener);</span>
+<span class="fc" id="L374">	}</span>
+
+	/**
+	 * Same as {@link SharedPreferences#unregisterOnSharedPreferenceChangeListener(SharedPreferences.OnSharedPreferenceChangeListener)}.
+	 *
+	 * @param listener Listener callback to un-register up on the current shared preferences.
+	 * @see #getSharedPreferences()
+	 * @see #registerOnSharedPreferenceChangeListener(SharedPreferences.OnSharedPreferenceChangeListener)
+	 */
+	public void unregisterOnSharedPreferenceChangeListener(@NonNull SharedPreferences.OnSharedPreferenceChangeListener listener) {
+<span class="fc" id="L384">		preferences(mContext).unregisterOnSharedPreferenceChangeListener(listener);</span>
+<span class="fc" id="L385">	}</span>
+
+	/**
+	 * Saves the given {@code int} value into shared preferences.
+	 *
+	 * @param key   The key under which will be the specified value mapped in the shared preferences.
+	 * @param value Value to save.
+	 * @return {@code True} if saving succeeded, {@code false} otherwise.
+	 * @see #getInt(String, int)
+	 * @see #contains(String)
+	 * @see #remove(String)
+	 */
+	public final boolean putInt(@NonNull String key, int value) {
+<span class="fc" id="L398">		return this.putElement(key, value, INTEGER, mContext);</span>
+	}
+
+	/**
+	 * Returns the {@code int} value mapped in the shared preferences under the given key.
+	 *
+	 * @param key      The key under which is the requested value mapped in the shared preferences.
+	 * @param defValue Default value to return if there is no mapping for the specified &lt;var&gt;key&lt;/var&gt; yet.
+	 * @return {@code int} value obtained from the shared preferences or &lt;var&gt;defValue&lt;/var&gt; if
+	 * there is no mapping for the given key.
+	 * @see #putInt(String, int)
+	 */
+	public final int getInt(@NonNull String key, int defValue) {
+<span class="fc" id="L411">		return (int) this.getElement(key, defValue, INTEGER, mContext);</span>
+	}
+
+	/**
+	 * Saves the given {@code float} value into shared preferences.
+	 *
+	 * @param key   The key under which will be the specified value mapped in the shared preferences.
+	 * @param value Value to save.
+	 * @return {@code True} if saving succeeded, {@code false} otherwise.
+	 * @see #getFloat(String, float)
+	 * @see #contains(String)
+	 * @see #remove(String)
+	 */
+	public final boolean putFloat(@NonNull String key, float value) {
+<span class="fc" id="L425">		return this.putElement(key, value, FLOAT, mContext);</span>
+	}
+
+	/**
+	 * Returns the {@code float} value mapped in the shared preferences under the given key.
+	 *
+	 * @param key      The key under which is the requested value mapped in the shared preferences.
+	 * @param defValue Default value to return if there is no mapping for the specified &lt;var&gt;key&lt;/var&gt; yet.
+	 * @return {@code float} value obtained from the shared preferences or
+	 * &lt;var&gt;defValue&lt;/var&gt; if there is no mapping for the specified key.
+	 * @see #putFloat(String, float)
+	 */
+	public final float getFloat(@NonNull String key, float defValue) {
+<span class="fc" id="L438">		return (float) this.getElement(key, defValue, FLOAT, mContext);</span>
+	}
+
+	/**
+	 * Saves the given {@code long} value into shared preferences.
+	 *
+	 * @param key   The key under which will be the specified value mapped in the shared preferences.
+	 * @param value Value to save.
+	 * @return {@code True} if saving succeeded, {@code false} otherwise.
+	 * @see #getLong(String, long)
+	 * @see #contains(String)
+	 * @see #remove(String)
+	 */
+	public final boolean putLong(@NonNull String key, long value) {
+<span class="fc" id="L452">		return this.putElement(key, value, LONG, mContext);</span>
+	}
+
+	/**
+	 * Returns the {@code long} value mapped in the shared preferences under the given key.
+	 *
+	 * @param key      The key under which is the requested value mapped in the shared preferences.
+	 * @param defValue Default value to return if there is no mapping for the specified &lt;var&gt;key&lt;/var&gt; yet.
+	 * @return {@code long} value obtained from the shared preferences or
+	 * &lt;var&gt;defValue&lt;/var&gt; if there is no mapping for the specified key.
+	 * @see #putLong(String, long)
+	 */
+	public final long getLong(@NonNull String key, long defValue) {
+<span class="fc" id="L465">		return (long) this.getElement(key, defValue, LONG, mContext);</span>
+	}
+
+	/**
+	 * Saves the given {@code boolean} value into shared preferences.
+	 *
+	 * @param key   The key under which will be the specified value mapped in the shared preferences.
+	 * @param value Value to save.
+	 * @return {@code True} if saving succeeded, {@code false} otherwise.
+	 * @see #getBoolean(String, boolean)
+	 * @see #contains(String)
+	 * @see #remove(String)
+	 */
+	public final boolean putBoolean(@NonNull String key, boolean value) {
+<span class="fc" id="L479">		return this.putElement(key, value, BOOLEAN, mContext);</span>
+	}
+
+	/**
+	 * Returns the {@code boolean} value mapped in the shared preferences under the given key.
+	 *
+	 * @param key      The key under which is the requested value mapped in the shared preferences.
+	 * @param defValue Default value to return if there is no mapping for the specified &lt;var&gt;key&lt;/var&gt; yet.
+	 * @return {@code boolean} value obtained from the shared preferences
+	 * or &lt;var&gt;defValue&lt;/var&gt; if there is no mapping for the specified key.
+	 * @see #putBoolean(String, boolean)
+	 */
+	public final boolean getBoolean(@NonNull String key, boolean defValue) {
+<span class="fc" id="L492">		return (boolean) this.getElement(key, defValue, BOOLEAN, mContext);</span>
+	}
+
+	/**
+	 * Saves the given {@code String} value into shared preferences.
+	 *
+	 * @param key   The key under which will be the specified value mapped in the shared preferences.
+	 * @param value Value to save.
+	 * @return {@code True} if saving succeeded, {@code false} otherwise.
+	 * @see #getString(String, String)
+	 * @see #contains(String)
+	 * @see #remove(String)
+	 */
+	public final boolean putString(@NonNull String key, @Nullable String value) {
+<span class="fc" id="L506">		return this.putElement(key, value, STRING, mContext);</span>
+	}
+
+	/**
+	 * Returns the {@code String} value mapped in the shared preferences under the given key.
+	 *
+	 * @param key      The key under which is the requested value mapped in the shared preferences.
+	 * @param defValue Default value to return if there is no mapping for the specified &lt;var&gt;key&lt;/var&gt; yet.
+	 * @return {@code String} value obtained from the shared preferences or
+	 * &lt;var&gt;defValue&lt;/var&gt; if there is no mapping for the specified key.
+	 * @see #putString(String, String)
+	 */
+	public final String getString(@NonNull String key, @Nullable String defValue) {
+<span class="fc" id="L519">		return (String) this.getElement(key, defValue, STRING, mContext);</span>
+	}
+
+	/**
+	 * Checks whether there is contained some value for the specified &lt;var&gt;key&lt;/var&gt; in the share
+	 * preferences.
+	 *
+	 * @param key Key of the desired preference of which value to check.
+	 * @return {@code True} if some value for the requested key is stored, {@code false} otherwise.
+	 * @see #remove(String)
+	 */
+	public final boolean contains(@NonNull String key) {
+<span class="nc" id="L531">		return preferences(mContext).contains(key);</span>
+	}
+
+	/**
+	 * Removes current value of a preference with the specified &lt;var&gt;key&lt;/var&gt; from the shared preferences.
+	 *
+	 * @param key Key of the desired preference of which value (entry) should be removed.
+	 * @return {@code True} if current value of shared preference has been removed, {@code false} if
+	 * some error occurred.
+	 * @see #contains(String)
+	 */
+	public final boolean remove(@NonNull String key) {
+<span class="fc" id="L543">		final SharedPreferences prefs = preferences(mContext);</span>
+<span class="fc" id="L544">		final SharedPreferences.Editor editor = prefs.edit();</span>
+<span class="fc" id="L545">		return editor.remove(key).commit();</span>
+	}
+
+	/**
+	 * Saves the given &lt;var&gt;value&lt;/var&gt; using the specified &lt;var&gt;preference&lt;/var&gt; into shared preferences.
+	 *
+	 * @param preference Preference of which value should be saved.
+	 * @param value      The value of preference to save into shared preferences.
+	 * @return {@code True} if save operation succeeded, {@code false} otherwise.
+	 * @see #getPreference(SharedPreference)
+	 * @see #containsPreference(SharedPreference)
+	 * @see #removePreference(SharedPreference)
+	 */
+	public final &lt;Type&gt; boolean putPreference(@NonNull SharedPreference&lt;Type&gt; preference, @Nullable Type value) {
+<span class="fc" id="L559">		preference.attachKey(mContext.getResources()).updateValue(value);</span>
+<span class="fc" id="L560">		final boolean succeed = preference.putIntoPreferences(preferences(mContext));</span>
+<span class="fc bfc" id="L561" title="All 2 branches covered.">		if (!mCachingEnabled) {</span>
+<span class="fc" id="L562">			preference.clear();</span>
+		}
+<span class="fc" id="L564">		return succeed;</span>
+	}
+
+	/**
+	 * Obtains the value of the given &lt;var&gt;preference&lt;/var&gt; from shared preferences.
+	 *
+	 * @param preference Preference of which value should be obtained.
+	 * @return Value of the given shared preference.
+	 * @see #putPreference(SharedPreference, Object)
+	 */
+	public final &lt;Type&gt; Type getPreference(@NonNull SharedPreference&lt;Type&gt; preference) {
+<span class="fc" id="L575">		preference.attachKey(mContext.getResources());</span>
+<span class="fc" id="L576">		final Type value = preference.getFromPreferences(preferences(mContext));</span>
+<span class="fc bfc" id="L577" title="All 2 branches covered.">		if (!mCachingEnabled) {</span>
+<span class="fc" id="L578">			preference.clear();</span>
+		}
+<span class="fc" id="L580">		return value;</span>
+	}
+
+	/**
+	 * Checks whether value of the given &lt;var&gt;preference&lt;/var&gt; is contained within the shared preferences.
+	 *
+	 * @param preference The desired preference of which value to check.
+	 * @return {@code True} if some value for the specified preference is stored, {@code false} otherwise.
+	 * @see #putPreference(SharedPreference, Object)
+	 * @see #getPreference(SharedPreference)
+	 * @see #removePreference(SharedPreference)
+	 */
+	public final boolean containsPreference(@NonNull SharedPreference preference) {
+<span class="nc" id="L593">		preference.attachKey(mContext.getResources());</span>
+<span class="nc" id="L594">		return contains(preference.getKey());</span>
+	}
+
+	/**
+	 * Removes current value of the given &lt;var&gt;preference&lt;/var&gt; from the shared preferences.
+	 *
+	 * @param preference The desired preference of which value (entry) should be removed.
+	 * @return {@code True} if current value of shared preference has been removed, {@code false} if
+	 * some error occurred.
+	 * @see #putPreference(SharedPreference, Object)
+	 * @see #getPreference(SharedPreference)
+	 * @see #containsPreference(SharedPreference)
+	 */
+	public final boolean removePreference(@NonNull SharedPreference preference) {
+<span class="fc" id="L608">		preference.attachKey(mContext.getResources());</span>
+<span class="fc" id="L609">		return remove(preference.getKey());</span>
+	}
+
+	/**
+	 * Saves the given value into shared preferences which will be mapped under the the given key.
+	 *
+	 * @param key     The preference key.
+	 * @param value   The preference value to save.
+	 * @param type    Preference type by which is the given value represented.
+	 * @param context Valid context to retrieve shared preferences.
+	 * @return {@code True} if operation succeeded, {@code false} otherwise.
+	 */
+	private boolean putElement(String key, Object value, int type, Context context) {
+<span class="pc bpc" id="L622" title="1 of 2 branches missed.">		if (TextUtils.isEmpty(key)) {</span>
+<span class="nc" id="L623">			throw new IllegalArgumentException(&quot;Empty preference keys are not allowed!&quot;);</span>
+		}
+		// Put element value into shared preferences.
+<span class="fc" id="L626">		final SharedPreferences prefs = preferences(context);</span>
+<span class="fc" id="L627">		final SharedPreferences.Editor editor = prefs.edit();</span>
+<span class="pc bpc" id="L628" title="2 of 7 branches missed.">		switch (type) {</span>
+			case GENERIC:
+<span class="nc bnc" id="L630" title="All 2 branches missed.">				if (value instanceof Integer) {</span>
+<span class="nc" id="L631">					editor.putInt(key, (Integer) value);</span>
+<span class="nc bnc" id="L632" title="All 2 branches missed.">				} else if (value instanceof Float) {</span>
+<span class="nc" id="L633">					editor.putFloat(key, (Float) value);</span>
+<span class="nc bnc" id="L634" title="All 2 branches missed.">				} else if (value instanceof Long) {</span>
+<span class="nc" id="L635">					editor.putLong(key, (Long) value);</span>
+<span class="nc bnc" id="L636" title="All 2 branches missed.">				} else if (value instanceof Boolean) {</span>
+<span class="nc" id="L637">					editor.putBoolean(key, (Boolean) value);</span>
+<span class="nc bnc" id="L638" title="All 2 branches missed.">				} else if (value instanceof String) {</span>
+<span class="nc" id="L639">					editor.putString(key, (String) value);</span>
+				} else {
+<span class="nc" id="L641">					final String valueType = value.getClass().getSimpleName();</span>
+<span class="nc" id="L642">					throw new IllegalArgumentException(</span>
+							&quot;Failed to save value of(&quot; + valueType + &quot;) for preference with key(&quot; + key + &quot;). &quot; +
+									&quot;Value is not of supported generic (primitive) type.&quot;
+					);
+				}
+				break;
+			case BOOLEAN:
+<span class="fc" id="L649">				editor.putBoolean(key, (Boolean) value);</span>
+<span class="fc" id="L650">				break;</span>
+			case INTEGER:
+<span class="fc" id="L652">				editor.putInt(key, (Integer) value);</span>
+<span class="fc" id="L653">				break;</span>
+			case FLOAT:
+<span class="fc" id="L655">				editor.putFloat(key, (Float) value);</span>
+<span class="fc" id="L656">				break;</span>
+			case LONG:
+<span class="fc" id="L658">				editor.putLong(key, (Long) value);</span>
+<span class="fc" id="L659">				break;</span>
+			case STRING:
+<span class="fc" id="L661">				editor.putString(key, (String) value);</span>
+				break;
+		}
+<span class="fc" id="L664">		return editor.commit();</span>
+	}
+
+	/**
+	 * Retrieves the value that is mapped within shared preferences under the given key.
+	 *
+	 * @param key      The preference key.
+	 * @param defValue Value to retrieve if there is no mapping for the specified key.
+	 * @param type     Preference type by which is the obtaining value represented.
+	 * @param context  Valid context to retrieve shared preferences.
+	 * @return Value of the element or {@code null} if operation failed (invalid key or context).
+	 */
+	private Object getElement(String key, Object defValue, int type, Context context) {
+<span class="pc bpc" id="L677" title="1 of 2 branches missed.">		if (TextUtils.isEmpty(key)) {</span>
+<span class="nc" id="L678">			throw new IllegalArgumentException(&quot;Empty preference keys are not allowed!&quot;);</span>
+		}
+		// Retrieve element value from preferences.
+<span class="fc" id="L681">		final SharedPreferences prefs = preferences(context);</span>
+<span class="pc bpc" id="L682" title="2 of 7 branches missed.">		switch (type) {</span>
+			case GENERIC:
+<span class="nc bnc" id="L684" title="All 2 branches missed.">				if (defValue != null) {</span>
+<span class="nc bnc" id="L685" title="All 2 branches missed.">					if (defValue instanceof Integer) {</span>
+<span class="nc" id="L686">						return prefs.getInt(key, (Integer) defValue);</span>
+<span class="nc bnc" id="L687" title="All 2 branches missed.">					} else if (defValue instanceof Float) {</span>
+<span class="nc" id="L688">						return prefs.getFloat(key, (Float) defValue);</span>
+<span class="nc bnc" id="L689" title="All 2 branches missed.">					} else if (defValue instanceof Long) {</span>
+<span class="nc" id="L690">						return prefs.getLong(key, (Long) defValue);</span>
+<span class="nc bnc" id="L691" title="All 2 branches missed.">					} else if (defValue instanceof Boolean) {</span>
+<span class="nc" id="L692">						return prefs.getBoolean(key, (Boolean) defValue);</span>
+<span class="nc bnc" id="L693" title="All 2 branches missed.">					} else if (defValue instanceof String) {</span>
+<span class="nc" id="L694">						return prefs.getString(key, (String) defValue);</span>
+					} else {
+<span class="nc" id="L696">						throw new IllegalArgumentException(</span>
+								&quot;Failed to retrieve value for preference with key(&quot; + key + &quot;). &quot; +
+										&quot;Value is not of supported generic (primitive) type.&quot;
+						);
+					}
+				}
+				break;
+			case BOOLEAN:
+<span class="fc" id="L704">				return prefs.getBoolean(key, (Boolean) defValue);</span>
+			case INTEGER:
+<span class="fc" id="L706">				return prefs.getInt(key, (Integer) defValue);</span>
+			case FLOAT:
+<span class="fc" id="L708">				return prefs.getFloat(key, (Float) defValue);</span>
+			case LONG:
+<span class="fc" id="L710">				return prefs.getLong(key, (Long) defValue);</span>
+			case STRING:
+<span class="fc" id="L712">				return prefs.getString(key, (String) defValue);</span>
+		}
+<span class="nc" id="L714">		return null;</span>
+	}
+
+	/**
+	 * Inner classes ===============================================================================
+	 */
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span>Generated by the Android Gradle plugin 2.3.0</div></body></html>

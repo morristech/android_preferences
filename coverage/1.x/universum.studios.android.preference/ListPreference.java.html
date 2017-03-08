@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>ListPreference.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debugAndroidTest</a> &gt; <a href="index.source.html" class="el_package">universum.studios.android.preference</a> &gt; <span class="el_source">ListPreference.java</span></div><h1>ListPreference.java</h1><pre class="source lang-java linenums">/*
+ * =================================================================================================
+ *                             Copyright (C) 2016 Universum Studios
+ * =================================================================================================
+ *         Licensed under the Apache License, Version 2.0 or later (further &quot;License&quot; only).
+ * -------------------------------------------------------------------------------------------------
+ * You may use this file only in compliance with the License. More details and copy of this License
+ * you may obtain at
+ *
+ * 		http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * You can redistribute, modify or publish any part of the code written within this file but as it
+ * is described in the License, the software distributed under the License is distributed on an
+ * &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES or CONDITIONS OF ANY KIND.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ * =================================================================================================
+ */
+package universum.studios.android.preference;
+
+import android.content.SharedPreferences;
+import android.support.annotation.CheckResult;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
+
+import java.util.Arrays;
+import java.util.List;
+
+/**
+ * A {@link SharedPreference} implementation that may be used to manage (store/retrieve) a {@link List}
+ * preference value within {@link SharedPreferences}.
+ *
+ * @param &lt;T&gt; A type of the items within a list that can this implementation of preference hold and
+ *            manage its storing/retrieving.
+ * @author Martin Albedinsky
+ * @see ArrayPreference
+ */
+public final class ListPreference&lt;T&gt; extends SharedPreference&lt;List&lt;T&gt;&gt; {
+
+	/**
+	 * Members =====================================================================================
+	 */
+
+	/**
+	 * Class of components stored within a list managed by this preference.
+	 */
+	private final Class&lt;T&gt; mComponentType;
+
+	/**
+	 * Constructors ================================================================================
+	 */
+
+	/**
+	 * Creates a new instance of universum.studios.android.preference.ListPreference.
+	 *
+	 * @param componentType Class of components that will be presented within a list managed by the
+	 *                      new list preference.
+	 * @see SharedPreference#SharedPreference(String, Object)
+	 */
+	public ListPreference(@NonNull String key, @NonNull Class&lt;T&gt; componentType, @Nullable List&lt;T&gt; defValue) {
+<span class="fc" id="L62">		super(key, defValue);</span>
+<span class="fc" id="L63">		this.mComponentType = componentType;</span>
+<span class="fc" id="L64">	}</span>
+
+	/**
+	 * Creates a new instance of universum.studios.android.preference.ListPreference.
+	 *
+	 * @param componentType Class of components that will be presented within a list managed by the
+	 *                      new list preference.
+	 * @see SharedPreference#SharedPreference(int, Object)
+	 */
+	public ListPreference(@StringRes int keyResId, @NonNull Class&lt;T&gt; componentType, @Nullable List&lt;T&gt; defValue) {
+<span class="fc" id="L74">		super(keyResId, defValue);</span>
+<span class="fc" id="L75">		this.mComponentType = componentType;</span>
+<span class="fc" id="L76">	}</span>
+
+	/**
+	 * Methods =====================================================================================
+	 */
+
+	/**
+	 * @see #putIntoPreferences(SharedPreferences, String, List, Class)
+	 */
+	@Override
+	@CheckResult
+	protected boolean onPutIntoPreferences(@NonNull SharedPreferences preferences) {
+<span class="fc" id="L88">		return putIntoPreferences(preferences, mKey, mValue, mComponentType);</span>
+	}
+
+	/**
+	 * Saves the given &lt;var&gt;list&lt;/var&gt; into the given shared &lt;var&gt;preferences&lt;/var&gt;.
+	 *
+	 * @param preferences   The instance of shared preferences into which will be the given list saved.
+	 * @param key           The key under which will be the saved list mapped in the shared preferences.
+	 * @param list          List to save into preferences.
+	 * @param componentType Class of components presented within the given list.
+	 * @param &lt;T&gt;           Type of items which are presented within the given list.
+	 * @return {@code True} if saving has succeeded, {@code false} otherwise.
+	 */
+	@CheckResult
+	@SuppressWarnings(&quot;unchecked&quot;)
+	public static &lt;T&gt; boolean putIntoPreferences(@NonNull SharedPreferences preferences, @NonNull String key, @Nullable List&lt;T&gt; list, @NonNull Class&lt;T&gt; componentType) {
+<span class="fc" id="L104">		final SharedPreferences.Editor editor = preferences.edit();</span>
+<span class="fc bfc" id="L105" title="All 2 branches covered.">		if (list != null) {</span>
+<span class="fc" id="L106">			final T[] array = (T[]) ArrayPreference.createArrayInSize(componentType, list.size());</span>
+<span class="fc bfc" id="L107" title="All 2 branches covered.">			if (array != null) {</span>
+<span class="fc" id="L108">				list.toArray(array);</span>
+<span class="fc" id="L109">				return ArrayPreference.putIntoPreferences(preferences, key, array);</span>
+			}
+<span class="fc" id="L111">			final String componentName = componentType.getSimpleName();</span>
+<span class="fc" id="L112">			throw new IllegalArgumentException(</span>
+					&quot;Failed to put list of(&quot; + componentName + &quot;) into shared preferences. &quot; +
+							&quot;Only lists of primitive types or theirs boxed representations including String are supported.&quot;
+			);
+		} else {
+<span class="fc" id="L117">			editor.putString(key, null);</span>
+		}
+<span class="fc" id="L119">		return editor.commit();</span>
+	}
+
+	/**
+	 * @see #getFromPreferences(SharedPreferences, String, List)
+	 */
+	@Nullable
+	@Override
+	protected List&lt;T&gt; onGetFromPreferences(@NonNull SharedPreferences preferences) {
+<span class="fc" id="L128">		return getFromPreferences(preferences, mKey, mDefaultValue);</span>
+	}
+
+	/**
+	 * Returns a {@link List} mapped in the given shared &lt;var&gt;preferences&lt;/var&gt; under the specified
+	 * &lt;var&gt;key&lt;/var&gt;.
+	 *
+	 * @param preferences The instance of shared preferences into which was the requested list
+	 *                    before saved.
+	 * @param key         The key under which is the saved list mapped in the shared preferences.
+	 * @param defValue    Default list to return if there is no mapping for the specified &lt;var&gt;key&lt;/var&gt;
+	 *                    yet.
+	 * @param &lt;T&gt;         Type of an items which should be presented within the obtained list.
+	 * @return An instance of the requested list or &lt;var&gt;defValue&lt;/var&gt; if there is no mapping
+	 * for the specified key.
+	 * @throws ClassCastException       If value stored under the specified key does not represents
+	 *                                  an array/a list.
+	 * @throws IllegalArgumentException If type of the requested list is not supported by the
+	 *                                  Preferences library.
+	 * @throws IllegalStateException    If the requested list was not stored by the Preferences  library.
+	 */
+	@SuppressWarnings(&quot;unchecked&quot;)
+	public static &lt;T&gt; List&lt;T&gt; getFromPreferences(@NonNull SharedPreferences preferences, @NonNull String key, @Nullable List&lt;T&gt; defValue) {
+<span class="fc" id="L151">		final String value = preferences.getString(key, null);</span>
+<span class="fc bfc" id="L152" title="All 2 branches covered.">		if (value != null) {</span>
+			try {
+<span class="fc" id="L154">				final T[] array = ArrayPreference.getFromPreferences(preferences, key, null);</span>
+<span class="fc" id="L155">				return Arrays.asList(array);</span>
+<span class="nc" id="L156">			} catch (ClassCastException e) {</span>
+<span class="nc" id="L157">				final String arrayValue = ArrayPreference.extractArrayValueFromPreferenceValue(value);</span>
+<span class="nc" id="L158">				throw new ClassCastException(</span>
+						&quot;Cannot obtain a list for the key(&quot; + key + &quot;) from shared preferences. &quot; +
+								&quot;Value(&quot; + arrayValue + &quot;) is not a list!&quot;
+				);
+<span class="fc" id="L162">			} catch (IllegalArgumentException e) {</span>
+<span class="fc" id="L163">				throw new IllegalArgumentException(</span>
+						&quot;Failed to obtain list for the key(&quot; + key + &quot;) from shared preferences. &quot; +
+								&quot;Only lists of primitive types or theirs boxed representations including String are supported.&quot;
+				);
+<span class="fc" id="L167">			} catch (IllegalStateException e) {</span>
+<span class="fc" id="L168">				throw new IllegalStateException(</span>
+						&quot;Trying to obtain a list for the key(&quot; + key + &quot;) from shared preferences not saved by the Preferences library.&quot;
+				);
+			}
+		}
+<span class="fc" id="L173">		return defValue;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span>Generated by the Android Gradle plugin 2.3.0</div></body></html>
