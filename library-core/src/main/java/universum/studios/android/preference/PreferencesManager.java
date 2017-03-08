@@ -91,10 +91,6 @@ import java.lang.annotation.RetentionPolicy;
 public abstract class PreferencesManager {
 
 	/**
-	 * Interface ===================================================================================
-	 */
-
-	/**
 	 * Constants ===================================================================================
 	 */
 
@@ -102,14 +98,6 @@ public abstract class PreferencesManager {
 	 * Log TAG.
 	 */
 	private static final String TAG = "PreferencesManager";
-
-	/**
-	 * Defines an annotation for determining set of allowed flags for {@link #setMode(int)} method.
-	 */
-	@Retention(RetentionPolicy.SOURCE)
-	@IntDef({MODE_PRIVATE, MODE_MULTI_PROCESS, MODE_ENABLE_WRITE_AHEAD_LOGGING, MODE_APPEND})
-	public @interface Mode {
-	}
 
 	/**
 	 * Wrapped mode: {@link Context#MODE_PRIVATE}
@@ -130,6 +118,14 @@ public abstract class PreferencesManager {
 	 * Wrapped mode: {@link Context#MODE_APPEND}
 	 */
 	public static final int MODE_APPEND = Context.MODE_APPEND;
+
+	/**
+	 * Defines an annotation for determining set of allowed flags for {@link #setMode(int)} method.
+	 */
+	@Retention(RetentionPolicy.SOURCE)
+	@IntDef({MODE_PRIVATE, MODE_MULTI_PROCESS, MODE_ENABLE_WRITE_AHEAD_LOGGING, MODE_APPEND})
+	public @interface Mode {
+	}
 
 	/**
 	 * Flag for generic preference type.
@@ -160,6 +156,10 @@ public abstract class PreferencesManager {
 	 * Flag for string preference type.
 	 */
 	private static final int STRING = 0x05;
+
+	/**
+	 * Interface ===================================================================================
+	 */
 
 	/**
 	 * Static members ==============================================================================
