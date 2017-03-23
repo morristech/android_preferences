@@ -48,6 +48,12 @@ android {
                 '../library-collection/src/main/java'
         ]
         debug.java.srcDirs = release.java.srcDirs
+        androidTest.java.srcDirs = [
+                '../library/src/androidTest/java',
+                '../library-core/src/androidTest/java',
+                '../library-common/src/androidTest/java',
+                '../library-collection/src/androidTest/java'
+        ]
     }
 
     compileOptions {

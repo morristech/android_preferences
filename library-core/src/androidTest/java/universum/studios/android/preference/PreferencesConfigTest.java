@@ -19,7 +19,6 @@
 package universum.studios.android.preference;
 
 import android.support.test.runner.AndroidJUnit4;
-import android.test.AndroidTestCase;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,7 +30,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
  * @author Martin Albedinsky
  */
 @RunWith(AndroidJUnit4.class)
-public class PreferencesConfigTest extends AndroidTestCase {
+public class PreferencesConfigTest {
 
 	@SuppressWarnings("unused")
 	private static final String TAG = "PreferencesConfigTest";
