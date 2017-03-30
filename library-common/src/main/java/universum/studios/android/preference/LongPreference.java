@@ -25,8 +25,8 @@ import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 
 /**
- * A {@link SharedPreference} implementation that may be used to manage (store/retrieve) a {@link Long}
- * preference value within {@link SharedPreferences}.
+ * A {@link SharedPreference} implementation that may be used to persist a {@link Long} value via
+ * {@link SharedPreferences}.
  *
  * @author Martin Albedinsky
  * @see BooleanPreference
@@ -51,10 +51,14 @@ public final class LongPreference extends SharedPreference<Long> {
 	}
 
 	/**
+	 * <b>This constructor has been deprecated and will be removed in the next release.</b>
+	 * <p>
 	 * Creates a new instance of LongPreference.
 	 *
 	 * @see SharedPreference#SharedPreference(int, Object)
+	 * @deprecated Use {@link #LongPreference(String, Long)} instead.
 	 */
+	@Deprecated
 	public LongPreference(@StringRes int keyResId, @NonNull Long defValue) {
 		super(keyResId, defValue);
 	}

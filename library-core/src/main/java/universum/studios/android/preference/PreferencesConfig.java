@@ -26,7 +26,7 @@ import android.util.Log;
  * Configuration options for the Preferences library.
  *
  * @author Martin Albedinsky
- * @deprecated No more used.
+ * @deprecated To control library logs use todo:
  */
 @Deprecated
 public final class PreferencesConfig {

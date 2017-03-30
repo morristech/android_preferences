@@ -26,10 +26,10 @@ import android.support.annotation.StringRes;
 import android.text.TextUtils;
 
 /**
- * A {@link SharedPreference} implementation that may be used to manage (store/retrieve) an {@link Enum}
- * preference value within {@link SharedPreferences}.
+ * A {@link SharedPreference} implementation that may be used to persist an {@link Enum} value via
+ * {@link SharedPreferences}.
  *
- * @param <E> A type of the enum implementation of which value will this preference manage.
+ * @param <E> Type of the enum implementation of which value should be persisted.
  * @author Martin Albedinsky
  * @see BooleanPreference
  * @see IntegerPreference
@@ -53,10 +53,14 @@ public final class EnumPreference<E extends Enum> extends SharedPreference<E> {
 	}
 
 	/**
+	 * <b>This constructor has been deprecated and will be removed in the next release.</b>
+	 * <p>
 	 * Creates a new instance of EnumPreference.
 	 *
 	 * @see SharedPreference#SharedPreference(int, Object)
+	 * @deprecated Use {@link #EnumPreference(String, Enum)} instead.
 	 */
+	@Deprecated
 	public EnumPreference(@StringRes int keyResId, @Nullable E defValue) {
 		super(keyResId, defValue);
 	}
@@ -79,7 +83,7 @@ public final class EnumPreference<E extends Enum> extends SharedPreference<E> {
 	@Override
 	@SuppressWarnings("unchecked")
 	protected E onGetFromPreferences(@NonNull SharedPreferences preferences) {
-		final String enumName = preferences.getString(mKey, mDefaultValue != null ? mDefaultValue.name() : "");
-		return !TextUtils.isEmpty(enumName) ? (E) E.valueOf(mDefaultValue.getClass(), enumName) : null;
+		final String enumName = preferences.getString(mKey, mDefaultValue == null ? "" : mDefaultValue.name());
+		return TextUtils.isEmpty(enumName) ? null : (E) E.valueOf(mDefaultValue.getClass(), enumName);
 	}
 }
