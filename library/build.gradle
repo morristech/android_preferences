@@ -44,6 +44,9 @@ android {
     sourceSets {
         release.java.srcDirs = [
                 '../library-core/src/main/java',
+                '../library-cache/src/main/java',
+                '../library-secure/src/main/java',
+                '../library-manager/src/main/java',
                 '../library-common/src/main/java',
                 '../library-collection/src/main/java'
         ]
@@ -51,6 +54,9 @@ android {
         androidTest.java.srcDirs = [
                 '../library/src/androidTest/java',
                 '../library-core/src/androidTest/java',
+                '../library-cache/src/androidTest/java',
+                '../library-secure/src/androidTest/java',
+                '../library-manager/src/androidTest/java',
                 '../library-common/src/androidTest/java',
                 '../library-collection/src/androidTest/java'
         ]
