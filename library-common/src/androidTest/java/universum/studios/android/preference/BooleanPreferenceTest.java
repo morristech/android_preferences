@@ -18,54 +18,48 @@
  */
 package universum.studios.android.preference;
 
-import android.content.SharedPreferences;
-import android.support.annotation.Nullable;
+import android.support.test.runner.AndroidJUnit4;
 
-import universum.studios.android.preference.inner.ContextBaseTest;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import universum.studios.android.test.PreferencesTest;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * @author Martin Albedinsky
  */
-class SharedPreferenceBaseTest<T> extends ContextBaseTest {
+@RunWith(AndroidJUnit4.class)
+public final class BooleanPreferenceTest extends PreferencesTest {
 
 	@SuppressWarnings("unused")
-	private static final String TAG = "PreferenceTestCase";
-
-	static final String DEF_PREF_KEY = "key";
-
-	final String PREF_KEY;
-	final T PREF_DEF_VALUE;
-	PreferencesManager preferencesManager;
-	SharedPreferences sharedPreferences;
-	SharedPreference<T> preference;
-
-	SharedPreferenceBaseTest() {
-		this(DEF_PREF_KEY, null);
-	}
-
-	SharedPreferenceBaseTest(T defValue) {
-		this(DEF_PREF_KEY, defValue);
-	}
-
-	SharedPreferenceBaseTest(String key, T defValue) {
-		this.PREF_KEY = key;
-		this.PREF_DEF_VALUE = defValue;
-	}
+	private static final String TAG = "BooleanPreferenceTest";
+	private static final String PREF_KEY = "PREFERENCE.Boolean";
 
 	@Override
 	public void beforeTest() throws Exception {
 		super.beforeTest();
-		this.preferencesManager = new PreferencesManagerTest.ManagerImpl(mContext);
-		this.sharedPreferences = preferencesManager.getSharedPreferences();
-		this.preference = onCreatePreference(PREF_KEY, PREF_DEF_VALUE);
-		if (preference != null) {
-			// Update the current value within shared preferences so we can always test with the clear 'account'.
-			preference.putIntoPreferences(sharedPreferences);
-		}
+		// Ensure that we have a clean slate before each test.
+		mPreferences.edit().remove(PREF_KEY).commit();
 	}
 
-	@Nullable
-	SharedPreference<T> onCreatePreference(String key, T defValue) {
-		return null;
+	@Test
+	public void testInstantiation() {
+		final BooleanPreference preference = new BooleanPreference(PREF_KEY, true);
+		assertThat(preference.getKey(), is(PREF_KEY));
+		assertThat(preference.getValue(), is(Boolean.TRUE));
+		assertThat(preference.getDefaultValue(), is(Boolean.TRUE));
+	}
+
+	@Test
+	public void testPutAndGet() {
+		final BooleanPreference preference = new BooleanPreference(PREF_KEY, true);
+		assertThat(preference.getFromPreferences(mPreferences), is(Boolean.TRUE));
+		preference.updateValue(false);
+		assertThat(preference.putIntoPreferences(mPreferences), is(Boolean.TRUE));
+		preference.clear();
+		assertThat(preference.getFromPreferences(mPreferences), is(Boolean.FALSE));
 	}
 }

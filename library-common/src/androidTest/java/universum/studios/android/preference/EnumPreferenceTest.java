@@ -18,13 +18,12 @@
  */
 package universum.studios.android.preference;
 
-import android.support.annotation.Nullable;
 import android.support.test.runner.AndroidJUnit4;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import universum.studios.android.preference.test.R;
+import universum.studios.android.test.PreferencesTest;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -33,33 +32,39 @@ import static org.hamcrest.MatcherAssert.assertThat;
  * @author Martin Albedinsky
  */
 @RunWith(AndroidJUnit4.class)
-public final class IntegerPreferenceTest extends SharedPreferenceBaseTest<Integer> {
+public final class EnumPreferenceTest extends PreferencesTest {
 
 	@SuppressWarnings("unused")
-	private static final String TAG = "IntegerPreferenceTest";
+	private static final String TAG = "EnumPreferenceTest";
+	private static final String PREF_KEY = "PREFERENCE.Enum";
 
-	public IntegerPreferenceTest() {
-		super("PREFERENCE.Integer", 13);
+	@SuppressWarnings("unused")
+	private enum TestEnum {
+		WINTER, SPRING, SUMMER, AUTUMN
 	}
 
-	@Nullable
 	@Override
-	SharedPreference<Integer> onCreatePreference(String key, Integer defValue) {
-		return new IntegerPreference(key, defValue);
+	public void beforeTest() throws Exception {
+		super.beforeTest();
+		// Ensure that we have a clean slate before each test.
+		mPreferences.edit().remove(PREF_KEY).commit();
 	}
 
 	@Test
 	public void testInstantiation() {
-		new IntegerPreference(DEF_PREF_KEY, 0);
-		new IntegerPreference(R.string.test_preference_key, 0);
+		final EnumPreference<TestEnum> preference = new EnumPreference<>(PREF_KEY, TestEnum.SPRING);
+		assertThat(preference.getKey(), is(PREF_KEY));
+		assertThat(preference.getValue(), is(TestEnum.SPRING));
+		assertThat(preference.getDefaultValue(), is(TestEnum.SPRING));
 	}
 
 	@Test
-	public void testOnPutObtainIntoFromPreferences() {
-		assertThat(preference.getValue(), is(PREF_DEF_VALUE));
-		preference.updateValue(26);
-		assertThat(preference.onPutIntoPreferences(sharedPreferences), is(true));
+	public void testPutAndGet() {
+		final EnumPreference<TestEnum> preference = new EnumPreference<>(PREF_KEY, TestEnum.SPRING);
+		assertThat(preference.getFromPreferences(mPreferences), is(TestEnum.SPRING));
+		preference.updateValue(TestEnum.AUTUMN);
+		assertThat(preference.putIntoPreferences(mPreferences), is(true));
 		preference.clear();
-		assertThat(preference.onGetFromPreferences(sharedPreferences), is(26));
+		assertThat(preference.getFromPreferences(mPreferences), is(TestEnum.AUTUMN));
 	}
 }

@@ -18,7 +18,6 @@
  */
 package universum.studios.android.preference;
 
-import android.support.annotation.Nullable;
 import android.support.test.runner.AndroidJUnit4;
 import android.text.TextUtils;
 
@@ -30,7 +29,7 @@ import org.junit.runner.RunWith;
 import java.util.Arrays;
 import java.util.Date;
 
-import universum.studios.android.preference.test.R;
+import universum.studios.android.test.PreferencesTest;
 
 import static junit.framework.Assert.assertEquals;
 import static org.hamcrest.CoreMatchers.is;
@@ -42,25 +41,28 @@ import static org.hamcrest.core.IsNull.nullValue;
  */
 @RunWith(AndroidJUnit4.class)
 @SuppressWarnings("ResourceType")
-public final class ArrayPreferenceTest extends SharedPreferenceBaseTest<Object> {
+public final class ArrayPreferenceTest extends PreferencesTest {
 
 	@SuppressWarnings("unused")
 	private static final String TAG = "ArrayPreferenceTest";
+	private static final String PREF_KEY = "PREFERENCE.Array";
 
-	public ArrayPreferenceTest() {
-		super("PREFERENCE.Array", null);
+	private enum TestEnum {
+		WINTER, SPRING, SUMMER, AUTUMN
 	}
 
-	@Nullable
 	@Override
-	SharedPreference<Object> onCreatePreference(String key, Object defValue) {
-		return new ArrayPreference<>(key, defValue);
+	public void beforeTest() throws Exception {
+		super.beforeTest();
+		// Ensure that we have a clean slate before each test.
+		mPreferences.edit().remove(PREF_KEY).commit();
 	}
 
 	@Test
 	public void testInstantiation() {
-		new ArrayPreference<>(PREF_KEY, null);
-		new ArrayPreference<>(R.string.test_preference_key, null);
+		final ArrayPreference<String> preference = new ArrayPreference<>(PREF_KEY, null);
+		assertThat(preference.getKey(), is(PREF_KEY));
+		assertThat(preference.getDefaultValue(), is(nullValue()));
 	}
 
 	@Test
@@ -118,129 +120,128 @@ public final class ArrayPreferenceTest extends SharedPreferenceBaseTest<Object> 
 	}
 
 	@Test
-	public void testPutObtainBooleanArrayIntoFromPreferences() {
+	public void testPutAndGetBooleanArray() {
 		// Test storing and obtaining of primitive array.
 		boolean[] firstPrimitiveArray = (boolean[]) createTestableArrayOf(boolean.class);
-		boolean[] secondPrimitiveArray = putObtainArrayIntoFromPreferences(firstPrimitiveArray);
+		boolean[] secondPrimitiveArray = putAndGetArray(firstPrimitiveArray);
 		assertThat(secondPrimitiveArray, is(firstPrimitiveArray));
 		// Test storing and obtaining of boxed array.
-		innerTestPutObtainArrayIntoFromPreferences(Boolean.class);
+		innerTestPutAndGetArray(Boolean.class);
 	}
 
 	@Test
-	public void testPutObtainByteArrayIntoFromPreferences() {
+	public void testPutAndGetByteArray() {
 		// Test storing and obtaining of primitive array.
 		byte[] firstPrimitiveArray = (byte[]) createTestableArrayOf(byte.class);
-		byte[] secondPrimitiveArray = putObtainArrayIntoFromPreferences(firstPrimitiveArray);
+		byte[] secondPrimitiveArray = putAndGetArray(firstPrimitiveArray);
 		assertThat(secondPrimitiveArray, is(firstPrimitiveArray));
 		// Test storing and obtaining of boxed array.
-		innerTestPutObtainArrayIntoFromPreferences(Byte.class);
+		innerTestPutAndGetArray(Byte.class);
 	}
 
 	@Test
-	public void testPutObtainCharArrayIntoFromPreferences() {
+	public void testPutAndGetCharArray() {
 		// fixme: not working
 		/*// Test storing and obtaining of primitive array.
 		char[] firstPrimitiveArray = (char[]) createTestableArrayOf(char.class);
-		char[] secondPrimitiveArray = putObtainArrayIntoFromPreferences(firstPrimitiveArray);
+		char[] secondPrimitiveArray = putAndGetArray(firstPrimitiveArray);
 		assertThat(secondPrimitiveArray, is(firstPrimitiveArray));
 		// Test storing and obtaining of boxed array.
-		innerTestPutObtainArrayIntoFromPreferences(Character[].class, Character.class);*/
+		innerTestPutAndGetArray(Character[].class, Character.class);*/
 	}
 
 	@Test
-	public void testPutObtainShortArrayIntoFromPreferences() {
+	public void testPutAndGetShortArray() {
 		// Test storing and obtaining of primitive array.
 		short[] firstPrimitiveArray = (short[]) createTestableArrayOf(short.class);
-		short[] secondPrimitiveArray = putObtainArrayIntoFromPreferences(firstPrimitiveArray);
+		short[] secondPrimitiveArray = putAndGetArray(firstPrimitiveArray);
 		assertThat(secondPrimitiveArray, is(firstPrimitiveArray));
 		// Test storing and obtaining of boxed array.
-		innerTestPutObtainArrayIntoFromPreferences(Short.class);
+		innerTestPutAndGetArray(Short.class);
 	}
 
 	@Test
-	public void testPutObtainIntegerArrayIntoFromPreferences() {
+	public void testPutAndGetIntegerArray() {
 		// Test storing and obtaining of primitive array.
 		int[] firstPrimitiveArray = (int[]) createTestableArrayOf(int.class);
-		int[] secondPrimitiveArray = putObtainArrayIntoFromPreferences(firstPrimitiveArray);
+		int[] secondPrimitiveArray = putAndGetArray(firstPrimitiveArray);
 		assertThat(secondPrimitiveArray, is(firstPrimitiveArray));
 		// Test storing and obtaining of boxed array.
-		innerTestPutObtainArrayIntoFromPreferences(Integer.class);
+		innerTestPutAndGetArray(Integer.class);
 	}
 
 	@Test
-	public void testPutObtainFloatArrayIntoFromPreferences() {
+	public void testPutAndGetFloatArray() {
 		// Test storing and obtaining of primitive array.
 		float[] firstPrimitiveArray = (float[]) createTestableArrayOf(float.class);
-		float[] secondPrimitiveArray = putObtainArrayIntoFromPreferences(firstPrimitiveArray);
+		float[] secondPrimitiveArray = putAndGetArray(firstPrimitiveArray);
 		assertThat(secondPrimitiveArray, is(firstPrimitiveArray));
 		// Test storing and obtaining of boxed array.
-		innerTestPutObtainArrayIntoFromPreferences(Float.class);
+		innerTestPutAndGetArray(Float.class);
 	}
 
 	@Test
-	public void testPutObtainLongArrayIntoFromPreferences() {
+	public void testPutAndGetLongArray() {
 		// Test storing and obtaining of primitive array.
 		long[] firstPrimitiveArray = (long[]) createTestableArrayOf(long.class);
-		long[] secondPrimitiveArray = putObtainArrayIntoFromPreferences(firstPrimitiveArray);
+		long[] secondPrimitiveArray = putAndGetArray(firstPrimitiveArray);
 		assertThat(secondPrimitiveArray, is(firstPrimitiveArray));
 		// Test storing and obtaining of boxed array.
-		innerTestPutObtainArrayIntoFromPreferences(Long.class);
+		innerTestPutAndGetArray(Long.class);
 	}
 
 	@Test
-	public void testPutObtainDoubleArrayIntoFromPreferences() {
+	public void testPutAndGetDoubleArray() {
 		// Test storing and obtaining of primitive array.
 		double[] firstPrimitiveArray = (double[]) createTestableArrayOf(double.class);
-		double[] secondPrimitiveArray = putObtainArrayIntoFromPreferences(firstPrimitiveArray);
+		double[] secondPrimitiveArray = putAndGetArray(firstPrimitiveArray);
 		assertThat(secondPrimitiveArray, is(firstPrimitiveArray));
 		// Test storing and obtaining of boxed array.
-		innerTestPutObtainArrayIntoFromPreferences(Double.class);
+		innerTestPutAndGetArray(Double.class);
 	}
 
 	@Test
-	public void testPutObtainStringArrayIntoFromPreferences() {
-		innerTestPutObtainArrayIntoFromPreferences(String.class);
+	public void testPutAndGetStringArray() {
+		innerTestPutAndGetArray(String.class);
 	}
 
 	@Test
-	public void testPutObtainArrayWithNullItemIntoFromPreferences() {
+	public void testPutAndGetArrayWithNullItem() {
 		// fixme: not working
 		/*final String[] firstArray = new String[] {"text", null, null};
-		final String[] secondArray = putObtainArrayIntoFromPreferences(firstArray);
+		final String[] secondArray = putAndGetArray(firstArray);
 		assertArraysEquals(String[].class, firstArray, secondArray);*/
 	}
 
 	@SuppressWarnings("unchecked")
-	private <A, T> void innerTestPutObtainArrayIntoFromPreferences(Class<T> itemClass) {
+	private <A, T> void innerTestPutAndGetArray(Class<T> itemClass) {
 		final T[] firstArray = (T[]) createTestableArrayOf(itemClass);
-		assertThat(putObtainArrayIntoFromPreferences(firstArray), is(firstArray));
+		assertThat(putAndGetArray(firstArray), is(firstArray));
 	}
 
-	@SuppressWarnings("unchecked")
-	private <A> A putObtainArrayIntoFromPreferences(A array) {
+	private <A> A putAndGetArray(A array) {
 		final ArrayPreference<A> preference = new ArrayPreference<>(PREF_KEY, null);
 		preference.updateValue(array);
-		preference.onPutIntoPreferences(sharedPreferences);
+		preference.onPutIntoPreferences(mPreferences);
 		preference.clear();
-		return preference.onGetFromPreferences(sharedPreferences);
+		return preference.onGetFromPreferences(mPreferences);
 	}
 
 	@Test
-	public void testObtainNotSavedArrayFromPreferences() {
-		assertThat(ArrayPreference.getFromPreferences(sharedPreferences, PREF_KEY, null), is(nullValue()));
+	public void testGetNotPersistedArray() {
+		assertThat(ArrayPreference.getFromPreferences(mPreferences, PREF_KEY, null), is(nullValue()));
 	}
 
 	@Test
-	public void testPutObtainNullArrayIntoFromPreferences() {
-		ArrayPreference.putIntoPreferences(sharedPreferences, PREF_KEY, null);
-		assertThat(ArrayPreference.getFromPreferences(sharedPreferences, PREF_KEY, null), is(nullValue()));
+	public void testPutAndGetNullArray() {
+		ArrayPreference.putIntoPreferences(mPreferences, PREF_KEY, null);
+		assertThat(ArrayPreference.getFromPreferences(mPreferences, PREF_KEY, null), is(nullValue()));
 	}
 
 	@Test
-	public void testPutObtainUnsupportedArrayIntoFromPreferences() {
+	public void testPutAndGetUnsupportedArray() {
 		try {
-			ArrayPreference.putIntoPreferences(sharedPreferences, PREF_KEY, new Date[]{new Date(0)});
+			ArrayPreference.putIntoPreferences(mPreferences, PREF_KEY, new Date[]{new Date(0)});
 			throw new AssertionError("No exception thrown.");
 		} catch (IllegalArgumentException e) {
 			assertThat(
@@ -249,12 +250,9 @@ public final class ArrayPreferenceTest extends SharedPreferenceBaseTest<Object> 
 							"Only arrays of primitive types or theirs boxed representations including String are supported.")
 			);
 		}
-
-		final StringPreference tmpPreference = new StringPreference(PREF_KEY, null);
-		tmpPreference.updateValue("<Date[]>[]");
-		tmpPreference.putIntoPreferences(sharedPreferences);
+		mPreferences.edit().putString(PREF_KEY, "<Date[]>[]").commit();
 		try {
-			ArrayPreference.getFromPreferences(sharedPreferences, PREF_KEY, null);
+			ArrayPreference.getFromPreferences(mPreferences, PREF_KEY, null);
 			throw new AssertionError();
 		} catch (IllegalArgumentException e) {
 			assertThat(
@@ -266,13 +264,10 @@ public final class ArrayPreferenceTest extends SharedPreferenceBaseTest<Object> 
 	}
 
 	@Test
-	public void testObtainNotArrayFromPreferences() {
-		final StringPreference tmpPreference = new StringPreference(PREF_KEY, null);
-		tmpPreference.updateValue("<String[]>text,text");
-		tmpPreference.putIntoPreferences(sharedPreferences);
-
+	public void testGetArrayNotPersistedByLibrary1() {
+		mPreferences.edit().putString(PREF_KEY, "<String[]>text,text").commit();
 		try {
-			ArrayPreference.getFromPreferences(sharedPreferences, PREF_KEY, null);
+			ArrayPreference.getFromPreferences(mPreferences, PREF_KEY, null);
 		} catch (IllegalStateException e) {
 			assertThat(
 					e.getMessage(),
@@ -284,13 +279,10 @@ public final class ArrayPreferenceTest extends SharedPreferenceBaseTest<Object> 
 	}
 
 	@Test
-	public void testObtainArrayNotStoredByLibraryFromPreferences() {
-		final StringPreference tmpPreference = new StringPreference(PREF_KEY, null);
-		tmpPreference.updateValue("[text,text,text]");
-		tmpPreference.putIntoPreferences(sharedPreferences);
-
+	public void testGetArrayNotPersistedByLibrary2() {
+		mPreferences.edit().putString(PREF_KEY, "[text,text,text]").commit();
 		try {
-			ArrayPreference.getFromPreferences(sharedPreferences, PREF_KEY, null);
+			ArrayPreference.getFromPreferences(mPreferences, PREF_KEY, null);
 		} catch (IllegalStateException e) {
 			assertThat(
 					e.getMessage(),
@@ -338,7 +330,7 @@ public final class ArrayPreferenceTest extends SharedPreferenceBaseTest<Object> 
 		} else if (String.class.equals(itemClass)) {
 			return new String[]{"text", "text text", "text text"};
 		} else if (Enum.class.equals(itemClass)) {
-			return new Enum[]{EnumPreferenceTest.TestEnum.ONE, EnumPreferenceTest.TestEnum.THREE};
+			return new Enum[]{TestEnum.WINTER, TestEnum.SUMMER};
 		}
 		return null;
 	}

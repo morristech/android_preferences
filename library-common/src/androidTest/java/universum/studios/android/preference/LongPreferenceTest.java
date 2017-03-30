@@ -18,13 +18,12 @@
  */
 package universum.studios.android.preference;
 
-import android.support.annotation.Nullable;
 import android.support.test.runner.AndroidJUnit4;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import universum.studios.android.preference.test.R;
+import universum.studios.android.test.PreferencesTest;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -33,33 +32,34 @@ import static org.hamcrest.MatcherAssert.assertThat;
  * @author Martin Albedinsky
  */
 @RunWith(AndroidJUnit4.class)
-public final class BooleanPreferenceTest extends SharedPreferenceBaseTest<Boolean> {
+public final class LongPreferenceTest extends PreferencesTest {
 
 	@SuppressWarnings("unused")
-	private static final String TAG = "BooleanPreferenceTest";
+	private static final String TAG = "LongPreferenceTest";
+	private static final String PREF_KEY = "PREFERENCE.Long";
 
-	public BooleanPreferenceTest() {
-		super("PREFERENCE.Boolean", true);
-	}
-
-	@Nullable
 	@Override
-	SharedPreference<Boolean> onCreatePreference(String key, Boolean defValue) {
-		return new BooleanPreference(key, defValue);
+	public void beforeTest() throws Exception {
+		super.beforeTest();
+		// Ensure that we have a clean slate before each test.
+		mPreferences.edit().remove(PREF_KEY).commit();
 	}
 
 	@Test
 	public void testInstantiation() {
-		new BooleanPreference(DEF_PREF_KEY, false);
-		new BooleanPreference(R.string.test_preference_key, false);
+		final LongPreference preference = new LongPreference(PREF_KEY, 0L);
+		assertThat(preference.getKey(), is(PREF_KEY));
+		assertThat(preference.getValue(), is(0L));
+		assertThat(preference.getDefaultValue(), is(0L));
 	}
 
 	@Test
-	public void testOnPutObtainIntoFromPreferences() {
-		assertThat(preference.getValue(), is(PREF_DEF_VALUE));
-		preference.updateValue(false);
-		assertThat(preference.onPutIntoPreferences(sharedPreferences), is(true));
+	public void testPutAndGet() {
+		final LongPreference preference = new LongPreference(PREF_KEY, 0L);
+		assertThat(preference.getFromPreferences(mPreferences), is(0L));
+		preference.updateValue(100000L);
+		assertThat(preference.putIntoPreferences(mPreferences), is(true));
 		preference.clear();
-		assertThat(preference.onGetFromPreferences(sharedPreferences), is(Boolean.FALSE));
+		assertThat(preference.getFromPreferences(mPreferences), is(100000L));
 	}
 }
