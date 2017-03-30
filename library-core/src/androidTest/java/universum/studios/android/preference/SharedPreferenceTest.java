@@ -28,7 +28,7 @@ import android.support.test.runner.AndroidJUnit4;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import universum.studios.android.preference.test.R;
+import universum.studios.android.test.PreferencesTest;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -39,27 +39,25 @@ import static org.hamcrest.core.IsNull.nullValue;
  * @author Martin Albedinsky
  */
 @RunWith(AndroidJUnit4.class)
-public final class SharedPreferenceTest extends SharedPreferenceBaseTest<String> {
+public final class SharedPreferenceTest extends PreferencesTest {
 
 	@SuppressWarnings("unused")
 	private static final String TAG = "SharedPreferenceTest";
+	private static final String PREF_KEY = "PREFERENCE.Impl";
+	private static final String PREF_DEF_VALUE = "defValue";
 
-	public SharedPreferenceTest() {
-		super("defaultValue");
-	}
-
-	@Nullable
 	@Override
-	SharedPreference<String> onCreatePreference(String key, String defValue) {
-		return new PreferenceImpl(key, defValue);
+	public void beforeTest() throws Exception {
+		super.beforeTest();
+		// Ensure that we have a clean slate before each test.
+		mPreferences.edit().remove(PREF_KEY).commit();
 	}
 
 	@Test
-	public void testInstantiationWithKeyString() {
+	public void testInstantiation() {
 		final SharedPreference<String> preference = new PreferenceImpl(PREF_KEY, PREF_DEF_VALUE);
-		// This will not change value of key, because there was no key resource specified.
-		preference.attachKey(mContext.getResources());
 		assertThat(preference.getKey(), is(PREF_KEY));
+		assertThat(preference.getValue(), is(PREF_DEF_VALUE));
 		assertThat(preference.getDefaultValue(), is(PREF_DEF_VALUE));
 	}
 
@@ -75,44 +73,8 @@ public final class SharedPreferenceTest extends SharedPreferenceBaseTest<String>
 	}
 
 	@Test
-	public void testInstantiationWithKeyResource() {
-		final SharedPreference preference = new PreferenceImpl(R.string.test_preference_key, PREF_DEF_VALUE);
-		preference.attachKey(mContext.getResources());
-		assertThat(preference.getKeyRes(), is(R.string.test_preference_key));
-		assertThat(preference.getKey(), is("universum.studios.android.preference.test.PREFERENCE.Key"));
-	}
-
-	@Test
-	public void testInstantiationWithEmptyKeyResource() {
-		final SharedPreference preference = new PreferenceImpl(R.string.test_preference_key_empty, PREF_DEF_VALUE);
-		try {
-			preference.attachKey(mContext.getResources());
-		} catch (IllegalArgumentException e) {
-			assertThat(e.getMessage(), is("Preference key cannot be empty."));
-			return;
-		}
-		throw new AssertionError("No exception thrown.");
-	}
-
-	@Test
-	public void testInstantiationWithInvalidKeyResource() {
-		try {
-			new PreferenceImpl(0, "defValue");
-		} catch (IllegalArgumentException e) {
-			assertThat(e.getMessage(), is("Resource id(0) for preference key is not valid."));
-			return;
-		}
-		throw new AssertionError("No exception thrown.");
-	}
-
-	@Test
-	public void testGetActualValue() {
-		assertThat(preference.getValue(), is(PREF_DEF_VALUE));
-	}
-
-	@Test
-	public void testUpdateActualValue() {
-		final SharedPreference<String> preference = new PreferenceImpl(PREF_KEY, null);
+	public void testUpdateAndGetValue() {
+		final SharedPreference<String> preference = new PreferenceImpl(PREF_KEY, PREF_DEF_VALUE);
 		// Test case 1.
 		preference.updateValue("newValue");
 		assertThat(preference.getValue(), is("newValue"));
@@ -126,72 +88,36 @@ public final class SharedPreferenceTest extends SharedPreferenceBaseTest<String>
 
 	@Test
 	public void testClear() {
+		final SharedPreference<String> preference = new PreferenceImpl(PREF_KEY, PREF_DEF_VALUE);
+		preference.updateValue("newValue");
 		preference.clear();
 		assertThat(preference.getValue(), is(nullValue()));
 	}
 
 	@Test
-	public void testObtainFromPreferences() {
-		assertThat(preference.getFromPreferences(sharedPreferences), is(PREF_DEF_VALUE));
+	public void testGetFromPreferences() {
+		final SharedPreference<String> preference = new PreferenceImpl(PREF_KEY, PREF_DEF_VALUE);
+		assertThat(preference.getFromPreferences(mPreferences), is(PREF_DEF_VALUE));
 		assertThat(preference.getValue(), is(PREF_DEF_VALUE));
 		// Test again to cover case when the value of preference has been already obtained.
-		preference.getFromPreferences(sharedPreferences);
+		preference.getFromPreferences(mPreferences);
 		assertThat(preference.getValue(), is(PREF_DEF_VALUE));
-	}
-
-	@Test
-	public void testObtainFromPreferencesWithoutSetUppedKey() {
-		final SharedPreference<String> preference = new PreferenceImpl(R.string.test_preference_key, PREF_DEF_VALUE);
-		try {
-			preference.getFromPreferences(sharedPreferences);
-		} catch (IllegalStateException e) {
-			assertThat(
-					e.getMessage(),
-					is("Key for preference(PreferenceImpl) is not properly initialized. " +
-							"Didn't you forget to set it up via SharedPreference.attachKey(Resources)?")
-			);
-			return;
-		}
-		throw new AssertionError("No exception thrown.");
 	}
 
 	@Test
 	public void testPutIntoPreferences() {
+		final SharedPreference<String> preference = new PreferenceImpl(PREF_KEY, PREF_DEF_VALUE);
 		preference.updateValue("newValue");
-		assertThat(preference.putIntoPreferences(sharedPreferences), is(true));
+		assertThat(preference.putIntoPreferences(mPreferences), is(true));
 		assertThat(preference.getValue(), is("newValue"));
 	}
 
 	@Test
-	public void testPutIntoPreferencesWithoutSetUppedKey() {
-		final SharedPreference<String> preference = new PreferenceImpl(R.string.test_preference_key, PREF_DEF_VALUE);
-		try {
-			preference.putIntoPreferences(sharedPreferences);
-		} catch (IllegalStateException e) {
-			assertThat(
-					e.getMessage(),
-					is("Key for preference(PreferenceImpl) is not properly initialized. " +
-							"Didn't you forget to set it up via SharedPreference.attachKey(Resources)?")
-			);
-			return;
-		}
-		throw new AssertionError("No exception thrown.");
-	}
-
-	@Test
-	public void testParseUsingSharedPreferences() {
-		assertThat(preference.retrieve(sharedPreferences), is(not(nullValue())));
-	}
-
-	@Test
-	public void testSaveUsingSharedPreferences() {
-		assertThat(preference.save(sharedPreferences), is(true));
-	}
-
-	@Test
 	public void testCreateOnChangeListener() {
+		final SharedPreference<String> preference = new PreferenceImpl(PREF_KEY, PREF_DEF_VALUE);
 		final SharedPreferences.OnSharedPreferenceChangeListener listener = preference.createOnChangeListener(
 				new SharedPreference.PreferenceChangeCallback<String>() {
+
 					@Override
 					public void onPreferenceChanged(@NonNull SharedPreference<String> preference) {
 					}
@@ -200,7 +126,7 @@ public final class SharedPreferenceTest extends SharedPreferenceBaseTest<String>
 		assertThat(listener, is(not(nullValue())));
 	}
 
-	static final class PreferenceImpl extends SharedPreference<String> {
+	private static final class PreferenceImpl extends SharedPreference<String> {
 
 		private PreferenceImpl(@NonNull String key, @Nullable String defValue) {
 			super(key, defValue);

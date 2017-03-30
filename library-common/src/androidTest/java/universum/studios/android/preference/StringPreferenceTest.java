@@ -18,13 +18,12 @@
  */
 package universum.studios.android.preference;
 
-import android.support.annotation.Nullable;
 import android.support.test.runner.AndroidJUnit4;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import universum.studios.android.preference.test.R;
+import universum.studios.android.test.PreferencesTest;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -34,43 +33,34 @@ import static org.hamcrest.core.IsNull.nullValue;
  * @author Martin Albedinsky
  */
 @RunWith(AndroidJUnit4.class)
-public final class EnumPreferenceTest extends SharedPreferenceBaseTest<EnumPreferenceTest.TestEnum> {
+public final class StringPreferenceTest extends PreferencesTest {
 
 	@SuppressWarnings("unused")
-	private static final String TAG = "EnumPreferenceTest";
+	private static final String TAG = "StringPreferenceTest";
+	private static final String PREF_KEY = "PREFERENCE.String";
 
-	enum TestEnum {
-		ONE, TWO, THREE
-	}
-
-	public EnumPreferenceTest() {
-		super("PREFERENCE.Enum", TestEnum.TWO);
-	}
-
-	@Nullable
 	@Override
-	SharedPreference<TestEnum> onCreatePreference(String key, TestEnum defValue) {
-		return new EnumPreference<>(key, defValue);
+	public void beforeTest() throws Exception {
+		super.beforeTest();
+		// Ensure that we have a clean slate before each test.
+		mPreferences.edit().remove(PREF_KEY).commit();
 	}
 
 	@Test
 	public void testInstantiation() {
-		new EnumPreference<>(DEF_PREF_KEY, null);
-		new EnumPreference<>(R.string.test_preference_key, null);
+		final StringPreference preference = new StringPreference(PREF_KEY, null);
+		assertThat(preference.getKey(), is(PREF_KEY));
+		assertThat(preference.getValue(), is(nullValue()));
+		assertThat(preference.getDefaultValue(), is(nullValue()));
 	}
 
 	@Test
-	public void testOnPutObtainIntoFromPreferences() {
-		assertThat(preference.getValue(), is(PREF_DEF_VALUE));
-		preference.updateValue(TestEnum.THREE);
-		assertThat(preference.onPutIntoPreferences(sharedPreferences), is(true));
+	public void testPutAndGet() {
+		final StringPreference preference = new StringPreference(PREF_KEY, null);
+		assertThat(preference.getFromPreferences(mPreferences), is(nullValue()));
+		preference.updateValue("New Year");
+		assertThat(preference.putIntoPreferences(mPreferences), is(true));
 		preference.clear();
-		assertThat(preference.onGetFromPreferences(sharedPreferences), is(TestEnum.THREE));
-	}
-
-	@Test
-	public void testObtainFromPreferencesUnsaved() {
-		final EnumPreference<TestEnum> enumPreference = new EnumPreference<>(PREF_KEY + "Unsaved", null);
-		assertThat(enumPreference.onGetFromPreferences(sharedPreferences), is(nullValue()));
+		assertThat(preference.getFromPreferences(mPreferences), is("New Year"));
 	}
 }

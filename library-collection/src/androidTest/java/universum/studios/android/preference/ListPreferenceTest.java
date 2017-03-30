@@ -18,15 +18,13 @@
  */
 package universum.studios.android.preference;
 
-import android.support.annotation.Nullable;
-
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import universum.studios.android.preference.test.R;
+import universum.studios.android.test.PreferencesTest;
 
 import static junit.framework.Assert.assertTrue;
 import static org.hamcrest.CoreMatchers.is;
@@ -37,95 +35,94 @@ import static org.hamcrest.core.IsNull.nullValue;
  * @author Martin Albedinsky
  */
 
-public final class ListPreferenceTest extends SharedPreferenceBaseTest<List<Object>> {
+public final class ListPreferenceTest extends PreferencesTest {
 
 	@SuppressWarnings("unused")
 	private static final String TAG = "ListPreferenceTest";
+	private static final String PREF_KEY = "PREFERENCE.List";
 
-	public ListPreferenceTest() {
-		super("PREFERENCE.List", null);
-	}
-
-	@Nullable
 	@Override
-	SharedPreference<List<Object>> onCreatePreference(String key, List<Object> defValue) {
-		return new ListPreference<>(key, Object.class, defValue);
+	public void beforeTest() throws Exception {
+		super.beforeTest();
+		// Ensure that we have a clean slate before each test.
+		mPreferences.edit().remove(PREF_KEY).commit();
 	}
 
 	@Test
 	public void testInstantiation() {
-		new ListPreference<>(DEF_PREF_KEY, String.class, null);
-		new ListPreference<>(R.string.test_preference_key, String.class, null);
+		final ListPreference<String> preference = new ListPreference<>(PREF_KEY, String.class, null);
+		assertThat(preference.getKey(), is(PREF_KEY));
+		assertThat(preference.getDefaultValue(), is(nullValue()));
 	}
 
 	@Test
-	public void testPutObtainBooleanListIntoFromPreferences() {
-		testPutObtainListIntoFromPreferencesTypeOf(Boolean.class);
+	public void testPutAndGetBooleanList() {
+		testPutAndGetListTypeOf(Boolean.class);
 	}
 
 	@Test
-	public void testPutObtainByteListIntoFromPreferences() {
-		testPutObtainListIntoFromPreferencesTypeOf(Byte.class);
+	public void testPutAndGetByteList() {
+		testPutAndGetListTypeOf(Byte.class);
 	}
 
 	@Test
-	public void testPutObtainShortListIntoFromPreferences() {
-		testPutObtainListIntoFromPreferencesTypeOf(Short.class);
+	public void testPutAndGetShortList() {
+		testPutAndGetListTypeOf(Short.class);
 	}
 
 	@Test
-	public void testPutObtainIntegerListIntoFromPreferences() {
-		testPutObtainListIntoFromPreferencesTypeOf(Integer.class);
+	public void testPutAndGetIntegerList() {
+		testPutAndGetListTypeOf(Integer.class);
 	}
 
 	@Test
-	public void testPutObtainFloatListIntoFromPreferences() {
-		testPutObtainListIntoFromPreferencesTypeOf(Float.class);
+	public void testPutAndGetFloatList() {
+		testPutAndGetListTypeOf(Float.class);
 	}
 
 	@Test
-	public void testPutObtainLongListIntoFromPreferences() {
-		testPutObtainListIntoFromPreferencesTypeOf(Long.class);
+	public void testPutAndGetLongList() {
+		testPutAndGetListTypeOf(Long.class);
 	}
 
 	@Test
-	public void testPutObtainDoubleListIntoFromPreferences() {
-		testPutObtainListIntoFromPreferencesTypeOf(Double.class);
+	public void testPutAndGetDoubleList() {
+		testPutAndGetListTypeOf(Double.class);
 	}
 
 	@Test
-	public void testPutObtainEmptyListIntoFromPreferences() {
-		innerTestPutObtainListIntoFromPreferences(new ArrayList<Integer>(0), Integer.class);
+	public void testPutAndGetEmptyList() {
+		innerTestPutAndGetList(new ArrayList<Integer>(0), Integer.class);
 	}
 
 	@Test
-	public void testObtainNotSavedListFromPreferences() {
-		assertThat(ListPreference.getFromPreferences(sharedPreferences, PREF_KEY, null), is(nullValue()));
+	public void testGetNotPersistedList() {
+		assertThat(ListPreference.getFromPreferences(mPreferences, PREF_KEY, null), is(nullValue()));
 	}
 
 	@Test
-	public void testPutObtainNullListIntoFromPreferences() {
-		innerTestPutObtainListIntoFromPreferences(null, null);
+	public void testPutAndGetNullList() {
+		innerTestPutAndGetList(null, null);
 	}
 
-	private <T> void testPutObtainListIntoFromPreferencesTypeOf(Class<T> componentType) {
-		innerTestPutObtainListIntoFromPreferences(createTestableListOf(componentType), componentType);
+	private <T> void testPutAndGetListTypeOf(Class<T> componentType) {
+		innerTestPutAndGetList(createTestableListOf(componentType), componentType);
 	}
 
-	private <T> void innerTestPutObtainListIntoFromPreferences(List<T> list, Class<T> componentType) {
+	private <T> void innerTestPutAndGetList(List<T> list, Class<T> componentType) {
 		final ListPreference<T> preference = new ListPreference<>(PREF_KEY, componentType, null);
 		preference.updateValue(list);
-		assertThat(preference.onPutIntoPreferences(sharedPreferences), is(true));
+		assertThat(preference.onPutIntoPreferences(mPreferences), is(true));
 		preference.clear();
-		assertThat(preference.onGetFromPreferences(sharedPreferences), is(list));
+		assertThat(preference.onGetFromPreferences(mPreferences), is(list));
 	}
 
 	@Test
-	public void testPutObtainUnsupportedListIntoFromPreferences() {
+	public void testPutAndGetUnsupportedList() {
 		try {
 			final List<Date> list = new ArrayList<>(1);
 			list.add(new Date(0));
-			assertTrue(ListPreference.putIntoPreferences(sharedPreferences, PREF_KEY, list, Date.class));
+			assertTrue(ListPreference.putIntoPreferences(mPreferences, PREF_KEY, list, Date.class));
 			throw new AssertionError("No exception thrown.");
 		} catch (IllegalArgumentException e) {
 			assertThat(
@@ -134,12 +131,9 @@ public final class ListPreferenceTest extends SharedPreferenceBaseTest<List<Obje
 							"Only lists of primitive types or theirs boxed representations including String are supported.")
 			);
 		}
-
-		final StringPreference tmpPreference = new StringPreference(PREF_KEY, null);
-		tmpPreference.updateValue("<Date[]>[]");
-		tmpPreference.putIntoPreferences(sharedPreferences);
+		mPreferences.edit().putString(PREF_KEY, "<Date[]>[]").commit();
 		try {
-			ListPreference.getFromPreferences(sharedPreferences, PREF_KEY, null);
+			ListPreference.getFromPreferences(mPreferences, PREF_KEY, null);
 			throw new AssertionError("No exception thrown.");
 		} catch (IllegalArgumentException e) {
 			assertThat(
@@ -151,12 +145,10 @@ public final class ListPreferenceTest extends SharedPreferenceBaseTest<List<Obje
 	}
 
 	@Test
-	public void testObtainNotListFromPreferences() {
-		final StringPreference tmpPreference = new StringPreference(PREF_KEY, null);
-		tmpPreference.updateValue("<String[]>text,text");
-		tmpPreference.putIntoPreferences(sharedPreferences);
+	public void testGetListNotPersistedByLibrary1() {
+		mPreferences.edit().putString(PREF_KEY, "<String[]>text,text").commit();
 		try {
-			ListPreference.getFromPreferences(sharedPreferences, PREF_KEY, null);
+			ListPreference.getFromPreferences(mPreferences, PREF_KEY, null);
 			throw new AssertionError("No exception thrown.");
 		} catch (IllegalStateException e) {
 			assertThat(
@@ -167,12 +159,10 @@ public final class ListPreferenceTest extends SharedPreferenceBaseTest<List<Obje
 	}
 
 	@Test
-	public void testObtainListNotStoredByLibraryFromPreferences() {
-		final StringPreference tmpPreference = new StringPreference(PREF_KEY, null);
-		tmpPreference.updateValue("[text, text, text]");
-		tmpPreference.putIntoPreferences(sharedPreferences);
+	public void testGetListNotPersistedByLibrary2() {
+		mPreferences.edit().putString(PREF_KEY, "[text, text, text]").commit();
 		try {
-			ListPreference.getFromPreferences(sharedPreferences, PREF_KEY, null);
+			ListPreference.getFromPreferences(mPreferences, PREF_KEY, null);
 		} catch (IllegalStateException e) {
 			assertThat(
 					e.getMessage(),

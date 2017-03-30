@@ -22,13 +22,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.test.runner.AndroidJUnit4;
-import android.text.TextUtils;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import universum.studios.android.preference.inner.ContextBaseTest;
-import universum.studios.android.preference.test.R;
+import universum.studios.android.test.BaseInstrumentedTest;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -37,10 +35,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
  * @author Martin Albedinsky
  */
 @RunWith(AndroidJUnit4.class)
-public final class PreferencesManagerTest extends ContextBaseTest {
+public final class PreferencesManagerTest extends BaseInstrumentedTest {
 
 	@SuppressWarnings("unused")
 	private static final String TAG = "PreferencesManagerTest";
+	private static final String PREF_KEY = "PREFERENCE.Key";
 
 	private final SharedPreferences.OnSharedPreferenceChangeListener SHARED_PREFERENCE_LISTENER = new SharedPreferences.OnSharedPreferenceChangeListener() {
 
@@ -55,18 +54,19 @@ public final class PreferencesManagerTest extends ContextBaseTest {
 	public void beforeTest() throws Exception {
 		super.beforeTest();
 		this.preferencesManager = new ManagerImpl(mContext);
-		this.preferencesManager.remove(mContext.getString(R.string.test_preference_key));
+		this.preferencesManager.remove(PREF_KEY);
 	}
 
 	@Test
 	public void testInstantiation() {
+		final String packageName = mContext.getPackageName();
 		final PreferencesManager manager = new ManagerImpl(mContext);
 		assertThat(manager.getMode(), is(Context.MODE_PRIVATE));
-		assertThat(manager.getSharedPreferencesName(), is("universum.studios.android.preference.test_preferences"));
+		assertThat(manager.getSharedPreferencesName(), is(packageName + "_preferences"));
 		assertThat(
 				manager.getSharedPreferences(),
 				is(mContext.getSharedPreferences(
-						"universum.studios.android.preference.test_preferences",
+						packageName + "_preferences",
 						Context.MODE_PRIVATE
 				))
 		);
@@ -101,11 +101,12 @@ public final class PreferencesManagerTest extends ContextBaseTest {
 
 	@Test
 	public void testInitializationWithEmptyName() {
+		final String packageName = mContext.getPackageName();
 		final PreferencesManager manager = new ManagerImpl(mContext, "", PreferencesManager.MODE_PRIVATE);
 		assertThat(
 				manager.getSharedPreferences(),
 				is(mContext.getSharedPreferences(
-						"universum.studios.android.preference.test_preferences",
+						packageName + "_preferences",
 						Context.MODE_PRIVATE
 				))
 		);
@@ -130,64 +131,58 @@ public final class PreferencesManagerTest extends ContextBaseTest {
 	}
 
 	@Test
-	public void testKey() {
-		final String key = preferencesManager.key(R.string.test_preference_key);
-		assertThat(TextUtils.isEmpty(key), is(false));
-	}
-
-	@Test
 	public void testObtainDefaultBoolean() {
-		assertThat(preferencesManager.getBoolean(mContext.getString(R.string.test_preference_key), true), is(true));
+		assertThat(preferencesManager.getBoolean(PREF_KEY, true), is(true));
 	}
 
 	@Test
 	public void testPutObtainBoolean() {
-		assertThat(preferencesManager.putBoolean(mContext.getString(R.string.test_preference_key), false), is(true));
-		assertThat(preferencesManager.getBoolean(mContext.getString(R.string.test_preference_key), true), is(false));
+		assertThat(preferencesManager.putBoolean(PREF_KEY, false), is(true));
+		assertThat(preferencesManager.getBoolean(PREF_KEY, true), is(false));
 	}
 
 	@Test
 	public void testObtainDefaultInt() {
-		assertThat(preferencesManager.getInt(mContext.getString(R.string.test_preference_key), 100), is(100));
+		assertThat(preferencesManager.getInt(PREF_KEY, 100), is(100));
 	}
 
 	@Test
 	public void testPutObtainInt() {
-		assertThat(preferencesManager.putInt(mContext.getString(R.string.test_preference_key), 14), is(true));
-		assertThat(preferencesManager.getInt(mContext.getString(R.string.test_preference_key), 0), is(14));
+		assertThat(preferencesManager.putInt(PREF_KEY, 14), is(true));
+		assertThat(preferencesManager.getInt(PREF_KEY, 0), is(14));
 	}
 
 	@Test
 	public void testObtainDefaultLong() {
-		assertThat(preferencesManager.getLong(mContext.getString(R.string.test_preference_key), 124589L), is(124589L));
+		assertThat(preferencesManager.getLong(PREF_KEY, 124589L), is(124589L));
 	}
 
 	@Test
 	public void testPutObtainLong() {
-		assertThat(preferencesManager.putLong(mContext.getString(R.string.test_preference_key), 1545454L), is(true));
-		assertThat(preferencesManager.getLong(mContext.getString(R.string.test_preference_key), 0), is(1545454L));
+		assertThat(preferencesManager.putLong(PREF_KEY, 1545454L), is(true));
+		assertThat(preferencesManager.getLong(PREF_KEY, 0), is(1545454L));
 	}
 
 	@Test
 	public void testObtainDefaultFloat() {
-		assertThat(preferencesManager.getFloat(mContext.getString(R.string.test_preference_key), 0.5f), is(0.5f));
+		assertThat(preferencesManager.getFloat(PREF_KEY, 0.5f), is(0.5f));
 	}
 
 	@Test
 	public void testPutObtainFloat() {
-		assertThat(preferencesManager.putFloat(mContext.getString(R.string.test_preference_key), 0.324234f), is(true));
-		assertThat(preferencesManager.getFloat(mContext.getString(R.string.test_preference_key), 0), is(0.324234f));
+		assertThat(preferencesManager.putFloat(PREF_KEY, 0.324234f), is(true));
+		assertThat(preferencesManager.getFloat(PREF_KEY, 0), is(0.324234f));
 	}
 
 	@Test
 	public void testObtainDefaultString() {
-		assertThat(preferencesManager.getString(mContext.getString(R.string.test_preference_key), "default"), is("default"));
+		assertThat(preferencesManager.getString(PREF_KEY, "default"), is("default"));
 	}
 
 	@Test
 	public void testPutObtainString() {
-		assertThat(preferencesManager.putString(mContext.getString(R.string.test_preference_key), "new value"), is(true));
-		assertThat(preferencesManager.getString(mContext.getString(R.string.test_preference_key), null), is("new value"));
+		assertThat(preferencesManager.putString(PREF_KEY, "new value"), is(true));
+		assertThat(preferencesManager.getString(PREF_KEY, null), is("new value"));
 	}
 
 	@Test
@@ -236,7 +231,7 @@ public final class PreferencesManagerTest extends ContextBaseTest {
 
 	static final class ManagerImpl extends PreferencesManager {
 
-		final BooleanPreference booleanPreference = new BooleanPreference(R.string.test_preference_key, true);
+		final BooleanPreference booleanPreference = new BooleanPreference(PREF_KEY, true);
 
 		ManagerImpl(@NonNull Context context) {
 			super(context);

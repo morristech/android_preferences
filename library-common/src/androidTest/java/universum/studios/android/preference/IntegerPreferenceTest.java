@@ -18,13 +18,12 @@
  */
 package universum.studios.android.preference;
 
-import android.support.annotation.Nullable;
 import android.support.test.runner.AndroidJUnit4;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import universum.studios.android.preference.test.R;
+import universum.studios.android.test.PreferencesTest;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -33,33 +32,34 @@ import static org.hamcrest.MatcherAssert.assertThat;
  * @author Martin Albedinsky
  */
 @RunWith(AndroidJUnit4.class)
-public final class FloatPreferenceTest extends SharedPreferenceBaseTest<Float> {
+public final class IntegerPreferenceTest extends PreferencesTest {
 
 	@SuppressWarnings("unused")
-	private static final String TAG = "FloatPreferenceTest";
+	private static final String TAG = "IntegerPreferenceTest";
+	private static final String PREF_KEY = "PREFERENCE.Integer";
 
-	public FloatPreferenceTest() {
-		super("PREFERENCE.Float", 0.563f);
-	}
-
-	@Nullable
 	@Override
-	SharedPreference<Float> onCreatePreference(String key, Float defValue) {
-		return new FloatPreference(key, defValue);
+	public void beforeTest() throws Exception {
+		super.beforeTest();
+		// Ensure that we have a clean slate before each test.
+		mPreferences.edit().remove(PREF_KEY).commit();
 	}
 
 	@Test
 	public void testInstantiation() {
-		new FloatPreference(DEF_PREF_KEY, 0f);
-		new FloatPreference(R.string.test_preference_key, 0f);
+		final IntegerPreference preference = new IntegerPreference(PREF_KEY, 3);
+		assertThat(preference.getKey(), is(PREF_KEY));
+		assertThat(preference.getValue(), is(3));
+		assertThat(preference.getDefaultValue(), is(3));
 	}
 
 	@Test
-	public void testOnPutObtainIntoFromPreferences() {
-		assertThat(preference.getValue(), is(PREF_DEF_VALUE));
-		preference.updateValue(0.99f);
-		assertThat(preference.onPutIntoPreferences(sharedPreferences), is(true));
+	public void testPutAndGet() {
+		final IntegerPreference preference = new IntegerPreference(PREF_KEY, 3);
+		assertThat(preference.getFromPreferences(mPreferences), is(3));
+		preference.updateValue(2017);
+		assertThat(preference.putIntoPreferences(mPreferences), is(true));
 		preference.clear();
-		assertThat(preference.onGetFromPreferences(sharedPreferences), is(0.99f));
+		assertThat(preference.getFromPreferences(mPreferences), is(2017));
 	}
 }
