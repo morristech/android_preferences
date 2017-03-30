@@ -37,7 +37,7 @@ import android.support.annotation.StringRes;
  */
 public final class BooleanPreference extends SharedPreference<Boolean> {
 
-	/**
+	/*
 	 * Constructors ================================================================================
 	 */
 
@@ -59,7 +59,7 @@ public final class BooleanPreference extends SharedPreference<Boolean> {
 		super(keyResId, defValue);
 	}
 
-	/**
+	/*
 	 * Methods =====================================================================================
 	 */
 

@@ -43,7 +43,7 @@ import java.util.regex.Pattern;
  */
 public final class ArrayPreference<T> extends SharedPreference<T> {
 
-	/**
+	/*
 	 * Constants ===================================================================================
 	 */
 
@@ -52,7 +52,7 @@ public final class ArrayPreference<T> extends SharedPreference<T> {
 	 */
 	private static final Matcher VALUE_MATCHER = Pattern.compile("^\\<(.+)\\[\\]\\>\\[(.*)\\]$").matcher("");
 
-	/**
+	/*
 	 * Constructors ================================================================================
 	 */
 
@@ -78,7 +78,7 @@ public final class ArrayPreference<T> extends SharedPreference<T> {
 		ensureIsArrayOrThrow(defValue);
 	}
 
-	/**
+	/*
 	 * Methods =====================================================================================
 	 */
 

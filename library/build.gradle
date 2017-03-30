@@ -75,11 +75,17 @@ android {
 /**
  * Library dependencies ============================================================================
  */
+repositories {
+    mavenLocal()
+    maven { url repos.bintray.universumStudiosAndroid }
+}
+
 dependencies {
     /*
      * RELEASE DEPENDENCIES ------------------------------------------------------------------------
      */
     compile deps.androidSupport.annotations
+    compile deps.universumStudios.cryptoCore
 
     /*
      * TEST DEPENDENCIES ---------------------------------------------------------------------------

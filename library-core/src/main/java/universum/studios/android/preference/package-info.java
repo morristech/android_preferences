@@ -18,7 +18,7 @@
  */
 /**
  * Provides classes that may be used to store or obtain data into/from the Android system
- * {@link android.content.SharedPreferences SharedPreferences} in a simplified 'direct' fashion.
+ * {@link android.content.SharedPreferences SharedPreferences} in a simplified fashion.
  *
  * @author Martin Albedinsky
  */

@@ -90,7 +90,7 @@ import java.lang.annotation.RetentionPolicy;
  */
 public abstract class PreferencesManager {
 
-	/**
+	/*
 	 * Constants ===================================================================================
 	 */
 
@@ -157,15 +157,15 @@ public abstract class PreferencesManager {
 	 */
 	private static final int STRING = 0x05;
 
-	/**
+	/*
 	 * Interface ===================================================================================
 	 */
 
-	/**
+	/*
 	 * Static members ==============================================================================
 	 */
 
-	/**
+	/*
 	 * Members =====================================================================================
 	 */
 
@@ -193,7 +193,7 @@ public abstract class PreferencesManager {
 	 */
 	private boolean mCachingEnabled = false;
 
-	/**
+	/*
 	 * Constructors ================================================================================
 	 */
 
@@ -227,7 +227,7 @@ public abstract class PreferencesManager {
 		setSharedPreferencesName(preferencesName);
 	}
 
-	/**
+	/*
 	 * Methods =====================================================================================
 	 */
 
@@ -714,7 +714,7 @@ public abstract class PreferencesManager {
 		return null;
 	}
 
-	/**
+	/*
 	 * Inner classes ===============================================================================
 	 */
 }

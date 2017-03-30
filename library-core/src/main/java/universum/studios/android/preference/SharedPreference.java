@@ -45,7 +45,7 @@ import android.text.TextUtils;
  */
 public abstract class SharedPreference<Type> {
 
-	/**
+	/*
 	 * Interface ===================================================================================
 	 */
 
@@ -71,7 +71,7 @@ public abstract class SharedPreference<Type> {
 		void onPreferenceChanged(@NonNull SharedPreference<PreferenceType> preference);
 	}
 
-	/**
+	/*
 	 * Constants ===================================================================================
 	 */
 
@@ -80,11 +80,11 @@ public abstract class SharedPreference<Type> {
 	 */
 	// private static final String TAG = "SharedPreference";
 
-	/**
+	/*
 	 * Static members ==============================================================================
 	 */
 
-	/**
+	/*
 	 * Members =====================================================================================
 	 */
 
@@ -115,7 +115,7 @@ public abstract class SharedPreference<Type> {
 	 */
 	private boolean mAlreadyParsed;
 
-	/**
+	/*
 	 * Constructors ================================================================================
 	 */
 
@@ -154,7 +154,7 @@ public abstract class SharedPreference<Type> {
 		this.mDefaultValue = defaultValue;
 	}
 
-	/**
+	/*
 	 * Methods =====================================================================================
 	 */
 
@@ -374,7 +374,7 @@ public abstract class SharedPreference<Type> {
 		this.mAlreadyParsed = false;
 	}
 
-	/**
+	/*
 	 * Inner classes ===============================================================================
 	 */
 }

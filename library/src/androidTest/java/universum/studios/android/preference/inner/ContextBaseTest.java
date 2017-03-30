@@ -24,6 +24,7 @@ import android.support.test.InstrumentationRegistry;
 /**
  * @author Martin Albedinsky
  */
+@Deprecated
 public abstract class ContextBaseTest extends BaseTest {
 
 	@SuppressWarnings("unused")

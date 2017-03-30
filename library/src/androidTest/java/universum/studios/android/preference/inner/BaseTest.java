@@ -18,21 +18,17 @@
  */
 package universum.studios.android.preference.inner;
 
-import android.support.annotation.NonNull;
-
-import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.Before;
 
 /**
  * @author Martin Albedinsky
  */
+@Deprecated
 public abstract class BaseTest {
 
 	@SuppressWarnings("unused")
 	private static final String TAG = "BaseTest";
-
-	public static final long WAIT_MAX_DURATION = 10000;
 
 	@Before
 	public void beforeTest() throws Exception {
@@ -40,18 +36,5 @@ public abstract class BaseTest {
 
 	@After
 	public void afterTest() throws Exception {
-	}
-
-	public static void waitUntil(@NonNull Object item, @NonNull Matcher matches) throws InterruptedException {
-		waitUntil(item, matches, WAIT_MAX_DURATION);
-	}
-
-	public static void waitUntil(@NonNull Object item, @NonNull Matcher matcher, long maxDuration) throws InterruptedException {
-		long duration = 0;
-		while (duration < maxDuration) {
-			if (matcher.matches(item)) break;
-			Thread.sleep(100);
-			duration += 100;
-		}
 	}
 }

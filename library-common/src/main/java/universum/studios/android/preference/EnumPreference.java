@@ -39,7 +39,7 @@ import android.text.TextUtils;
  */
 public final class EnumPreference<E extends Enum> extends SharedPreference<E> {
 
-	/**
+	/*
 	 * Constructors ================================================================================
 	 */
 
@@ -61,7 +61,7 @@ public final class EnumPreference<E extends Enum> extends SharedPreference<E> {
 		super(keyResId, defValue);
 	}
 
-	/**
+	/*
 	 * Methods =====================================================================================
 	 */
 

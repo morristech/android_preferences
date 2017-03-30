@@ -37,7 +37,7 @@ import android.support.annotation.StringRes;
  */
 public final class FloatPreference extends SharedPreference<Float> {
 
-	/**
+	/*
 	 * Constructors ================================================================================
 	 */
 
@@ -59,7 +59,7 @@ public final class FloatPreference extends SharedPreference<Float> {
 		super(keyResId, defValue);
 	}
 
-	/**
+	/*
 	 * Methods =====================================================================================
 	 */
 

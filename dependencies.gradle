@@ -34,6 +34,7 @@ def test = [
 ]
 
 def universumStudios = [
+        cryptoCore    : 'universum.studios.android:crypto-core:0.1.2@aar',
         supportSamples: "universum.studios.android.support:support-samples:${versions.universumStudiosSupportSamplesVersion}@aar"
 ]
 
