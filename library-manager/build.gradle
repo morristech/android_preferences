@@ -68,7 +68,10 @@ dependencies {
     /*
      * DEBUG DEPENDENCIES --------------------------------------------------------------------------
      */
-    debugCompile project(':library-core')
+    //debugCompile project(':library-core')
+    // This dependency is needed only for tests but declaring it along with ':library-core' causes
+    // build to fail with error: Multiple packages define PreferencesConfig.java.
+    debugCompile project(':library-common')
 
     /*
      * TEST DEPENDENCIES ---------------------------------------------------------------------------
