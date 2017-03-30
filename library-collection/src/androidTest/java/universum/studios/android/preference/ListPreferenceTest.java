@@ -113,7 +113,7 @@ public final class ListPreferenceTest extends PreferencesTest {
 		final ListPreference<T> preference = new ListPreference<>(PREF_KEY, componentType, null);
 		preference.updateValue(list);
 		assertThat(preference.onPutIntoPreferences(mPreferences), is(true));
-		preference.clear();
+		preference.invalidate();
 		assertThat(preference.onGetFromPreferences(mPreferences), is(list));
 	}
 

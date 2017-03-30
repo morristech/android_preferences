@@ -60,7 +60,7 @@ public final class StringPreferenceTest extends PreferencesTest {
 		assertThat(preference.getFromPreferences(mPreferences), is(nullValue()));
 		preference.updateValue("New Year");
 		assertThat(preference.putIntoPreferences(mPreferences), is(true));
-		preference.clear();
+		preference.invalidate();
 		assertThat(preference.getFromPreferences(mPreferences), is("New Year"));
 	}
 }

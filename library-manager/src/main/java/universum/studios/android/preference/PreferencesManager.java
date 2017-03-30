@@ -559,7 +559,7 @@ public abstract class PreferencesManager {
 		preference.attachKey(mContext.getResources()).updateValue(value);
 		final boolean succeed = preference.putIntoPreferences(preferences(mContext));
 		if (!mCachingEnabled) {
-			preference.clear();
+			preference.invalidate();
 		}
 		return succeed;
 	}
@@ -575,7 +575,7 @@ public abstract class PreferencesManager {
 		preference.attachKey(mContext.getResources());
 		final Type value = preference.getFromPreferences(preferences(mContext));
 		if (!mCachingEnabled) {
-			preference.clear();
+			preference.invalidate();
 		}
 		return value;
 	}

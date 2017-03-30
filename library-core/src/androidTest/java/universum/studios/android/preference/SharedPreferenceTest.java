@@ -90,7 +90,7 @@ public final class SharedPreferenceTest extends PreferencesTest {
 	public void testClear() {
 		final SharedPreference<String> preference = new PreferenceImpl(PREF_KEY, PREF_DEF_VALUE);
 		preference.updateValue("newValue");
-		preference.clear();
+		preference.invalidate();
 		assertThat(preference.getValue(), is(nullValue()));
 	}
 

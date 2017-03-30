@@ -21,6 +21,7 @@ Supported down to the **Android [API Level 8](http://developer.android.com/about
 ### Dependencies ###
 
 - [`com.android.support:support-annotations`](https://developer.android.com/topic/libraries/support-library/packages.html#annotations)
+- [`universum.studios.android:logger`](https://github.com/universum-studios/android_logger)
 - [`universum.studios.android:crypto-core`](https://github.com/universum-studios/android_crypto/MODULES.md)
 
 ## License ##

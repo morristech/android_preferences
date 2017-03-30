@@ -223,7 +223,7 @@ public final class ArrayPreferenceTest extends PreferencesTest {
 		final ArrayPreference<A> preference = new ArrayPreference<>(PREF_KEY, null);
 		preference.updateValue(array);
 		preference.onPutIntoPreferences(mPreferences);
-		preference.clear();
+		preference.invalidate();
 		return preference.onGetFromPreferences(mPreferences);
 	}
 

@@ -59,7 +59,7 @@ public final class BooleanPreferenceTest extends PreferencesTest {
 		assertThat(preference.getFromPreferences(mPreferences), is(Boolean.TRUE));
 		preference.updateValue(false);
 		assertThat(preference.putIntoPreferences(mPreferences), is(Boolean.TRUE));
-		preference.clear();
+		preference.invalidate();
 		assertThat(preference.getFromPreferences(mPreferences), is(Boolean.FALSE));
 	}
 }

@@ -59,7 +59,7 @@ public final class FloatPreferenceTest extends PreferencesTest {
 		assertThat(preference.getFromPreferences(mPreferences), is(-1f));
 		preference.updateValue(0.99f);
 		assertThat(preference.putIntoPreferences(mPreferences), is(true));
-		preference.clear();
+		preference.invalidate();
 		assertThat(preference.getFromPreferences(mPreferences), is(0.99f));
 	}
 }

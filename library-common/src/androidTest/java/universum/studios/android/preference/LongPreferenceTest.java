@@ -59,7 +59,7 @@ public final class LongPreferenceTest extends PreferencesTest {
 		assertThat(preference.getFromPreferences(mPreferences), is(0L));
 		preference.updateValue(100000L);
 		assertThat(preference.putIntoPreferences(mPreferences), is(true));
-		preference.clear();
+		preference.invalidate();
 		assertThat(preference.getFromPreferences(mPreferences), is(100000L));
 	}
 }

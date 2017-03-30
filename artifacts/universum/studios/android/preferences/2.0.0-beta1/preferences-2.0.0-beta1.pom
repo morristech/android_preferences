@@ -43,6 +43,19 @@
     </dependency>
     <dependency>
       <groupId>universum.studios.android</groupId>
+      <artifactId>logger</artifactId>
+      <version>1.0.0</version>
+      <type>aar</type>
+      <scope>compile</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>*</artifactId>
+          <groupId>*</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>universum.studios.android</groupId>
       <artifactId>crypto-core</artifactId>
       <version>0.1.2</version>
       <type>aar</type>
