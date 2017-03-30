@@ -33,6 +33,15 @@ import java.util.Set;
 public interface SharedPreferencesFacade {
 
 	/**
+	 * Returns the name of {@link android.content.SharedPreferences SharedPreferences} that are hidden
+	 * behind this facade.
+	 *
+	 * @return Shared preferences name.
+	 */
+	@NonNull
+	String getPreferencesName();
+
+	/**
 	 * Checks whether the {@code SharedPreferences} hidden behind this facade contain value for the
 	 * specified <var>key</var> or not.
 	 *

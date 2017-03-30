@@ -28,7 +28,7 @@ import java.util.Set;
 /**
  * Simple implementation of {@link SharedPreferencesFacade} which supports simple <var>obtaining</var>
  * and <var>putting</var> of values stored in {@link SharedPreferences} with which is facade created
- * via {@link #SimpleSharedPreferencesFacade(SharedPreferences)} constructor.
+ * via {@link #SimpleSharedPreferencesFacade(SharedPreferences, String)} constructor.
  *
  * @author Martin Albedinsky
  */
@@ -62,6 +62,12 @@ public class SimpleSharedPreferencesFacade implements SharedPreferencesFacade {
 	@NonNull
 	protected final SharedPreferences mPreferences;
 
+	/**
+	 * Name of the shared preferences wrapped by this facade.
+	 */
+	@NonNull
+	protected final String mPreferencesName;
+
 	/*
 	 * Constructors ================================================================================
 	 */
@@ -71,15 +77,25 @@ public class SimpleSharedPreferencesFacade implements SharedPreferencesFacade {
 	 * instance in order to support simple <var>putting</var> and <var>obtaining</var> of values
 	 * stored in such preferences.
 	 *
-	 * @param preferences The shared preferences for which to create new facade.
+	 * @param preferences     The shared preferences for which to create new facade.
+	 * @param preferencesName The name of the given shared preferences.
 	 */
-	public SimpleSharedPreferencesFacade(@NonNull SharedPreferences preferences) {
+	public SimpleSharedPreferencesFacade(@NonNull SharedPreferences preferences, @NonNull String preferencesName) {
 		this.mPreferences = preferences;
+		this.mPreferencesName = preferencesName;
 	}
 
 	/*
 	 * Methods =====================================================================================
 	 */
+
+	/**
+	 */
+	@NonNull
+	@Override
+	public final String getPreferencesName() {
+		return mPreferencesName;
+	}
 
 	/**
 	 */
