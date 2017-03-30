@@ -11,7 +11,7 @@ def testConfig = [
 ]
 
 def libraryConfig = [
-        version: '1.0.1'
+        version: '2.0.0'
 ]
 
 def mavenConfig = [
@@ -32,7 +32,7 @@ def bintrayConfig = [
         packageName              : mavenConfig.groupId + ':' + mavenConfig.artifactId,
         packageLabels            : ['android', 'preferences'],
         packageVersionName       : mavenConfig.version,
-        packageVersionDescription: 'Version patch.',
+        packageVersionDescription: 'Major release.',
         packageVersionTag        : mavenConfig.version
 ]
 
