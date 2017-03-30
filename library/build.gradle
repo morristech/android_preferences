@@ -85,6 +85,7 @@ dependencies {
      * RELEASE DEPENDENCIES ------------------------------------------------------------------------
      */
     compile deps.androidSupport.annotations
+    compile deps.universumStudios.logger
     compile deps.universumStudios.cryptoCore
 
     /*

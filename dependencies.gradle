@@ -4,6 +4,8 @@ def versions = [
         androidSupportTestVersion            : '0.5',
         androidSupportTestEspressoVersion    : '2.2.2',
         butterknife                          : '8.5.1',
+        universumStudiosLoggerVersion        : '1.0.0',
+        universumStudiosCryptoVersion        : '0.1.2',
         universumStudiosSupportSamplesVersion: '0.1.3'
 ]
 
@@ -34,7 +36,8 @@ def test = [
 ]
 
 def universumStudios = [
-        cryptoCore    : 'universum.studios.android:crypto-core:0.1.2@aar',
+        logger        : "universum.studios.android:logger:${versions.universumStudiosLoggerVersion}@aar",
+        cryptoCore    : "universum.studios.android:crypto-core:${versions.universumStudiosCryptoVersion}@aar",
         supportSamples: "universum.studios.android.support:support-samples:${versions.universumStudiosSupportSamplesVersion}@aar"
 ]
 

@@ -27,7 +27,7 @@ as usually.
 
 - **[Core](https://github.com/universum-studios/android_preferences/tree/master/library-core)**
 - **[Cache](https://github.com/universum-studios/android_preferences/tree/master/library-cache)**
-- **[Secure](https://github.com/universum-studios/android_preferences/tree/master/library-secure)**
+- **[Crypto](https://github.com/universum-studios/android_preferences/tree/master/library-crypto)**
 - **[Manager](https://github.com/universum-studios/android_preferences/tree/master/library-manager)**
 - **[Common](https://github.com/universum-studios/android_preferences/tree/master/library-common)**
 - **[Collection](https://github.com/universum-studios/android_preferences/tree/master/library-collection)**
