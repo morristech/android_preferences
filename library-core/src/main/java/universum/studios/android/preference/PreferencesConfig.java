@@ -21,10 +21,13 @@ package universum.studios.android.preference;
 import android.util.Log;
 
 /**
+ * <b>This class has been deprecated and will be removed in the next release.</b>
+ * <p>
  * Configuration options for the Preferences library.
  *
  * @author Martin Albedinsky
  */
+@Deprecated
 public final class PreferencesConfig {
 
 	/**
@@ -33,6 +36,7 @@ public final class PreferencesConfig {
 	 *
 	 * @see Log#v(String, String)
 	 */
+	@Deprecated
 	public static boolean LOG_ENABLED = true;
 
 	/**
@@ -41,6 +45,7 @@ public final class PreferencesConfig {
 	 *
 	 * @see Log#d(String, String)
 	 */
+	@Deprecated
 	public static boolean DEBUG_LOG_ENABLED = false;
 
 	/**
