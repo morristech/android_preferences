@@ -59,7 +59,7 @@ public final class IntegerPreferenceTest extends PreferencesTest {
 		assertThat(preference.getFromPreferences(mPreferences), is(3));
 		preference.updateValue(2017);
 		assertThat(preference.putIntoPreferences(mPreferences), is(true));
-		preference.clear();
+		preference.invalidate();
 		assertThat(preference.getFromPreferences(mPreferences), is(2017));
 	}
 }

@@ -64,7 +64,7 @@ public final class EnumPreferenceTest extends PreferencesTest {
 		assertThat(preference.getFromPreferences(mPreferences), is(TestEnum.SPRING));
 		preference.updateValue(TestEnum.AUTUMN);
 		assertThat(preference.putIntoPreferences(mPreferences), is(true));
-		preference.clear();
+		preference.invalidate();
 		assertThat(preference.getFromPreferences(mPreferences), is(TestEnum.AUTUMN));
 	}
 }

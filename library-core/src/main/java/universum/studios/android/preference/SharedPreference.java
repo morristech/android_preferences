@@ -262,7 +262,7 @@ public abstract class SharedPreference<T> {
 	 *
 	 * @param newValue New value for this preference.
 	 * @return This preference to allow methods chaining.
-	 * @see #save(SharedPreferences)
+	 * @see #getValue()
 	 */
 	public SharedPreference<T> updateValue(@Nullable T newValue) {
 		if (mValue == null || !mValue.equals(newValue)) {
@@ -278,6 +278,9 @@ public abstract class SharedPreference<T> {
 	 * @param preferences The instance of shared preferences where should be the actual value of
 	 *                    this preference persisted.
 	 * @return {@code True} if put has been successful, {@code false} otherwise.
+	 * @see #getFromPreferences(SharedPreferences)
+	 * @see #updateValue(Object)
+	 * @see #getValue()
 	 */
 	public final boolean putIntoPreferences(@NonNull SharedPreferences preferences) {
 		this.ensureValidKeyOrThrow();
@@ -313,12 +316,18 @@ public abstract class SharedPreference<T> {
 	}
 
 	/**
-	 * Performs obtaining of the actual value of this preference from the given shared preferences.
+	 * Obtains the actual value of this preference that is persisted within the given shared
+	 * <var>preferences</var>.
+	 * <p>
+	 * <b>Note</b>, that the value is obtained only in case when this preference does not already
+	 * hold the actual value which may be obtained via {@link #getValue()}.
 	 *
-	 * @param preferences The instance of shared preferences into which was the value of this preference
-	 *                    before saved.
-	 * @return The actual value obtained from the given shared preferences or {@code null} if this
-	 * preference's key is invalid.
+	 * @param preferences The instance of shared preferences from which to obtain the actual value
+	 *                    if needed.
+	 * @return The actual value either already hold by this preference or obtained from the preferences.
+	 * May be also the default value is there is no value persisted yet.
+	 * @see #getDefaultValue()
+	 * @see #putIntoPreferences(SharedPreferences)
 	 */
 	final T getFromPreferences(SharedPreferences preferences) {
 		this.ensureValidKeyOrThrow();
@@ -391,9 +400,10 @@ public abstract class SharedPreference<T> {
 	}
 
 	/**
-	 * Clears the actual value of this preference.
+	 * Invalidates the actual value of this preference so next call to {@link #getFromPreferences(SharedPreferences)}
+	 * will obtain the actual value from the specified preferences in order to refresh it.
 	 */
-	final void clear() {
+	final void invalidate() {
 		this.mValue = null;
 		this.mValueIsActual = false;
 	}
