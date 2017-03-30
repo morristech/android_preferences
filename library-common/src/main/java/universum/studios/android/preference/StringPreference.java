@@ -37,7 +37,7 @@ import android.support.annotation.StringRes;
  */
 public final class StringPreference extends SharedPreference<String> {
 
-	/**
+	/*
 	 * Constructors ================================================================================
 	 */
 
@@ -59,7 +59,7 @@ public final class StringPreference extends SharedPreference<String> {
 		super(keyResId, defValue);
 	}
 
-	/**
+	/*
 	 * Methods =====================================================================================
 	 */
 

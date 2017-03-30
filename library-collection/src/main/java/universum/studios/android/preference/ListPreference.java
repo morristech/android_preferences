@@ -38,7 +38,7 @@ import java.util.List;
  */
 public final class ListPreference<T> extends SharedPreference<List<T>> {
 
-	/**
+	/*
 	 * Members =====================================================================================
 	 */
 
@@ -47,7 +47,7 @@ public final class ListPreference<T> extends SharedPreference<List<T>> {
 	 */
 	private final Class<T> mComponentType;
 
-	/**
+	/*
 	 * Constructors ================================================================================
 	 */
 
@@ -75,7 +75,7 @@ public final class ListPreference<T> extends SharedPreference<List<T>> {
 		this.mComponentType = componentType;
 	}
 
-	/**
+	/*
 	 * Methods =====================================================================================
 	 */
 

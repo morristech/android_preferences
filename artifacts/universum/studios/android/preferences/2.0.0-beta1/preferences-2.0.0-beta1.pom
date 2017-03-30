@@ -41,5 +41,18 @@
       <version>25.3.0</version>
       <scope>compile</scope>
     </dependency>
+    <dependency>
+      <groupId>universum.studios.android</groupId>
+      <artifactId>crypto-core</artifactId>
+      <version>0.1.2</version>
+      <type>aar</type>
+      <scope>compile</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>*</artifactId>
+          <groupId>*</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
   </dependencies>
 </project>

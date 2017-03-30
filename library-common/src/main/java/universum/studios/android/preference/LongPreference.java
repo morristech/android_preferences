@@ -37,7 +37,7 @@ import android.support.annotation.StringRes;
  */
 public final class LongPreference extends SharedPreference<Long> {
 
-	/**
+	/*
 	 * Constructors ================================================================================
 	 */
 
@@ -59,7 +59,7 @@ public final class LongPreference extends SharedPreference<Long> {
 		super(keyResId, defValue);
 	}
 
-	/**
+	/*
 	 * Methods =====================================================================================
 	 */
 
