@@ -1,7 +1,7 @@
 Change-Log
 ===============
 
-### Release 2.0.0 ###
+### Release 2.0.0-beta1 ###
 > --.--.2017
 
 - todo:
