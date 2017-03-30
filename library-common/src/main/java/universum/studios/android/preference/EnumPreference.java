@@ -79,7 +79,7 @@ public final class EnumPreference<E extends Enum> extends SharedPreference<E> {
 	@Override
 	@SuppressWarnings("unchecked")
 	protected E onGetFromPreferences(@NonNull SharedPreferences preferences) {
-		final String enumName = preferences.getString(mKey, mDefaultValue != null ? mDefaultValue.name() : "");
-		return !TextUtils.isEmpty(enumName) ? (E) E.valueOf(mDefaultValue.getClass(), enumName) : null;
+		final String enumName = preferences.getString(mKey, mDefaultValue == null ? "" : mDefaultValue.name());
+		return TextUtils.isEmpty(enumName) ? null : (E) E.valueOf(mDefaultValue.getClass(), enumName);
 	}
 }

@@ -102,19 +102,19 @@ public final class ListPreference<T> extends SharedPreference<List<T>> {
 	@SuppressWarnings("unchecked")
 	public static <T> boolean putIntoPreferences(@NonNull SharedPreferences preferences, @NonNull String key, @Nullable List<T> list, @NonNull Class<T> componentType) {
 		final SharedPreferences.Editor editor = preferences.edit();
-		if (list != null) {
-			final T[] array = (T[]) ArrayPreference.createArrayInSize(componentType, list.size());
-			if (array != null) {
-				list.toArray(array);
-				return ArrayPreference.putIntoPreferences(preferences, key, array);
-			}
-			final String componentName = componentType.getSimpleName();
-			throw new IllegalArgumentException(
-					"Failed to put list of(" + componentName + ") into shared preferences. " +
-							"Only lists of primitive types or theirs boxed representations including String are supported."
-			);
-		} else {
+		if (list == null) {
 			editor.putString(key, null);
+		} else {
+			final T[] array = (T[]) ArrayPreference.createArrayInSize(componentType, list.size());
+			if (array == null) {
+				final String componentName = componentType.getSimpleName();
+				throw new IllegalArgumentException(
+						"Failed to put list of(" + componentName + ") into shared preferences. " +
+								"Only lists of primitive types or theirs boxed representations including String are supported."
+				);
+			}
+			list.toArray(array);
+			return ArrayPreference.putIntoPreferences(preferences, key, array);
 		}
 		return editor.commit();
 	}
