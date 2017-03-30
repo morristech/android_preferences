@@ -28,11 +28,10 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * A {@link SharedPreference} implementation that may be used to manage (store/retrieve) a {@link List}
- * preference value within {@link SharedPreferences}.
+ * A {@link SharedPreference} implementation that may be used to persist a {@link List} of values
+ * via {@link SharedPreferences}.
  *
- * @param <T> A type of the items within a list that can this implementation of preference hold and
- *            manage its storing/retrieving.
+ * @param <T> Type of items within a list of which values should be persisted.
  * @author Martin Albedinsky
  * @see ArrayPreference
  */
@@ -52,7 +51,7 @@ public final class ListPreference<T> extends SharedPreference<List<T>> {
 	 */
 
 	/**
-	 * Creates a new instance of universum.studios.android.preference.ListPreference.
+	 * Creates a new instance of ListPreference.
 	 *
 	 * @param componentType Class of components that will be presented within a list managed by the
 	 *                      new list preference.
@@ -64,12 +63,16 @@ public final class ListPreference<T> extends SharedPreference<List<T>> {
 	}
 
 	/**
-	 * Creates a new instance of universum.studios.android.preference.ListPreference.
+	 * <b>This constructor has been deprecated and will be removed in the next release.</b>
+	 * <p>
+	 * Creates a new instance of ListPreference.
 	 *
 	 * @param componentType Class of components that will be presented within a list managed by the
 	 *                      new list preference.
 	 * @see SharedPreference#SharedPreference(int, Object)
+	 * @deprecated Use {@link #ListPreference(String, Class, List)} instead.
 	 */
+	@Deprecated
 	public ListPreference(@StringRes int keyResId, @NonNull Class<T> componentType, @Nullable List<T> defValue) {
 		super(keyResId, defValue);
 		this.mComponentType = componentType;

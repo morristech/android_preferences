@@ -25,8 +25,8 @@ import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 
 /**
- * A {@link SharedPreference} implementation that may be used to manage (store/retrieve) an {@link Integer}
- * preference value within {@link SharedPreferences}.
+ * A {@link SharedPreference} implementation that may be used to persist a {@link Integer} value via
+ * {@link SharedPreferences}.
  *
  * @author Martin Albedinsky
  * @see BooleanPreference
@@ -51,10 +51,14 @@ public final class IntegerPreference extends SharedPreference<Integer> {
 	}
 
 	/**
+	 * <b>This constructor has been deprecated and will be removed in the next release.</b>
+	 * <p>
 	 * Creates a new instance of IntegerPreference.
 	 *
 	 * @see SharedPreference#SharedPreference(int, Object)
+	 * @deprecated Use {@link #IntegerPreference(String, Integer)} instead.
 	 */
+	@Deprecated
 	public IntegerPreference(@StringRes int keyResId, @NonNull Integer defValue) {
 		super(keyResId, defValue);
 	}

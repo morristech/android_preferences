@@ -25,8 +25,8 @@ import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 
 /**
- * A {@link SharedPreference} implementation that may be used to manage (store/retrieve) a {@link Boolean}
- * preference value within {@link SharedPreferences}.
+ * A {@link SharedPreference} implementation that may be used to persist a {@link Boolean} value via
+ * {@link SharedPreferences}.
  *
  * @author Martin Albedinsky
  * @see StringPreference
@@ -51,10 +51,14 @@ public final class BooleanPreference extends SharedPreference<Boolean> {
 	}
 
 	/**
+	 * <b>This constructor has been deprecated and will be removed in the next release.</b>
+	 * <p>
 	 * Creates a new instance of BooleanPreference.
 	 *
 	 * @see SharedPreference#SharedPreference(int, Object)
+	 * @deprecated Use {@link #BooleanPreference(String, Boolean)} instead.
 	 */
+	@Deprecated
 	public BooleanPreference(@StringRes int keyResId, @NonNull Boolean defValue) {
 		super(keyResId, defValue);
 	}
