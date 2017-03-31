@@ -41,7 +41,8 @@ public final class SharedPreferencesCaches {
 	}
 
 	/**
-	 * Returns a new instance of {@link SharedPreferencesCache} that is backed by {@link java.util.Map Map}.
+	 * Returns a new instance of {@link SharedPreferencesCache} that is backed by implementation of
+	 * {@link java.util.Map Map}.
 	 *
 	 * @return Preferences cache ready to be used.
 	 */
