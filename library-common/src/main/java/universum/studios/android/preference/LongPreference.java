@@ -46,7 +46,7 @@ public final class LongPreference extends SharedPreference<Long> {
 	 *
 	 * @see SharedPreference#SharedPreference(String, Object)
 	 */
-	public LongPreference(@NonNull String key, @NonNull Long defValue) {
+	public LongPreference(@NonNull final String key, @NonNull final Long defValue) {
 		super(key, defValue);
 	}
 
@@ -59,7 +59,7 @@ public final class LongPreference extends SharedPreference<Long> {
 	 * @deprecated Use {@link #LongPreference(String, Long)} instead.
 	 */
 	@Deprecated
-	public LongPreference(@StringRes int keyResId, @NonNull Long defValue) {
+	public LongPreference(@StringRes final int keyResId, @NonNull final Long defValue) {
 		super(keyResId, defValue);
 	}
 
@@ -71,7 +71,7 @@ public final class LongPreference extends SharedPreference<Long> {
 	 */
 	@Override
 	@CheckResult
-	protected boolean onPutIntoPreferences(@NonNull SharedPreferences preferences) {
+	protected boolean onPutIntoPreferences(@NonNull final SharedPreferences preferences) {
 		return preferences.edit().putLong(mKey, mValue).commit();
 	}
 
@@ -79,7 +79,7 @@ public final class LongPreference extends SharedPreference<Long> {
 	 */
 	@Nullable
 	@Override
-	protected Long onGetFromPreferences(@NonNull SharedPreferences preferences) {
+	protected Long onGetFromPreferences(@NonNull final SharedPreferences preferences) {
 		return preferences.getLong(mKey, mDefaultValue);
 	}
 }

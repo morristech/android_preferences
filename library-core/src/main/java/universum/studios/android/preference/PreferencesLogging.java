@@ -61,7 +61,7 @@ public final class PreferencesLogging {
 	 * @param logger The desired logger. May by {@code null} to use default logger.
 	 * @see #getLogger()
 	 */
-	public static void setLogger(@Nullable Logger logger) {
+	public static void setLogger(@Nullable final Logger logger) {
 		sLogger = logger == null ? LOGGER : logger;
 	}
 
@@ -79,98 +79,98 @@ public final class PreferencesLogging {
 	/**
 	 * Delegates to {@link Logger#d(String, String)}.
 	 */
-	public static void d(@NonNull String tag, @NonNull String msg) {
+	public static void d(@NonNull final String tag, @NonNull final String msg) {
 		sLogger.d(tag, msg);
 	}
 
 	/**
 	 * Delegates to {@link Logger#d(String, String, Throwable)}.
 	 */
-	public static void d(@NonNull String tag, @NonNull String msg, @Nullable Throwable tr) {
+	public static void d(@NonNull final String tag, @NonNull final String msg, @Nullable final Throwable tr) {
 		sLogger.d(tag, msg, tr);
 	}
 
 	/**
 	 * Delegates to {@link Logger#v(String, String)}.
 	 */
-	public static void v(@NonNull String tag, @NonNull String msg) {
+	public static void v(@NonNull final String tag, @NonNull final String msg) {
 		sLogger.d(tag, msg);
 	}
 
 	/**
 	 * Delegates to {@link Logger#v(String, String, Throwable)}.
 	 */
-	public static void v(@NonNull String tag, @NonNull String msg, @Nullable Throwable tr) {
+	public static void v(@NonNull final String tag, @NonNull final String msg, @Nullable final Throwable tr) {
 		sLogger.v(tag, msg, tr);
 	}
 
 	/**
 	 * Delegates to {@link Logger#i(String, String)}.
 	 */
-	public static void i(@NonNull String tag, @NonNull String msg) {
+	public static void i(@NonNull final String tag, @NonNull final String msg) {
 		sLogger.i(tag, msg);
 	}
 
 	/**
 	 * Delegates to {@link Logger#i(String, String, Throwable)}.
 	 */
-	public static void i(@NonNull String tag, @NonNull String msg, @Nullable Throwable tr) {
+	public static void i(@NonNull final String tag, @NonNull final String msg, @Nullable final Throwable tr) {
 		sLogger.i(tag, msg, tr);
 	}
 
 	/**
 	 * Delegates to {@link Logger#w(String, String)}.
 	 */
-	public static void w(@NonNull String tag, @NonNull String msg) {
+	public static void w(@NonNull final String tag, @NonNull final String msg) {
 		sLogger.w(tag, msg);
 	}
 
 	/**
 	 * Delegates to {@link Logger#w(String, Throwable)}.
 	 */
-	public static void w(@NonNull String tag, @Nullable Throwable tr) {
+	public static void w(@NonNull final String tag, @Nullable final Throwable tr) {
 		sLogger.w(tag, tr);
 	}
 
 	/**
 	 * Delegates to {@link Logger#w(String, String, Throwable)}.
 	 */
-	public static void w(@NonNull String tag, @NonNull String msg, @Nullable Throwable tr) {
+	public static void w(@NonNull final String tag, @NonNull final String msg, @Nullable final Throwable tr) {
 		sLogger.w(tag, msg, tr);
 	}
 
 	/**
 	 * Delegates to {@link Logger#e(String, String)}.
 	 */
-	public static void e(@NonNull String tag, @NonNull String msg) {
+	public static void e(@NonNull final String tag, @NonNull final String msg) {
 		sLogger.e(tag, msg);
 	}
 
 	/**
 	 * Delegates to {@link Logger#e(String, String, Throwable)}.
 	 */
-	public static void e(@NonNull String tag, @NonNull String msg, @Nullable Throwable tr) {
+	public static void e(@NonNull final String tag, @NonNull final String msg, @Nullable final Throwable tr) {
 		sLogger.e(tag, msg, tr);
 	}
 
 	/**
 	 * Delegates to {@link Logger#wtf(String, String)}.
 	 */
-	public static void wtf(@NonNull String tag, @NonNull String msg) {
+	public static void wtf(@NonNull final String tag, @NonNull final String msg) {
 		sLogger.w(tag, msg);
 	}
 
 	/**
 	 * Delegates to {@link Logger#wtf(String, Throwable)}.
 	 */
-	public static void wtf(@NonNull String tag, @Nullable Throwable tr) {
+	public static void wtf(@NonNull final String tag, @Nullable final Throwable tr) {
 		sLogger.w(tag, tr);
 	}
 
 	/**
 	 * Delegates to {@link Logger#wtf(String, String, Throwable)}.
 	 */
-	public static void wtf(@NonNull String tag, @NonNull String msg, @Nullable Throwable tr) {
+	public static void wtf(@NonNull final String tag, @NonNull final String msg, @Nullable final Throwable tr) {
 		sLogger.wtf(tag, msg, tr);
 	}
 }

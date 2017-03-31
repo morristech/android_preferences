@@ -23,6 +23,7 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -59,8 +60,7 @@ public class SimpleSharedPreferencesFacade implements SharedPreferencesFacade {
 	 * Instance of SharedPreferences that is used by this facade implementation to manage putting and
 	 * obtaining of values into/from preferences in a simple way.
 	 */
-	@NonNull
-	protected final SharedPreferences mPreferences;
+	private final SharedPreferences mPreferences;
 
 	/*
 	 * Constructors ================================================================================
@@ -81,30 +81,41 @@ public class SimpleSharedPreferencesFacade implements SharedPreferencesFacade {
 	 */
 
 	/**
+	 * Returns the {@link SharedPreferences} that are hidden behind this facade.
+	 *
+	 * @return The associated preferences.
+	 * @see Builder#preferences(SharedPreferences)
+	 */
+	@NonNull
+	public final SharedPreferences getPreferences() {
+		return mPreferences;
+	}
+
+	/**
 	 */
 	@Override
-	public void registerOnSharedPreferenceChangeListener(@NonNull SharedPreferences.OnSharedPreferenceChangeListener listener) {
+	public void registerOnSharedPreferenceChangeListener(@NonNull final SharedPreferences.OnSharedPreferenceChangeListener listener) {
+		mPreferences.registerOnSharedPreferenceChangeListener(listener);
+	}
+
+	/**
+	 */
+	@Override
+	public void unregisterOnSharedPreferenceChangeListener(@NonNull final SharedPreferences.OnSharedPreferenceChangeListener listener) {
 		mPreferences.unregisterOnSharedPreferenceChangeListener(listener);
 	}
 
 	/**
 	 */
 	@Override
-	public void unregisterOnSharedPreferenceChangeListener(@NonNull SharedPreferences.OnSharedPreferenceChangeListener listener) {
-		mPreferences.unregisterOnSharedPreferenceChangeListener(listener);
-	}
-
-	/**
-	 */
-	@Override
-	public boolean contains(@NonNull String key) {
+	public boolean contains(@NonNull final String key) {
 		return mPreferences.contains(key);
 	}
 
 	/**
 	 */
 	@Override
-	public boolean putString(@NonNull String key, @Nullable String value) {
+	public boolean putString(@NonNull final String key, @Nullable final String value) {
 		return mPreferences.edit().putString(key, value).commit();
 	}
 
@@ -112,7 +123,7 @@ public class SimpleSharedPreferencesFacade implements SharedPreferencesFacade {
 	 */
 	@Nullable
 	@Override
-	public String getString(@NonNull String key, @Nullable String defValue) {
+	public String getString(@NonNull final String key, @Nullable final String defValue) {
 		return mPreferences.getString(key, defValue);
 	}
 
@@ -121,7 +132,7 @@ public class SimpleSharedPreferencesFacade implements SharedPreferencesFacade {
 	 * this method does nothing and always returns {@code false}.
 	 */
 	@Override
-	public boolean putStringSet(@NonNull String key, @Nullable Set<String> values) {
+	public boolean putStringSet(@NonNull final String key, @Nullable final Set<String> values) {
 		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB && mPreferences.edit().putStringSet(key, values).commit();
 	}
 
@@ -131,71 +142,85 @@ public class SimpleSharedPreferencesFacade implements SharedPreferencesFacade {
 	 */
 	@Nullable
 	@Override
-	public Set<String> getStringSet(@NonNull String key, @Nullable Set<String> defValues) {
+	public Set<String> getStringSet(@NonNull final String key, @Nullable final Set<String> defValues) {
 		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB ? mPreferences.getStringSet(key, defValues) : null;
 	}
 
 	/**
 	 */
 	@Override
-	public boolean putInt(@NonNull String key, int value) {
+	public boolean putInt(@NonNull final String key, final int value) {
 		return mPreferences.edit().putInt(key, value).commit();
 	}
 
 	/**
 	 */
 	@Override
-	public int getInt(@NonNull String key, int defValue) {
+	public int getInt(@NonNull final String key, final int defValue) {
 		return mPreferences.getInt(key, defValue);
 	}
 
 	/**
 	 */
 	@Override
-	public boolean putFloat(@NonNull String key, float value) {
+	public boolean putFloat(@NonNull final String key, final float value) {
 		return mPreferences.edit().putFloat(key, value).commit();
 	}
 
 	/**
 	 */
 	@Override
-	public float getFloat(@NonNull String key, float defValue) {
+	public float getFloat(@NonNull final String key, final float defValue) {
 		return mPreferences.getFloat(key, defValue);
 	}
 
 	/**
 	 */
 	@Override
-	public boolean putLong(@NonNull String key, long value) {
+	public boolean putLong(@NonNull final String key, final long value) {
 		return mPreferences.edit().putLong(key, value).commit();
 	}
 
 	/**
 	 */
 	@Override
-	public long getLong(@NonNull String key, long defValue) {
+	public long getLong(@NonNull final String key, final long defValue) {
 		return mPreferences.getLong(key, defValue);
 	}
 
 	/**
 	 */
 	@Override
-	public boolean putBoolean(@NonNull String key, boolean value) {
+	public boolean putBoolean(@NonNull final String key, final boolean value) {
 		return mPreferences.edit().putBoolean(key, value).commit();
 	}
 
 	/**
 	 */
 	@Override
-	public boolean getBoolean(@NonNull String key, boolean defValue) {
+	public boolean getBoolean(@NonNull final String key, final boolean defValue) {
 		return mPreferences.getBoolean(key, defValue);
 	}
 
 	/**
 	 */
 	@Override
-	public boolean remove(@NonNull String key) {
+	public boolean remove(@NonNull final String key) {
 		return mPreferences.edit().remove(key).commit();
+	}
+
+	/**
+	 */
+	@Override
+	public int removeAll() {
+		final Map<String, ?> values = mPreferences.getAll();
+		int result = 0;
+		if (!values.isEmpty()) {
+			for (final Map.Entry<String, ?> entry : values.entrySet()) {
+				if (mPreferences.edit().remove(entry.getKey()).commit()) result++;
+			}
+		}
+		return result;
 	}
 
 	/*
@@ -203,9 +228,16 @@ public class SimpleSharedPreferencesFacade implements SharedPreferencesFacade {
 	 */
 
 	/**
-	 * Builder that may be used to creates new instances of SimpleSharedPreferencesFacade that hide
-	 * a desired shared <var>preferences</var> instance in order to support simple <var>putting</var>
+	 * Builder that may be used to create instances of {@link SimpleSharedPreferencesFacade} which
+	 * hide a desired shared <var>preferences</var> instance in order to support simple <var>putting</var>
 	 * and <var>obtaining</var> of values stored in such preferences.
+	 *
+	 * <h3>Required parameters</h3>
+	 * Parameters specified below are required in order to create a new instance of
+	 * {@link SimpleSharedPreferencesFacade} via {@link Builder#build()} successfully.
+	 * <ul>
+	 * <li>{@link #preferences(SharedPreferences)}</li>
+	 * </ul>
 	 *
 	 * @param <B> Type of the builder used for methods chaining.
 	 * @author Martin Albedinsky
@@ -224,17 +256,17 @@ public class SimpleSharedPreferencesFacade implements SharedPreferencesFacade {
 		 * @return This builder to allow methods chaining.
 		 */
 		@SuppressWarnings("unchecked")
-		public B preferences(@NonNull SharedPreferences preferences) {
+		public B preferences(@NonNull final SharedPreferences preferences) {
 			this.preferences = preferences;
 			return (B) this;
 		}
 
 		/**
-		 * Builds a new instance of SimpleSharedPreferencesFacade from the configuration specified
+		 * Builds a new instance of SimpleSharedPreferencesFacade with the configuration specified
 		 * for this builder.
 		 *
 		 * @return Instance of preferences facade ready to be used.
-		 * @throws IllegalArgumentException If some of the required parameters are missing.
+		 * @throws IllegalArgumentException If some of the required parameters is missing.
 		 */
 		@NonNull
 		public SimpleSharedPreferencesFacade build() {

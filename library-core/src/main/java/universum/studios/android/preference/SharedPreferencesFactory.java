@@ -45,7 +45,7 @@ public interface SharedPreferencesFactory {
 		 */
 		@NonNull
 		@Override
-		public SharedPreferences createPreferences(@NonNull Context context) {
+		public SharedPreferences createPreferences(@NonNull final Context context) {
 			return PreferenceManager.getDefaultSharedPreferences(context);
 		}
 	};
@@ -95,7 +95,7 @@ public interface SharedPreferencesFactory {
 		 * @param fileName The desired name for preferences file.
 		 * @see #SimpleFactory(String, int)
 		 */
-		public SimpleFactory(@NonNull String fileName) {
+		public SimpleFactory(@NonNull final String fileName) {
 			this(fileName, SharedPreferencesPolicy.FILE_MODE_PRIVATE);
 		}
 
@@ -106,7 +106,7 @@ public interface SharedPreferencesFactory {
 		 * @param fileName The desired name for preferences file.
 		 * @param fileMode The desired creation mode for preferences file.
 		 */
-		public SimpleFactory(@NonNull String fileName, @SharedPreferencesPolicy.FileMode int fileMode) {
+		public SimpleFactory(@NonNull final String fileName, @SharedPreferencesPolicy.FileMode final int fileMode) {
 			this.fileName = fileName;
 			this.fileMode = fileMode;
 		}
@@ -115,7 +115,7 @@ public interface SharedPreferencesFactory {
 		 */
 		@NonNull
 		@Override
-		public SharedPreferences createPreferences(@NonNull Context context) {
+		public SharedPreferences createPreferences(@NonNull final Context context) {
 			return context.getSharedPreferences(fileName, fileMode);
 		}
 	}

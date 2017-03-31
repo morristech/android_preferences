@@ -46,7 +46,7 @@ public final class StringPreference extends SharedPreference<String> {
 	 *
 	 * @see SharedPreference#SharedPreference(String, Object)
 	 */
-	public StringPreference(@NonNull String key, @Nullable String defValue) {
+	public StringPreference(@NonNull final String key, @Nullable final String defValue) {
 		super(key, defValue);
 	}
 
@@ -71,7 +71,7 @@ public final class StringPreference extends SharedPreference<String> {
 	 */
 	@Override
 	@CheckResult
-	protected boolean onPutIntoPreferences(@NonNull SharedPreferences preferences) {
+	protected boolean onPutIntoPreferences(@NonNull final SharedPreferences preferences) {
 		return preferences.edit().putString(mKey, mValue).commit();
 	}
 
@@ -79,7 +79,7 @@ public final class StringPreference extends SharedPreference<String> {
 	 */
 	@Nullable
 	@Override
-	protected String onGetFromPreferences(@NonNull SharedPreferences preferences) {
+	protected String onGetFromPreferences(@NonNull final SharedPreferences preferences) {
 		return preferences.getString(mKey, mDefaultValue);
 	}
 }

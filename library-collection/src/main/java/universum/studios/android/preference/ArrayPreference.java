@@ -61,7 +61,7 @@ public final class ArrayPreference<T> extends SharedPreference<T> {
 	 * @throws IllegalArgumentException If the given <var>defValue</var> is not actually an array.
 	 * @see SharedPreference#SharedPreference(String, Object)
 	 */
-	public ArrayPreference(@NonNull String key, @Nullable T defValue) {
+	public ArrayPreference(@NonNull final String key, @Nullable final T defValue) {
 		super(key, defValue);
 		assertIsArrayOrThrow(defValue);
 	}
@@ -91,7 +91,7 @@ public final class ArrayPreference<T> extends SharedPreference<T> {
 	 *
 	 * @param value The value to be check if it is an array.
 	 */
-	private static void assertIsArrayOrThrow(Object value) {
+	private static void assertIsArrayOrThrow(final Object value) {
 		if (value != null && !value.getClass().isArray()) {
 			throw new IllegalArgumentException("Not an array(" + value.getClass().getSimpleName() + ").");
 		}
@@ -102,7 +102,7 @@ public final class ArrayPreference<T> extends SharedPreference<T> {
 	 */
 	@Override
 	@CheckResult
-	protected boolean onPutIntoPreferences(@NonNull SharedPreferences preferences) {
+	protected boolean onPutIntoPreferences(@NonNull final SharedPreferences preferences) {
 		return putIntoPreferences(preferences, mKey, mValue);
 	}
 
@@ -116,7 +116,7 @@ public final class ArrayPreference<T> extends SharedPreference<T> {
 	 * @throws IllegalArgumentException If the given <var>array</var> is not actually an array.
 	 */
 	@CheckResult
-	public static boolean putIntoPreferences(@NonNull SharedPreferences preferences, @NonNull String key, @Nullable Object array) {
+	public static boolean putIntoPreferences(@NonNull final SharedPreferences preferences, @NonNull final String key, @Nullable final Object array) {
 		if (array == null) {
 			return preferences.edit().putString(key, null).commit();
 		}
@@ -145,7 +145,7 @@ public final class ArrayPreference<T> extends SharedPreference<T> {
 	 * @return Class of the given array or {@code null} if the given array is not supported by this
 	 * preference.
 	 */
-	static Class<?> resolveArrayClass(Object array) {
+	static Class<?> resolveArrayClass(final Object array) {
 		if (array instanceof boolean[]) {
 			return boolean[].class;
 		} else if (array instanceof byte[]) {
@@ -188,7 +188,7 @@ public final class ArrayPreference<T> extends SharedPreference<T> {
 	@Nullable
 	@Override
 	@SuppressWarnings("unchecked")
-	protected T onGetFromPreferences(@NonNull SharedPreferences preferences) {
+	protected T onGetFromPreferences(@NonNull final SharedPreferences preferences) {
 		return getFromPreferences(preferences, mKey, mDefaultValue);
 	}
 
@@ -211,7 +211,7 @@ public final class ArrayPreference<T> extends SharedPreference<T> {
 	 * @throws IllegalStateException    If the requested array was not stored by the Preferences library.
 	 */
 	@SuppressWarnings("unchecked")
-	public static <A> A getFromPreferences(@NonNull SharedPreferences preferences, @NonNull String key, @Nullable Object defValue) {
+	public static <A> A getFromPreferences(@NonNull final SharedPreferences preferences, @NonNull final String key, @Nullable final Object defValue) {
 		Object array = defValue;
 		final String value = preferences.getString(key, null);
 		if (!TextUtils.isEmpty(value)) {
@@ -257,7 +257,7 @@ public final class ArrayPreference<T> extends SharedPreference<T> {
 	 * or does not match array preference structure.
 	 */
 	@Nullable
-	static String extractArrayValueFromPreferenceValue(String value) {
+	static String extractArrayValueFromPreferenceValue(final String value) {
 		if (!TextUtils.isEmpty(value) && VALUE_MATCHER.reset(value).matches()) {
 			return VALUE_MATCHER.group(2);
 		}
@@ -272,7 +272,7 @@ public final class ArrayPreference<T> extends SharedPreference<T> {
 	 * @param index      The index at which should be the value updated.
 	 * @param value      The value to update to.
 	 */
-	private static void setArrayValueAt(Class<?> arrayClass, Object array, int index, Object value) {
+	private static void setArrayValueAt(final Class<?> arrayClass, final Object array, final int index, final Object value) {
 		if (value == null) {
 			Array.set(array, index, null);
 			return;
@@ -297,7 +297,7 @@ public final class ArrayPreference<T> extends SharedPreference<T> {
 	 * @return Array class associated with the specified name or {@code Object[].class} if the given
 	 * class name is associated to an array that is not supported by this preference.
 	 */
-	static Class<?> resolveArrayClassByName(String arrayClassName) {
+	static Class<?> resolveArrayClassByName(final String arrayClassName) {
 		switch (arrayClassName) {
 			case "boolean[]":
 				return boolean[].class;
@@ -343,7 +343,7 @@ public final class ArrayPreference<T> extends SharedPreference<T> {
 	 * @param size           Initial size of the array.
 	 * @return New instance of the requested array.
 	 */
-	static Object createArrayInSize(Class<?> componentClass, int size) {
+	static Object createArrayInSize(final Class<?> componentClass, final int size) {
 		if (boolean.class.equals(componentClass)) {
 			return new boolean[size];
 		} else if (byte.class.equals(componentClass)) {

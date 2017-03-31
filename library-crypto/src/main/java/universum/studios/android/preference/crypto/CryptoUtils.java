@@ -29,6 +29,9 @@ import universum.studios.android.crypto.Decrypto;
 import universum.studios.android.crypto.Encrypto;
 
 /**
+ * Utility class used by {@link CryptoSharedPreferences} to perform encryption and decryption related
+ * operations.
+ *
  * @author Martin Albedinsky
  */
 final class CryptoUtils {
@@ -57,7 +60,7 @@ final class CryptoUtils {
 	 * @see Cryptography#CHARSET_NAME
 	 */
 	@Nullable
-	static String encrypt(@Nullable String value, @NonNull Encrypto encrypto) {
+	static String encrypt(@Nullable final String value, @NonNull final Encrypto encrypto) {
 		if (value == null || value.length() == 0) {
 			return value;
 		}
@@ -87,7 +90,7 @@ final class CryptoUtils {
 	 * @see Cryptography#CHARSET_NAME
 	 */
 	@Nullable
-	static String decrypt(@Nullable String value, @NonNull Decrypto decrypto) {
+	static String decrypt(@Nullable final String value, @NonNull final Decrypto decrypto) {
 		if (value == null || value.length() == 0) {
 			return value;
 		}

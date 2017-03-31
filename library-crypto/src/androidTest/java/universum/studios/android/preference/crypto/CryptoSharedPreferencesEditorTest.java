@@ -27,10 +27,10 @@ import org.junit.runner.RunWith;
  * @author Martin Albedinsky
  */
 @RunWith(AndroidJUnit4.class)
-public final class CryptoSharedPreferencesTest extends BaseCryptoPreferencesTest {
+public final class CryptoSharedPreferencesEditorTest extends BaseCryptoPreferencesTest {
 
 	@SuppressWarnings("unused")
-	private static final String TAG = "CryptoSharedPreferencesTest";
+	private static final String TAG = "CryptoSharedPreferencesEditorTest";
 
 	@Test
 	public void test() {

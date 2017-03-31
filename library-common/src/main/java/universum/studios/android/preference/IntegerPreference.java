@@ -46,7 +46,7 @@ public final class IntegerPreference extends SharedPreference<Integer> {
 	 *
 	 * @see SharedPreference#SharedPreference(String, Object)
 	 */
-	public IntegerPreference(@NonNull String key, @NonNull Integer defValue) {
+	public IntegerPreference(@NonNull final String key, @NonNull final Integer defValue) {
 		super(key, defValue);
 	}
 
@@ -71,7 +71,7 @@ public final class IntegerPreference extends SharedPreference<Integer> {
 	 */
 	@Override
 	@CheckResult
-	protected boolean onPutIntoPreferences(@NonNull SharedPreferences preferences) {
+	protected boolean onPutIntoPreferences(@NonNull final SharedPreferences preferences) {
 		return preferences.edit().putInt(mKey, mValue).commit();
 	}
 
@@ -79,7 +79,7 @@ public final class IntegerPreference extends SharedPreference<Integer> {
 	 */
 	@Nullable
 	@Override
-	protected Integer onGetFromPreferences(@NonNull SharedPreferences preferences) {
+	protected Integer onGetFromPreferences(@NonNull final SharedPreferences preferences) {
 		return preferences.getInt(mKey, mDefaultValue);
 	}
 }

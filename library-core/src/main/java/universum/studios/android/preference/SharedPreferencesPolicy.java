@@ -99,7 +99,7 @@ public final class SharedPreferencesPolicy {
 	 * @see #preferencesName(Context, String)
 	 * @see PreferenceManager#getDefaultSharedPreferencesName(Context)
 	 */
-	public static String defaultPreferencesName(@NonNull Context context) {
+	public static String defaultPreferencesName(@NonNull final Context context) {
 		return preferencesName(context, DEFAULT_PREFERENCES_NAME_SUFFIX);
 	}
 
@@ -112,7 +112,7 @@ public final class SharedPreferencesPolicy {
 	 * @return Preferences name that may be used in association with {@link Context#getSharedPreferences(String, int)}.
 	 * @see #defaultPreferencesName(Context)
 	 */
-	public static String preferencesName(@NonNull Context context, @NonNull String nameSuffix) {
+	public static String preferencesName(@NonNull final Context context, @NonNull final String nameSuffix) {
 		return context.getPackageName() + nameSuffix;
 	}
 

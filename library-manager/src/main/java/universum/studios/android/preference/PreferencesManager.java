@@ -186,7 +186,7 @@ public class PreferencesManager extends SimpleSharedPreferencesFacade {
 	 * parsing of that value will be not performed, instead actual value will be obtained from that
 	 * preference object.
 	 */
-	private boolean mCachingEnabled = false;
+	private boolean mCachingEnabled;
 
 	/*
 	 * Constructors ================================================================================
@@ -252,7 +252,7 @@ public class PreferencesManager extends SimpleSharedPreferencesFacade {
 	 *
 	 * @param builder
 	 */
-	protected PreferencesManager(@NonNull Builder builder) {
+	protected PreferencesManager(@NonNull final Builder builder) {
 		super(builder);
 		this.mContext = builder.context;
 		this.mPreferencesName = builder.preferencesName;
@@ -262,19 +262,6 @@ public class PreferencesManager extends SimpleSharedPreferencesFacade {
 	/*
 	 * Methods =====================================================================================
 	 */
-
-	/**
-	 * Returns the {@link SharedPreferences} that are managed by this manager.
-	 *
-	 * @return The associated preferences.
-	 * @see Builder#preferences(SharedPreferences)
-	 * @see #getPreferencesName()
-	 * @see #getPreferencesFileMode()
-	 */
-	@NonNull
-	public final SharedPreferences getPreferences() {
-		return mPreferences;
-	}
 
 	/**
 	 * Returns the name of {@link SharedPreferences} that are managed by this manager.
@@ -308,7 +295,7 @@ public class PreferencesManager extends SimpleSharedPreferencesFacade {
 	 * @param enabled {@code True} to enable caching, {@code false} to disable.
 	 * @see #isCachingEnabled()
 	 */
-	public final void setCachingEnabled(boolean enabled) {
+	public final void setCachingEnabled(final boolean enabled) {
 		this.mCachingEnabled = enabled;
 	}
 
@@ -330,7 +317,7 @@ public class PreferencesManager extends SimpleSharedPreferencesFacade {
 	 * @return String key obtained from the context specified for this manager.
 	 */
 	@NonNull
-	protected final String key(@StringRes int resId) {
+	protected final String key(@StringRes final int resId) {
 		return mContext.getString(resId);
 	}
 
@@ -340,6 +327,7 @@ public class PreferencesManager extends SimpleSharedPreferencesFacade {
 	 *
 	 * @param preference Preference for which to persist the value.
 	 * @param value      The value to be persisted.
+	 * @param <T>        Type of the value associated with the preference.
 	 * @return {@code True} if put has been successful, {@code false} otherwise.
 	 * @see #getPreference(SharedPreference)
 	 * @see #containsPreference(SharedPreference)
@@ -347,8 +335,8 @@ public class PreferencesManager extends SimpleSharedPreferencesFacade {
 	 * @see SharedPreference#updateValue(Object)
 	 * @see SharedPreference#putIntoPreferences(SharedPreferences)
 	 */
-	public final <Type> boolean putPreference(@NonNull SharedPreference<Type> preference, @Nullable Type value) {
-		final boolean result = preference.updateValue(value).putIntoPreferences(mPreferences);
+	public final <T> boolean putPreference(@NonNull final SharedPreference<T> preference, @Nullable final T value) {
+		final boolean result = preference.updateValue(value).putIntoPreferences(getPreferences());
 		if (!mCachingEnabled) {
 			preference.invalidate();
 		}
@@ -360,6 +348,7 @@ public class PreferencesManager extends SimpleSharedPreferencesFacade {
 	 * managed by this manager.
 	 *
 	 * @param preference Preference for which to obtain its associated value.
+	 * @param <T>        Type of the value associated with the preference.
 	 * @return Value associated with the preference. May be {@code null} if there is no value persisted
 	 * for the preference yet.
 	 * @see #putPreference(SharedPreference, Object)
@@ -367,8 +356,8 @@ public class PreferencesManager extends SimpleSharedPreferencesFacade {
 	 * @see SharedPreference#getFromPreferences(SharedPreferences)
 	 */
 	@Nullable
-	public final <Type> Type getPreference(@NonNull SharedPreference<Type> preference) {
-		final Type value = preference.getFromPreferences(mPreferences);
+	public final <T> T getPreference(@NonNull final SharedPreference<T> preference) {
+		final T value = preference.getFromPreferences(getPreferences());
 		if (!mCachingEnabled) {
 			preference.invalidate();
 		}
@@ -386,7 +375,7 @@ public class PreferencesManager extends SimpleSharedPreferencesFacade {
 	 * @see #getPreference(SharedPreference)
 	 * @see #removePreference(SharedPreference)
 	 */
-	public final boolean containsPreference(@NonNull SharedPreference preference) {
+	public final boolean containsPreference(@NonNull final SharedPreference preference) {
 		return contains(preference.getKey());
 	}
 
@@ -400,7 +389,7 @@ public class PreferencesManager extends SimpleSharedPreferencesFacade {
 	 * @see #getPreference(SharedPreference)
 	 * @see #containsPreference(SharedPreference)
 	 */
-	public final boolean removePreference(@NonNull SharedPreference preference) {
+	public final boolean removePreference(@NonNull final SharedPreference preference) {
 		return remove(preference.getKey());
 	}
 
@@ -511,6 +500,11 @@ public class PreferencesManager extends SimpleSharedPreferencesFacade {
 	/**
 	 * Builder that may be used to creates new instances of PreferencesManager with a desired configuration.
 	 *
+	 * <h3>Required parameters</h3>
+	 * <ul>
+	 * <li>{@code none}</li>
+	 * </ul>
+	 *
 	 * @author Martin Albedinsky
 	 */
 	public static class Builder extends SimpleSharedPreferencesFacade.Builder<Builder> {
@@ -537,7 +531,8 @@ public class PreferencesManager extends SimpleSharedPreferencesFacade {
 		 * @param context The context that is used to create default preferences instance for this
 		 *                builder if there is no explicit instance of preferences specified.
 		 */
-		public Builder(@NonNull Context context) {
+		public Builder(@NonNull final Context context) {
+			super();
 			this.context = context;
 		}
 
@@ -554,7 +549,7 @@ public class PreferencesManager extends SimpleSharedPreferencesFacade {
 		 * @return This builder to allow methods chaining.
 		 * @see SharedPreferencesPolicy#defaultPreferencesName(Context)
 		 */
-		public Builder preferencesName(@Nullable String name) {
+		public Builder preferencesName(@Nullable final String name) {
 			this.preferencesName = name;
 			return this;
 		}
@@ -572,16 +567,16 @@ public class PreferencesManager extends SimpleSharedPreferencesFacade {
 		 *                 annotation.
 		 * @return This builder to allow methods chaining.
 		 */
-		public Builder preferencesFileMode(@SharedPreferencesPolicy.FileMode int fileMode) {
+		public Builder preferencesFileMode(@SharedPreferencesPolicy.FileMode final int fileMode) {
 			this.preferencesFileMode = fileMode;
 			return this;
 		}
 
 		/**
-		 * Builds a new instance of PreferencesManager from the configuration specified for this builder.
+		 * Builds a new instance of PreferencesManager with the configuration specified for this builder.
 		 *
 		 * @return Instance of preferences manager ready to be used.
-		 * @throws IllegalArgumentException If some of the required parameters are missing.
+		 * @throws IllegalArgumentException If some of the required parameters is missing.
 		 */
 		@NonNull
 		@Override

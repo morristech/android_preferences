@@ -57,7 +57,7 @@ public final class ListPreference<T> extends SharedPreference<List<T>> {
 	 *                      new list preference.
 	 * @see SharedPreference#SharedPreference(String, Object)
 	 */
-	public ListPreference(@NonNull String key, @NonNull Class<T> componentType, @Nullable List<T> defValue) {
+	public ListPreference(@NonNull final String key, @NonNull final Class<T> componentType, @Nullable final List<T> defValue) {
 		super(key, defValue);
 		this.mComponentType = componentType;
 	}
@@ -87,7 +87,7 @@ public final class ListPreference<T> extends SharedPreference<List<T>> {
 	 */
 	@Override
 	@CheckResult
-	protected boolean onPutIntoPreferences(@NonNull SharedPreferences preferences) {
+	protected boolean onPutIntoPreferences(@NonNull final SharedPreferences preferences) {
 		return putIntoPreferences(preferences, mKey, mValue, mComponentType);
 	}
 
@@ -103,7 +103,7 @@ public final class ListPreference<T> extends SharedPreference<List<T>> {
 	 */
 	@CheckResult
 	@SuppressWarnings("unchecked")
-	public static <T> boolean putIntoPreferences(@NonNull SharedPreferences preferences, @NonNull String key, @Nullable List<T> list, @NonNull Class<T> componentType) {
+	public static <T> boolean putIntoPreferences(@NonNull final SharedPreferences preferences, @NonNull final String key, @Nullable final List<T> list, @NonNull final Class<T> componentType) {
 		final SharedPreferences.Editor editor = preferences.edit();
 		if (list == null) {
 			editor.putString(key, null);
@@ -127,7 +127,7 @@ public final class ListPreference<T> extends SharedPreference<List<T>> {
 	 */
 	@Nullable
 	@Override
-	protected List<T> onGetFromPreferences(@NonNull SharedPreferences preferences) {
+	protected List<T> onGetFromPreferences(@NonNull final SharedPreferences preferences) {
 		return getFromPreferences(preferences, mKey, mDefaultValue);
 	}
 
@@ -150,7 +150,7 @@ public final class ListPreference<T> extends SharedPreference<List<T>> {
 	 * @throws IllegalStateException    If the requested list was not stored by the Preferences  library.
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> List<T> getFromPreferences(@NonNull SharedPreferences preferences, @NonNull String key, @Nullable List<T> defValue) {
+	public static <T> List<T> getFromPreferences(@NonNull final SharedPreferences preferences, @NonNull final String key, @Nullable final List<T> defValue) {
 		final String value = preferences.getString(key, null);
 		if (value != null) {
 			try {
