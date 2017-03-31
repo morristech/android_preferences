@@ -19,7 +19,9 @@
 package universum.studios.android.preference;
 
 import android.content.Context;
+import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -30,6 +32,15 @@ import java.lang.annotation.RetentionPolicy;
  * @author Martin Albedinsky
  */
 public final class SharedPreferencesPolicy {
+
+	/*
+	 * Constants ===================================================================================
+	 */
+
+	/**
+	 * Suffix for default name used by the <b>Android</b> for shared preferences.
+	 */
+	public static final String DEFAULT_PREFERENCES_NAME_SUFFIX = "_preferences";
 
 	/**
 	 * Copied flag from {@link Context#MODE_PRIVATE}.
@@ -53,9 +64,59 @@ public final class SharedPreferencesPolicy {
 	public @interface FileMode {
 	}
 
+	/*
+	 * Interface ===================================================================================
+	 */
+
+	/*
+	 * Static members ==============================================================================
+	 */
+
+	/*
+	 * Members =====================================================================================
+	 */
+
+	/*
+	 * Constructors ================================================================================
+	 */
+
 	/**
 	 */
 	private SharedPreferencesPolicy() {
-		// Creation of instances of this class is not publicly allowed.
+		// Not allowed to be instantiated publicly.
 	}
+
+	/*
+	 * Methods =====================================================================================
+	 */
+
+	/**
+	 * Creates a default name for shared preferences for the specified <var>context</var> that is
+	 * the same one as created by default by the <b>Android</b> framework.
+	 *
+	 * @param context The context for which to create preferences name.
+	 * @return Preferences name that may be used in association with {@link Context#getSharedPreferences(String, int)}.
+	 * @see #preferencesName(Context, String)
+	 * @see PreferenceManager#getDefaultSharedPreferencesName(Context)
+	 */
+	public static String defaultPreferencesName(@NonNull Context context) {
+		return preferencesName(context, DEFAULT_PREFERENCES_NAME_SUFFIX);
+	}
+
+	/**
+	 * Creates a name for shared preferences with the given <var>nameSuffix</var> for the specified
+	 * <var>context</var>.
+	 *
+	 * @param context    The context for which to create preferences name.
+	 * @param nameSuffix Suffix to be added into preferences name.
+	 * @return Preferences name that may be used in association with {@link Context#getSharedPreferences(String, int)}.
+	 * @see #defaultPreferencesName(Context)
+	 */
+	public static String preferencesName(@NonNull Context context, @NonNull String nameSuffix) {
+		return context.getPackageName() + nameSuffix;
+	}
+
+	/*
+	 * Inner classes ===============================================================================
+	 */
 }

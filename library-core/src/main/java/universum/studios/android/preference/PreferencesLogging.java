@@ -52,7 +52,7 @@ public final class PreferencesLogging {
 	/**
 	 */
 	private PreferencesLogging() {
-		// Creation of instances of this class is not publicly allowed.
+		// Not allowed to be instantiated publicly.
 	}
 
 	/**

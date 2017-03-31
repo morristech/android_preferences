@@ -52,6 +52,6 @@ public final class PreferencesConfig {
 	/**
 	 */
 	private PreferencesConfig() {
-		// Creation of instances of this class is not publicly allowed.
+		// Not allowed to be instantiated publicly.
 	}
 }

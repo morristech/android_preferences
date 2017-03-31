@@ -27,8 +27,8 @@ import java.util.Set;
 
 /**
  * Simple implementation of {@link SharedPreferencesFacade} which supports simple <var>obtaining</var>
- * and <var>putting</var> of values stored in {@link SharedPreferences} with which is facade created
- * via {@link #SimpleSharedPreferencesFacade(SharedPreferences)} constructor.
+ * and <var>putting</var> of values persisted in {@link SharedPreferences} with which is facade created
+ * via {@link SimpleSharedPreferencesFacade.Builder} builder.
  *
  * @author Martin Albedinsky
  */
@@ -67,19 +67,32 @@ public class SimpleSharedPreferencesFacade implements SharedPreferencesFacade {
 	 */
 
 	/**
-	 * Creates a new instance of SimpleSharedPreferencesFacade that wraps the given <var>preferences</var>
-	 * instance in order to support simple <var>putting</var> and <var>obtaining</var> of values
-	 * stored in such preferences.
+	 * Creates a new instance of SimpleSharedPreferencesFacade with configuration provided by the
+	 * specified <var>builder</var>.
 	 *
-	 * @param preferences The shared preferences for which to create new facade.
+	 * @param builder The builder used to configure the new preferences facade.
 	 */
-	public SimpleSharedPreferencesFacade(@NonNull SharedPreferences preferences) {
-		this.mPreferences = preferences;
+	protected SimpleSharedPreferencesFacade(@NonNull Builder builder) {
+		this.mPreferences = builder.preferences;
 	}
 
 	/*
 	 * Methods =====================================================================================
 	 */
+
+	/**
+	 */
+	@Override
+	public void registerOnSharedPreferenceChangeListener(@NonNull SharedPreferences.OnSharedPreferenceChangeListener listener) {
+		mPreferences.unregisterOnSharedPreferenceChangeListener(listener);
+	}
+
+	/**
+	 */
+	@Override
+	public void unregisterOnSharedPreferenceChangeListener(@NonNull SharedPreferences.OnSharedPreferenceChangeListener listener) {
+		mPreferences.unregisterOnSharedPreferenceChangeListener(listener);
+	}
 
 	/**
 	 */
@@ -188,4 +201,47 @@ public class SimpleSharedPreferencesFacade implements SharedPreferencesFacade {
 	/*
 	 * Inner classes ===============================================================================
 	 */
+
+	/**
+	 * Builder that may be used to creates new instances of SimpleSharedPreferencesFacade that hide
+	 * a desired shared <var>preferences</var> instance in order to support simple <var>putting</var>
+	 * and <var>obtaining</var> of values stored in such preferences.
+	 *
+	 * @param <B> Type of the builder used for methods chaining.
+	 * @author Martin Albedinsky
+	 */
+	public static class Builder<B> {
+
+		/**
+		 * See {@link SimpleSharedPreferencesFacade#mPreferences}.
+		 */
+		SharedPreferences preferences;
+
+		/**
+		 * Specifies a shared preferences instance that should be hidden behind facade.
+		 *
+		 * @param preferences The shared preferences for which to create new facade.
+		 * @return This builder to allow methods chaining.
+		 */
+		@SuppressWarnings("unchecked")
+		public B preferences(@NonNull SharedPreferences preferences) {
+			this.preferences = preferences;
+			return (B) this;
+		}
+
+		/**
+		 * Builds a new instance of SimpleSharedPreferencesFacade from the configuration specified
+		 * for this builder.
+		 *
+		 * @return Instance of preferences facade ready to be used.
+		 * @throws IllegalArgumentException If some of the required parameters are missing.
+		 */
+		@NonNull
+		public SimpleSharedPreferencesFacade build() {
+			if (preferences == null) {
+				throw new IllegalArgumentException("No preferences specified.");
+			}
+			return new SimpleSharedPreferencesFacade(this);
+		}
+	}
 }
