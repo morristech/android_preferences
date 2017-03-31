@@ -95,7 +95,7 @@ public class SimpleSharedPreferencesFacade implements SharedPreferencesFacade {
 	 */
 	@Override
 	public void registerOnSharedPreferenceChangeListener(@NonNull final SharedPreferences.OnSharedPreferenceChangeListener listener) {
-		mPreferences.unregisterOnSharedPreferenceChangeListener(listener);
+		mPreferences.registerOnSharedPreferenceChangeListener(listener);
 	}
 
 	/**
@@ -215,7 +215,7 @@ public class SimpleSharedPreferencesFacade implements SharedPreferencesFacade {
 	public int removeAll() {
 		final Map<String, ?> values = mPreferences.getAll();
 		int result = 0;
-		if (values != null && !values.isEmpty()) {
+		if (!values.isEmpty()) {
 			for (final Map.Entry<String, ?> entry : values.entrySet()) {
 				if (mPreferences.edit().remove(entry.getKey()).commit()) result++;
 			}

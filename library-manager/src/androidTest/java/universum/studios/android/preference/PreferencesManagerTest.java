@@ -30,6 +30,7 @@ import universum.studios.android.test.TestUtils;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assume.assumeTrue;
 
 /**
  * @author Martin Albedinsky
@@ -125,14 +126,13 @@ public final class PreferencesManagerTest extends BaseInstrumentedTest {
 
 	@Test
 	public void testKey() {
-		if (TestUtils.hasLibraryRootTestPackageName(mContext)) {
-			final int keyIdentifier = mContext.getResources().getIdentifier(
-					"test_preference_key",
-					"string",
-					mContext.getPackageName()
-			);
-			assertThat(mManager.key(keyIdentifier), is("TEST_PREFERENCE.Key"));
-		}
+		assumeTrue(TestUtils.hasLibraryRootTestPackageName(mContext));
+		final int keyIdentifier = mContext.getResources().getIdentifier(
+				"test_preference_key",
+				"string",
+				mContext.getPackageName()
+		);
+		assertThat(mManager.key(keyIdentifier), is("TEST_PREFERENCE.Key"));
 	}
 
 	@Test

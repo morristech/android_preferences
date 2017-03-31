@@ -39,16 +39,100 @@ import universum.studios.android.preference.SharedPreferencesCache;
 
 /**
  * A {@link SharedPreferences} implementation that supports <b>encryption</b> for both <b>keys</b>
- * and <b>values</b> that are persisted in shared preferences.
- *
- * <h3>Keys Encryption</h3>
- * todo:
+ * and <b>values</b> that are persisted in shared preferences. New instances of {@link CryptoSharedPreferences}
+ * may be created via {@link Builder} and its {@link Builder#build()} method.
  *
  * <h3>Values Encryption</h3>
- * todo:
+ * Primary functionality provided by {@link CryptoSharedPreferences} is the fact that all values
+ * persisted via these preferences implementation are <b>encrypted</b>. Encryption of values stored
+ * in shared preferences should improve security standards of an Android application as the encrypted
+ * values that are stored within a corresponding preferences Xml file are <b>obscured</b> so any
+ * possible attacker that gains access to preferences files containing encrypted values will have
+ * hard time reading them. Each instance of {@link CryptoSharedPreferences} is required to be created
+ * with at least {@link Crypto} implementation that will be used for values encryption and decryption.
+ * A desired {@link Crypto} should be supplied via {@link Builder#valueCrypto(Crypto)} otherwise
+ * the builder will throw an exception if a new instance of crypto preferences is tried to be created
+ * via {@link Builder#build()}. See other sections of this description to get more info.
+ * <p>
+ * Below snippet shows contents of a shared preferences Xml without and with encryption applied to
+ * both keys and values:
+ * <pre>
+ * &lt;!-- Preference data without encryption applied. --&gt;
+ * &lt;?xml version='1.0' encoding='utf-8' standalone='yes'?&gt;
+ * &lt;map&gt;
+ *     &lt;string name="universum.studios.android.preference.crypto.PREFERENCE.UserName"&gt;
+ *          Android User
+ *     &lt;/string&gt;
+ *
+ *     &lt;long name="universum.studios.android.preference.crypto.PREFERENCE.UserBirthDate"&gt;
+ *          1490986235741
+ *     &lt;/long&gt;
+ * &lt;/map&gt;
+ *
+ * &lt;!-- Preference data with encryption applied. --&gt;
+ * &lt;?xml version='1.0' encoding='utf-8' standalone='yes'?&gt;
+ * &lt;map&gt;
+ *     &lt;string name="dW5pdmVyc3VtLnN0dWRpb3MuYW5kcm9pZC5wcmVmZXJlbmNlLmNyeXB0by5QUkVGRVJFTkNFLlVzZXJOYW1l"&gt;
+ *          QW5kcm9pZCBVc2Vy
+ *     &lt;/string&gt;
+ *
+ *     &lt;string name="dW5pdmVyc3VtLnN0dWRpb3MuYW5kcm9pZC5wcmVmZXJlbmNlLmNyeXB0by5QUkVGRVJFTkNFLlVzZXJCaXJ0aERhdGU="&gt;
+ *          MTQ5MDk4NjIzNTc0MQ==
+ *     &lt;/string&gt;
+ * &lt;/map&gt;
+ * </pre>
+ *
+ * <h3>Keys Encryption</h3>
+ * Keys that are used to map with them associated values in shared preferences may be also encrypted
+ * in order to improve security standards of an Android application. Unlike values encryption, keys
+ * encryption is optional. If keys encryption is required to be enabled a desired {@link Crypto}
+ * implementation should be supplied via {@link Builder#keyCrypto(Crypto)} for {@link CryptoSharedPreferences}.
+ * The specified crypto will be then used by the crypto preferences for encryption of preference keys
+ * whenever a preference value is requested to be persisted or obtained and for decryption whenever
+ * a change callback for registered {@link OnSharedPreferenceChangeListener} is about to be dispatched
+ * (see paragraph below).
+ * <p>
+ * In order to receive callback of {@link OnSharedPreferenceChangeListener} with instance of
+ * {@link CryptoSharedPreferences crypto preferences} along with decrypted key so the listener does
+ * not need to deal with either key nor value decryption such listener should be registered via
+ * {@link #registerOnSharedPreferenceChangeListener(OnSharedPreferenceChangeListener)} and later
+ * unregistered via {@link #unregisterOnSharedPreferenceChangeListener(OnSharedPreferenceChangeListener)}.
+ * Then each listener's {@link OnSharedPreferenceChangeListener#onSharedPreferenceChanged(SharedPreferences, String) callback}
+ * will cary instance of the crypto preferences and already decrypted key of which associated value
+ * has changed. The changed value may be obtained in a standard fashion via one of {@code get...(...)}
+ * methods directly via the dispatched preferences instance like shown below:
+ * <pre>
+ * CryptoSharedPreferences.registerOnSharedPreferenceChangeListener(new OnSharedPreferenceChangeListener() {
+ *
+ *      &#64;Override
+ *      public void onSharedPreferenceChanged(&#64;NonNull SharedPreferences preferences, &#64;NonNull String key) {
+ *          // ... preferences are actually CryptoSharedPreferences and the key is already decrypted
+ *          switch (key) {
+ *              SamplePreferenceKey.USER_NAME:
+ *                  final String userName = preferences.getString(key, "Unknown");
+ *                  // ... userName will contain decrypted value
+ *                  break;
+ *              // ... handle changes for other preference keys
+ *          }
+ *      }
+ * });
+ * </pre>
  *
  * <h3>Caching</h3>
- * todo:
+ * Due to the fact that preference values that are to be returned via one of {@code get...(...)}
+ * methods need to be always decrypted, obtaining of such values may be potentially a time consuming
+ * task. In order to speed up this operation an implementation of {@link SharedPreferencesCache} may
+ * be supplied via {@link Builder#valueCache(SharedPreferencesCache)} for {@link CryptoSharedPreferences}.
+ * Such cache will be then used by the crypto preferences for storing of already decrypted values
+ * which may be retrieved whenever they are requested in a much faster fashion. When cache is used
+ * it is simply asked if it contains value for the requested key, if YES, that value is returned, if
+ * NO, an encrypted value is obtained from the wrapped preferences, decrypted, stored in the cache
+ * and returned. A specific value stored in the cache is invalidated (evicted from the cache) whenever
+ * a new edit session is started for key associated with that value, that is whenever {@link #edit()}
+ * is called and followed by {@code put...(...)} call with that key.
+ *
+ * In order to speed up obtaining of preference values that need to be decrypted whenever they are
+ * to be returned to the caller where this task may potentially a time consuming operation
  *
  * @author Martin Albedinsky
  */
@@ -123,7 +207,7 @@ public final class CryptoSharedPreferences implements SharedPreferences {
 	private CryptoSharedPreferences(final Builder builder) {
 		this.mDelegate = builder.preferences;
 		this.mHelper = new CryptoHelper(builder.keyCrypto, builder.valueCrypto);
-		this.mChangeListeners = new ChangeListeners(mHelper);
+		this.mChangeListeners = new ChangeListeners(mHelper, this);
 		this.mCache = builder.cache;
 
 	}
@@ -382,7 +466,7 @@ public final class CryptoSharedPreferences implements SharedPreferences {
 		 * change listener that is registered directly on the encrypted preferences instance will
 		 * be notified with <b>encrypted</b> key of the changed preference. It is recommended to
 		 * use registration method of {@link CryptoSharedPreferences} so the listeners do not need
-		 * to deal with decryption of the preference keys.
+		 * to deal with decryption of the preference keys nor values.
 		 * <p>
 		 * See <b>Keys Encryption</b> section in description of {@link CryptoSharedPreferences} for
 		 * more information.
@@ -392,7 +476,7 @@ public final class CryptoSharedPreferences implements SharedPreferences {
 		 * @return This builder to allow methods chaining.
 		 * @see #valueCrypto(Crypto)
 		 */
-		public Builder keyCrypto(@Nullablefinal  Crypto crypto) {
+		public Builder keyCrypto(@Nullable final Crypto crypto) {
 			this.keyCrypto = crypto;
 			return this;
 		}
@@ -771,6 +855,13 @@ public final class CryptoSharedPreferences implements SharedPreferences {
 		private final CryptoHelper helper;
 
 		/**
+		 * Instance of shared preferences that should be dispatched in
+		 * {@link OnSharedPreferenceChangeListener#onSharedPreferenceChanged(SharedPreferences, String)}
+		 * callback along with decrypted key.
+		 */
+		private final SharedPreferences preferences;
+
+		/**
 		 * List of registered {@link OnSharedPreferenceChangeListener}.
 		 */
 		private final List<OnSharedPreferenceChangeListener> listeners = new ArrayList<>(2);
@@ -778,10 +869,13 @@ public final class CryptoSharedPreferences implements SharedPreferences {
 		/**
 		 * Creates a new instance of ChangeListeners with the given <var>helper</var>.
 		 *
-		 * @param helper Helper used for cryptographic operations.
+		 * @param helper      Helper used for cryptographic operations.
+		 * @param preferences Preferences that should be dispatched in callback of registered change
+		 *                    listeners along with decrypted key.
 		 */
-		ChangeListeners(final CryptoHelper helper) {
+		ChangeListeners(final CryptoHelper helper, final SharedPreferences preferences) {
 			this.helper = helper;
+			this.preferences = preferences;
 		}
 
 		/**
@@ -826,7 +920,7 @@ public final class CryptoSharedPreferences implements SharedPreferences {
 				if (!listeners.isEmpty()) {
 					final String decryptedKey = helper.decryptKey(key);
 					for (final OnSharedPreferenceChangeListener listener : listeners) {
-						listener.onSharedPreferenceChanged(sharedPreferences, decryptedKey);
+						listener.onSharedPreferenceChanged(preferences, decryptedKey);
 					}
 				}
 			}
