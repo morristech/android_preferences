@@ -20,16 +20,21 @@ package universum.studios.android.preference;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.AndroidRuntimeException;
 
 import java.util.Set;
 
 /**
- * Interface declaring layer for caches that may be used to store values of {@code SharedPreferences}
+ * Interface that specifies a layer for caches that may be used to store values of {@code SharedPreferences}
  * in a memory.
  *
  * @author Martin Albedinsky
  */
 public interface SharedPreferencesCache {
+
+	/*
+	 * Methods =====================================================================================
+	 */
 
 	/**
 	 * Checks whether this cache is empty or not.
@@ -48,132 +53,120 @@ public interface SharedPreferencesCache {
 	boolean contains(@NonNull String key);
 
 	/**
-	 * Puts the given string <var>value</var> for the specified <var>key</var> into {@code SharedPreferences}
-	 * hidden behind this facade.
+	 * Puts the given string <var>value</var> for the specified <var>key</var> into this cache.
 	 *
-	 * @param key   The key for which to put the value into preferences.
-	 * @param value The desired value to put into preferences.
+	 * @param key   The key for which to put the value into cache.
+	 * @param value The desired value to put into cache.
 	 * @return {@code True} if put has been successful, {@code false} otherwise.
 	 */
 	boolean putString(@NonNull String key, @Nullable String value);
 
 	/**
-	 * Retrieves the string value for the specified <var>key</var> from {@code SharedPreferences}
-	 * hidden behind this facade.
+	 * Retrieves the string value for the specified <var>key</var> stored in this cache.
 	 *
-	 * @param key      The key for which to retrieve its associated value.
-	 * @param defValue Default value to be returned in case when there is no value persisted for
-	 *                 the specified key.
-	 * @return Either persisted or default string value.
+	 * @param key The key for which to retrieve its associated value.
+	 * @return The value associated with the key.
+	 * @throws NotInCacheException If there is no value stored in this cache for the requested key.
+	 * @see #contains(String)
 	 */
 	@Nullable
-	String getString(@NonNull String key, @Nullable String defValue);
+	String getString(@NonNull String key);
 
 	/**
-	 * Puts the given set of string <var>values</var> for the specified <var>key</var> into {@code SharedPreferences}
-	 * hidden behind this facade.
+	 * Puts the given set of string <var>values</var> for the specified <var>key</var> into this cache.
 	 *
-	 * @param key    The key for which to put the values into preferences.
-	 * @param values The desired values to put into preferences.
+	 * @param key    The key for which to put the value into cache.
+	 * @param values The desired set of values to put into cache.
 	 * @return {@code True} if put has been successful, {@code false} otherwise.
 	 */
 	boolean putStringSet(@NonNull String key, @Nullable Set<String> values);
 
 	/**
-	 * Retrieves the set of string values for the specified <var>key</var> from {@code SharedPreferences}
-	 * hidden behind this facade.
+	 * Retrieves the set of string values for the specified <var>key</var> stored in this cache.
 	 *
-	 * @param key       The key for which to retrieve its associated values.
-	 * @param defValues Default values to be returned in case when there are no values persisted for
-	 *                  the specified key.
-	 * @return Either persisted or default string values.
+	 * @param key The key for which to retrieve its associated value.
+	 * @return The set of values associated with the key.
+	 * @throws NotInCacheException If there is no value stored in this cache for the requested key.
+	 * @see #contains(String)
 	 */
 	@Nullable
-	Set<String> getStringSet(@NonNull String key, @Nullable Set<String> defValues);
+	Set<String> getStringSet(@NonNull String key);
 
 	/**
-	 * Puts the given integer <var>value</var> for the specified <var>key</var> into {@code SharedPreferences}
-	 * hidden behind this facade.
+	 * Puts the given integer <var>value</var> for the specified <var>key</var> into this cache.
 	 *
-	 * @param key   The key for which to put the value into preferences.
-	 * @param value The desired value to put into preferences.
+	 * @param key   The key for which to put the value into cache.
+	 * @param value The desired value to put into cache.
 	 * @return {@code True} if put has been successful, {@code false} otherwise.
 	 */
 	boolean putInt(@NonNull String key, int value);
 
 	/**
-	 * Retrieves the integer value for the specified <var>key</var> from {@code SharedPreferences}
-	 * hidden behind this facade.
+	 * Retrieves the integer value for the specified <var>key</var> stored in this cache.
 	 *
-	 * @param key      The key for which to retrieve its associated value.
-	 * @param defValue Default value to be returned in case when there is no value persisted for
-	 *                 the specified key.
-	 * @return Either persisted or default integer value.
+	 * @param key The key for which to retrieve its associated value.
+	 * @return The value associated with the key.
+	 * @throws NotInCacheException If there is no value stored in this cache for the requested key.
+	 * @see #contains(String)
 	 */
-	int getInt(@NonNull String key, int defValue);
+	int getInt(@NonNull String key);
 
 	/**
-	 * Puts the given float <var>value</var> for the specified <var>key</var> into {@code SharedPreferences}
-	 * hidden behind this facade.
+	 * Puts the given float <var>value</var> for the specified <var>key</var> into this cache.
 	 *
-	 * @param key   The key for which to put the value into preferences.
-	 * @param value The desired value to put into preferences.
+	 * @param key   The key for which to put the value into cache.
+	 * @param value The desired value to put into cache.
 	 * @return {@code True} if put has been successful, {@code false} otherwise.
 	 */
 	boolean putFloat(@NonNull String key, float value);
 
 	/**
-	 * Retrieves the float value for the specified <var>key</var> from {@code SharedPreferences}
-	 * hidden behind this facade.
+	 * Retrieves the float value for the specified <var>key</var> stored in this cache.
 	 *
-	 * @param key      The key for which to retrieve its associated value.
-	 * @param defValue Default value to be returned in case when there is no value persisted for
-	 *                 the specified key.
-	 * @return Either persisted or default float value.
+	 * @param key The key for which to retrieve its associated value.
+	 * @return The value associated with the key.
+	 * @throws NotInCacheException If there is no value stored in this cache for the requested key.
+	 * @see #contains(String)
 	 */
-	float getFloat(@NonNull String key, float defValue);
+	float getFloat(@NonNull String key);
 
 	/**
-	 * Puts the given long <var>value</var> for the specified <var>key</var> into {@code SharedPreferences}
-	 * hidden behind this facade.
+	 * Puts the given long <var>value</var> for the specified <var>key</var> into this cache.
 	 *
-	 * @param key   The key for which to put the value into preferences.
-	 * @param value The desired value to put into preferences.
+	 * @param key   The key for which to put the value into cache.
+	 * @param value The desired value to put into cache.
 	 * @return {@code True} if put has been successful, {@code false} otherwise.
 	 */
 	boolean putLong(@NonNull String key, long value);
 
 	/**
-	 * Retrieves the long value for the specified <var>key</var> from {@code SharedPreferences}
-	 * hidden behind this facade.
+	 * Retrieves the long value for the specified <var>key</var> stored in this cache.
 	 *
-	 * @param key      The key for which to retrieve its associated value.
-	 * @param defValue Default value to be returned in case when there is no value persisted for
-	 *                 the specified key.
-	 * @return Either persisted or default long value.
+	 * @param key The key for which to retrieve its associated value.
+	 * @return The value associated with the key.
+	 * @throws NotInCacheException If there is no value stored in this cache for the requested key.
+	 * @see #contains(String)
 	 */
-	long getLong(@NonNull String key, long defValue);
+	long getLong(@NonNull String key);
 
 	/**
-	 * Puts the given boolean <var>value</var> for the specified <var>key</var> into {@code SharedPreferences}
-	 * hidden behind this facade.
+	 * Puts the given boolean <var>value</var> for the specified <var>key</var> into this cache.
 	 *
-	 * @param key   The key for which to put the value into preferences.
-	 * @param value The desired value to put into preferences.
+	 * @param key   The key for which to put the value into cache.
+	 * @param value The desired value to put into cache.
 	 * @return {@code True} if put has been successful, {@code false} otherwise.
 	 */
 	boolean putBoolean(@NonNull String key, boolean value);
 
 	/**
-	 * Retrieves the boolean value for the specified <var>key</var> from {@code SharedPreferences}
-	 * hidden behind this facade.
+	 * Retrieves the boolean value for the specified <var>key</var> stored in this cache.
 	 *
-	 * @param key      The key for which to retrieve its associated value.
-	 * @param defValue Default value to be returned in case when there is no value persisted for
-	 *                 the specified key.
-	 * @return Either persisted or default boolean value.
+	 * @param key The key for which to retrieve its associated value.
+	 * @return The value associated with the key.
+	 * @throws NotInCacheException If there is no value stored in this cache for the requested key.
+	 * @see #contains(String)
 	 */
-	boolean getBoolean(@NonNull String key, boolean defValue);
+	boolean getBoolean(@NonNull String key);
 
 	/**
 	 * Evicts a value for the specified <var>key</var> stored in this cache.
@@ -189,4 +182,30 @@ public interface SharedPreferencesCache {
 	 * @return The number of values that has been evicted. May be {@code 0} if this cache is empty.
 	 */
 	int evictAll();
+
+	/*
+	 * Inner classes ===============================================================================
+	 */
+
+	/**
+	 * An exception that may be used by implementations of {@link SharedPreferencesCache} to indicate
+	 * that they have no value stored for a requested key.
+	 * <p>
+	 * A client that uses a {@link SharedPreferencesCache} to store and retrieve preference values
+	 * should always check whether the cache contains the desired value via {@link #contains(String)}
+	 * to avoid this exception.
+	 *
+	 * @author Martin Albedinsky
+	 */
+	final class NotInCacheException extends AndroidRuntimeException {
+
+		/**
+		 * Creates a new instance of NotInCacheException for the specified <var>key</var>.
+		 *
+		 * @param key The key for which to inform that it has no value associated within the cache.
+		 */
+		public NotInCacheException(@NonNull String key) {
+			super("There is no value associated with the key(" + key + ") in the cache.");
+		}
+	}
 }

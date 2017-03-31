@@ -379,7 +379,7 @@ public class PreferencesManager extends SimpleSharedPreferencesFacade {
 	 * Checks whether there is value associated with the specified <var>preference</var> contained
 	 * within {@link SharedPreferences} that are managed by this manager.
 	 *
-	 * @param preference The desired preference of which value's existence to check.
+	 * @param preference The desired preference of which value's presence to check.
 	 * @return {@code True} if there is value contained for key of the specified preference,
 	 * {@code false} otherwise.
 	 * @see #putPreference(SharedPreference, Object)

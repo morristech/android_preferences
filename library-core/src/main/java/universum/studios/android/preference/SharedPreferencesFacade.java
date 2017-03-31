@@ -25,7 +25,7 @@ import android.support.annotation.Nullable;
 import java.util.Set;
 
 /**
- * Interface declaring layer which may be used to hide a concrete implementation of
+ * Interface that specifies a layer which may be used to hide a concrete implementation of
  * {@link android.content.SharedPreferences SharedPreferences} and to simplify <b>putting</b> and
  * <var>obtaining</var> of values for such preferences implementation.
  *
@@ -34,17 +34,21 @@ import java.util.Set;
 public interface SharedPreferencesFacade {
 
 	/**
-	 * todo:
+	 * Registers a listener in order to receive a callback whenever a value of preference persisted
+	 * within the {@code SharedPreferences} hidden behind this facade changes.
 	 *
-	 * @param listener
+	 * @param listener The desired listener to be registered.
+	 * @see #unregisterOnSharedPreferenceChangeListener(SharedPreferences.OnSharedPreferenceChangeListener)
 	 * @see SharedPreferences#registerOnSharedPreferenceChangeListener(SharedPreferences.OnSharedPreferenceChangeListener)
 	 */
 	void registerOnSharedPreferenceChangeListener(@NonNull SharedPreferences.OnSharedPreferenceChangeListener listener);
 
 	/**
-	 * todo:
+	 * Un-registers a previously registered listener in order to not receive further any callbacks
+	 * about  preference changes.
 	 *
-	 * @param listener
+	 * @param listener The desired listener to be un-registered.
+	 * @see #registerOnSharedPreferenceChangeListener(SharedPreferences.OnSharedPreferenceChangeListener)
 	 * @see SharedPreferences#unregisterOnSharedPreferenceChangeListener(SharedPreferences.OnSharedPreferenceChangeListener)
 	 */
 	void unregisterOnSharedPreferenceChangeListener(@NonNull SharedPreferences.OnSharedPreferenceChangeListener listener);
@@ -53,7 +57,7 @@ public interface SharedPreferencesFacade {
 	 * Checks whether the {@code SharedPreferences} hidden behind this facade contain value for the
 	 * specified <var>key</var> or not.
 	 *
-	 * @param key The key of which value's existence to check.
+	 * @param key The key of which value's presence to check.
 	 * @return {@code True} if there is value contained for the specified key, {@code false} otherwise.
 	 * @see SharedPreferences#contains(String)
 	 */

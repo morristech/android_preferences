@@ -28,7 +28,7 @@ import java.util.Set;
 import universum.studios.android.preference.SharedPreferencesCache;
 
 /**
- * Class that todo:
+ * A {@link SharedPreferencesCache} implementation backed by implementation of {@link Map}.
  *
  * @author Martin Albedinsky
  */
@@ -56,7 +56,7 @@ final class MapCache implements SharedPreferencesCache {
 	 */
 
 	/**
-	 * todo:
+	 * Map used to store all values available through this cache.
 	 */
 	private final Map<String, Object> mMap = new HashMap<>();
 	 
@@ -86,98 +86,109 @@ final class MapCache implements SharedPreferencesCache {
 	 */
 	@Override
 	public boolean putString(@NonNull String key, @Nullable String value) {
-		// todo:
-		return false;
+		mMap.put(key, value);
+		return true;
 	}
 
 	/**
 	 */
 	@Nullable
 	@Override
-	public String getString(@NonNull String key, @Nullable String defValue) {
-		// todo:
-		return null;
+	public String getString(@NonNull String key) {
+		assertContainsOrThrow(key);
+		return (String) mMap.get(key);
 	}
 
 	/**
 	 */
 	@Override
 	public boolean putStringSet(@NonNull String key, @Nullable Set<String> values) {
-		// todo:
-		return false;
+		mMap.put(key, values);
+		return true;
 	}
 
 	/**
 	 */
 	@Nullable
 	@Override
-	public Set<String> getStringSet(@NonNull String key, @Nullable Set<String> defValues) {
-		// todo:
-		return null;
+	@SuppressWarnings("unchecked")
+	public Set<String> getStringSet(@NonNull String key) {
+		assertContainsOrThrow(key);
+		return (Set<String>) mMap.get(key);
 	}
 
 	/**
 	 */
 	@Override
 	public boolean putInt(@NonNull String key, int value) {
-		// todo:
-		return false;
+		mMap.put(key, value);
+		return true;
 	}
 
 	/**
 	 */
 	@Override
-	public int getInt(@NonNull String key, int defValue) {
-		// todo:
-		return 0;
+	public int getInt(@NonNull String key) {
+		assertContainsOrThrow(key);
+		return (int) mMap.get(key);
 	}
 
 	/**
 	 */
 	@Override
 	public boolean putFloat(@NonNull String key, float value) {
-		// todo:
-		return false;
+		mMap.put(key, value);
+		return true;
 	}
 
 	/**
 	 */
 	@Override
-	public float getFloat(@NonNull String key, float defValue) {
-		// todo:
-		return 0;
+	public float getFloat(@NonNull String key) {
+		assertContainsOrThrow(key);
+		return (float) mMap.get(key);
 	}
 
 	/**
 	 */
 	@Override
 	public boolean putLong(@NonNull String key, long value) {
-		// todo:
-		return false;
+		mMap.put(key, value);
+		return true;
 	}
 
 	/**
 	 */
 	@Override
-	public long getLong(@NonNull String key, long defValue) {
-		// todo:
-		return 0;
+	public long getLong(@NonNull String key) {
+		assertContainsOrThrow(key);
+		return (long) mMap.get(key);
 	}
 
 	/**
 	 */
 	@Override
 	public boolean putBoolean(@NonNull String key, boolean value) {
-		// todo:
-		return false;
+		mMap.put(key, value);
+		return true;
 	}
 
 	/**
 	 */
 	@Override
-	public boolean getBoolean(@NonNull String key, boolean defValue) {
-		// todo:
-		return false;
+	public boolean getBoolean(@NonNull String key) {
+		assertContainsOrThrow(key);
+		return (boolean) mMap.get(key);
+	}
+
+	/**
+	 * Asserts that this cache contains value for the specified <var>key</var>. If there is no value
+	 * for the key stored in this cache, a new {@link NotInCacheException} is thrown.
+	 *
+	 * @param key The of which value's presence to check.
+	 */
+	private void assertContainsOrThrow(String key) {
+		if (!mMap.containsKey(key)) throw new NotInCacheException(key);
 	}
 
 	/**
