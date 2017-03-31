@@ -37,7 +37,7 @@ public final class SharedPreferencesCaches {
 	/**
 	 */
 	private SharedPreferencesCaches() {
-		// Creation of instances of this class is not publicly allowed.
+		// Not allowed to be instantiated publicly.
 	}
 
 	/**

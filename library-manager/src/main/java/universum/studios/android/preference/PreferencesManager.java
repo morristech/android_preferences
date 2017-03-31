@@ -25,6 +25,7 @@ import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
+import android.text.TextUtils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -169,6 +170,17 @@ public class PreferencesManager extends SimpleSharedPreferencesFacade {
 	protected final Context mContext;
 
 	/**
+	 * Name of the shared preferences managed by this manager.
+	 */
+	private final String mPreferencesName;
+
+	/**
+	 * File mode of the shared preferences managed by this manager.
+	 */
+	@SharedPreferencesPolicy.FileMode
+	private final int mPreferencesFileMode;
+
+	/**
 	 * Flag indicating whether caching of the actual values of each shared preference is enabled.
 	 * This means that, if shared preference holds actual value which is same as in shared preferences,
 	 * parsing of that value will be not performed, instead actual value will be obtained from that
@@ -181,43 +193,70 @@ public class PreferencesManager extends SimpleSharedPreferencesFacade {
 	 */
 
 	/**
+	 * <b>This constructor has been deprecated and will be removed in the next release.</b>
+	 * <p>
 	 * Same as {@link #PreferencesManager(Context, String)} with default name for
 	 * preferences (like the one provided by Android framework).
+	 *
+	 * @deprecated Use {@link #PreferencesManager(Builder)} instead.
 	 */
+	@Deprecated
 	public PreferencesManager(@NonNull Context context) {
-		this(context, defaultSharedPreferencesName(context));
+		this(new Builder(context)
+				.preferences(context.getSharedPreferences(
+						SharedPreferencesPolicy.defaultPreferencesName(context),
+						SharedPreferencesPolicy.FILE_MODE_PRIVATE
+				))
+				.preferencesName(SharedPreferencesPolicy.defaultPreferencesName(context))
+		);
 	}
 
 	/**
+	 * <b>This constructor has been deprecated and will be removed in the next release.</b>
+	 * <p>
 	 * Same as {@link #PreferencesManager(Context, String, int)} with {@link Context#MODE_PRIVATE}
 	 * creation mode.
+	 *
+	 * @deprecated Use {@link #PreferencesManager(Builder)} instead.
 	 */
+	@Deprecated
 	public PreferencesManager(@NonNull Context context, @NonNull String preferencesName) {
-		this(context, preferencesName, SharedPreferencesPolicy.FILE_MODE_PRIVATE);
+		this(new Builder(context)
+				.preferences(context.getSharedPreferences(preferencesName, SharedPreferencesPolicy.FILE_MODE_PRIVATE))
+				.preferencesName(preferencesName)
+		);
 	}
 
 	/**
+	 * <b>This constructor has been deprecated and will be removed in the next release.</b>
+	 * <p>
 	 * Creates a new instance of PreferencesManager with the given shared preferences name and
 	 * preferences file creation mode.
 	 *
 	 * @param context             Valid context to access shared preferences.
 	 * @param preferencesName     Name for shared preferences file.
 	 * @param preferencesFileMode Shared preferences will be created in this mode.
+	 * @deprecated Use {@link #PreferencesManager(Builder)} instead.
 	 */
+	@Deprecated
 	public PreferencesManager(@NonNull Context context, @NonNull String preferencesName, @SharedPreferencesPolicy.FileMode int preferencesFileMode) {
-		this(context, context.getSharedPreferences(preferencesName, preferencesFileMode), preferencesName);
+		this(new Builder(context)
+				.preferences(context.getSharedPreferences(preferencesName, preferencesFileMode))
+				.preferencesName(preferencesName)
+				.preferencesFileMode(preferencesFileMode)
+		);
 	}
 
 	/**
 	 * todo:
 	 *
-	 * @param context
-	 * @param preferences
-	 * @param preferencesName
+	 * @param builder
 	 */
-	public PreferencesManager(@NonNull Context context, @NonNull SharedPreferences preferences, @NonNull String preferencesName) {
-		super(preferences, preferencesName);
-		this.mContext = context;
+	protected PreferencesManager(@NonNull Builder builder) {
+		super(builder);
+		this.mContext = builder.context;
+		this.mPreferencesName = builder.preferencesName;
+		this.mPreferencesFileMode = builder.preferencesFileMode;
 	}
 
 	/*
@@ -225,24 +264,42 @@ public class PreferencesManager extends SimpleSharedPreferencesFacade {
 	 */
 
 	/**
-	 * Creates a default name for shared preferences (like the one created by {@link PreferenceManager}).
+	 * Returns the {@link SharedPreferences} that are managed by this manager.
 	 *
-	 * @param context Context for which the name should be created.
-	 * @return Default name for shared preferences.
-	 */
-	@NonNull
-	public static String defaultSharedPreferencesName(@NonNull Context context) {
-		return context.getPackageName() + "_preferences";
-	}
-
-	/**
-	 * todo:
-	 *
-	 * @return
+	 * @return The associated preferences.
+	 * @see Builder#preferences(SharedPreferences)
+	 * @see #getPreferencesName()
+	 * @see #getPreferencesFileMode()
 	 */
 	@NonNull
 	public final SharedPreferences getPreferences() {
 		return mPreferences;
+	}
+
+	/**
+	 * Returns the name of {@link SharedPreferences} that are managed by this manager.
+	 *
+	 * @return The associated preference's name.
+	 * @see Builder#preferencesName(String)
+	 * @see #getPreferences()
+	 * @see #getPreferencesFileMode()
+	 */
+	@NonNull
+	public final String getPreferencesName() {
+		return mPreferencesName;
+	}
+
+	/**
+	 * Returns the file mode of {@link SharedPreferences} that are managed by this manager.
+	 *
+	 * @return The associated preference's file mode.
+	 * @see Builder#preferencesFileMode(int)
+	 * @see #getPreferences()
+	 * @see #getPreferencesName()
+	 */
+	@SharedPreferencesPolicy.FileMode
+	public final int getPreferencesFileMode() {
+		return mPreferencesFileMode;
 	}
 
 	/**
@@ -267,32 +324,10 @@ public class PreferencesManager extends SimpleSharedPreferencesFacade {
 	}
 
 	/**
-	 * Same as {@link SharedPreferences#registerOnSharedPreferenceChangeListener(SharedPreferences.OnSharedPreferenceChangeListener)}.
-	 *
-	 * @param listener Listener callback to register up on the current shared preferences.
-	 * @see #getSharedPreferences()
-	 * @see #unregisterOnSharedPreferenceChangeListener(SharedPreferences.OnSharedPreferenceChangeListener)
-	 */
-	public void registerOnSharedPreferenceChangeListener(@NonNull SharedPreferences.OnSharedPreferenceChangeListener listener) {
-		mPreferences.registerOnSharedPreferenceChangeListener(listener);
-	}
-
-	/**
-	 * Same as {@link SharedPreferences#unregisterOnSharedPreferenceChangeListener(SharedPreferences.OnSharedPreferenceChangeListener)}.
-	 *
-	 * @param listener Listener callback to un-register up on the current shared preferences.
-	 * @see #getSharedPreferences()
-	 * @see #registerOnSharedPreferenceChangeListener(SharedPreferences.OnSharedPreferenceChangeListener)
-	 */
-	public void unregisterOnSharedPreferenceChangeListener(@NonNull SharedPreferences.OnSharedPreferenceChangeListener listener) {
-		mPreferences.unregisterOnSharedPreferenceChangeListener(listener);
-	}
-
-	/**
 	 * Returns a string key for the specified <var>resId</var>.
 	 *
 	 * @param resId Resource id of the desired preference key.
-	 * @return String key obtained from the current context.
+	 * @return String key obtained from the context specified for this manager.
 	 */
 	@NonNull
 	protected final String key(@StringRes int resId) {
@@ -300,18 +335,20 @@ public class PreferencesManager extends SimpleSharedPreferencesFacade {
 	}
 
 	/**
-	 * Saves the given <var>value</var> using the specified <var>preference</var> into shared preferences.
+	 * Persists the given <var>value</var> for the specified <var>preference</var> into {@link SharedPreferences}
+	 * that are managed by this manager.
 	 *
-	 * @param preference Preference of which value should be saved.
-	 * @param value      The value of preference to save into shared preferences.
-	 * @return {@code True} if save operation succeeded, {@code false} otherwise.
+	 * @param preference Preference for which to persist the value.
+	 * @param value      The value to be persisted.
+	 * @return {@code True} if put has been successful, {@code false} otherwise.
 	 * @see #getPreference(SharedPreference)
 	 * @see #containsPreference(SharedPreference)
 	 * @see #removePreference(SharedPreference)
+	 * @see SharedPreference#updateValue(Object)
+	 * @see SharedPreference#putIntoPreferences(SharedPreferences)
 	 */
 	public final <Type> boolean putPreference(@NonNull SharedPreference<Type> preference, @Nullable Type value) {
-		preference.updateValue(value);
-		final boolean result = preference.putIntoPreferences(mPreferences);
+		final boolean result = preference.updateValue(value).putIntoPreferences(mPreferences);
 		if (!mCachingEnabled) {
 			preference.invalidate();
 		}
@@ -319,12 +356,17 @@ public class PreferencesManager extends SimpleSharedPreferencesFacade {
 	}
 
 	/**
-	 * Obtains the value of the given <var>preference</var> from shared preferences.
+	 * Obtains the value for the given <var>preference</var> from {@link SharedPreferences} that are
+	 * managed by this manager.
 	 *
-	 * @param preference Preference of which value should be obtained.
-	 * @return Value of the given shared preference.
+	 * @param preference Preference for which to obtain its associated value.
+	 * @return Value associated with the preference. May be {@code null} if there is no value persisted
+	 * for the preference yet.
 	 * @see #putPreference(SharedPreference, Object)
+	 * @see #contains(String)
+	 * @see SharedPreference#getFromPreferences(SharedPreferences)
 	 */
+	@Nullable
 	public final <Type> Type getPreference(@NonNull SharedPreference<Type> preference) {
 		final Type value = preference.getFromPreferences(mPreferences);
 		if (!mCachingEnabled) {
@@ -334,10 +376,12 @@ public class PreferencesManager extends SimpleSharedPreferencesFacade {
 	}
 
 	/**
-	 * Checks whether value of the given <var>preference</var> is contained within the shared preferences.
+	 * Checks whether there is value associated with the specified <var>preference</var> contained
+	 * within {@link SharedPreferences} that are managed by this manager.
 	 *
-	 * @param preference The desired preference of which value to check.
-	 * @return {@code True} if some value for the specified preference is stored, {@code false} otherwise.
+	 * @param preference The desired preference of which value's existence to check.
+	 * @return {@code True} if there is value contained for key of the specified preference,
+	 * {@code false} otherwise.
 	 * @see #putPreference(SharedPreference, Object)
 	 * @see #getPreference(SharedPreference)
 	 * @see #removePreference(SharedPreference)
@@ -347,11 +391,11 @@ public class PreferencesManager extends SimpleSharedPreferencesFacade {
 	}
 
 	/**
-	 * Removes current value of the given <var>preference</var> from the shared preferences.
+	 * Removes a value for the specified <var>preference</var> from {@link SharedPreferences} that
+	 * are managed by this manager.
 	 *
-	 * @param preference The desired preference of which value (entry) should be removed.
-	 * @return {@code True} if current value of shared preference has been removed, {@code false} if
-	 * some error occurred.
+	 * @param preference The preference for which to remove its associated value.
+	 * @return {@code True} if removal has been successful, {@code false} otherwise.
 	 * @see #putPreference(SharedPreference, Object)
 	 * @see #getPreference(SharedPreference)
 	 * @see #containsPreference(SharedPreference)
@@ -365,17 +409,16 @@ public class PreferencesManager extends SimpleSharedPreferencesFacade {
 	/**
 	 * <b>This method has been deprecated and will be removed in the next release.</b>
 	 * <p>
-	 * Returns the actual file creation mode for shared preferences.
+	 * Creates a default name for shared preferences (like the one created by {@link PreferenceManager}).
 	 *
-	 * @return The shared preferences file creation mode. {@link #MODE_PRIVATE} by default.
-	 * @see Context
-	 * @see #setMode(int)
-	 * @deprecated The new implementation of preferences manager is created with already initialized
-	 * instance of {@link SharedPreferences} and thus its file mode cannot be changed.
+	 * @param context Context for which the name should be created.
+	 * @return Default name for shared preferences.
+	 * @deprecated Use {@link SharedPreferencesPolicy#defaultPreferencesName(Context)} instead.
 	 */
+	@NonNull
 	@Deprecated
-	protected final int getMode() {
-		return SharedPreferencesPolicy.FILE_MODE_PRIVATE;
+	public static String defaultSharedPreferencesName(@NonNull Context context) {
+		return SharedPreferencesPolicy.defaultPreferencesName(context);
 	}
 
 	/**
@@ -392,6 +435,21 @@ public class PreferencesManager extends SimpleSharedPreferencesFacade {
 	@Deprecated
 	protected final void setMode(@Mode int mode) {
 		// Actual implementation of this manager does not support changing of preferences file mode.
+	}
+
+	/**
+	 * <b>This method has been deprecated and will be removed in the next release.</b>
+	 * <p>
+	 * Returns the actual file creation mode for shared preferences.
+	 *
+	 * @return The shared preferences file creation mode. {@link #MODE_PRIVATE} by default.
+	 * @see Context
+	 * @see #setMode(int)
+	 * @deprecated Use {@link #getPreferencesFileMode()} instead.
+	 */
+	@Deprecated
+	protected final int getMode() {
+		return getPreferencesFileMode();
 	}
 
 	/**
@@ -449,4 +507,92 @@ public class PreferencesManager extends SimpleSharedPreferencesFacade {
 	/*
 	 * Inner classes ===============================================================================
 	 */
+
+	/**
+	 * Builder that may be used to creates new instances of PreferencesManager with a desired configuration.
+	 *
+	 * @author Martin Albedinsky
+	 */
+	public static class Builder extends SimpleSharedPreferencesFacade.Builder<Builder> {
+
+		/**
+		 * See {@link PreferencesManager#mContext}.
+		 */
+		final Context context;
+
+		/**
+		 * See {@link PreferencesManager#mPreferencesName}.
+		 */
+		String preferencesName;
+
+		/**
+		 * See {@link PreferencesManager#mPreferencesFileMode}.
+		 */
+		@SharedPreferencesPolicy.FileMode
+		int preferencesFileMode = SharedPreferencesPolicy.FILE_MODE_PRIVATE;
+
+		/**
+		 * Creates a new Builder with the specified <var>context</var>.
+		 *
+		 * @param context The context that is used to create default preferences instance for this
+		 *                builder if there is no explicit instance of preferences specified.
+		 */
+		public Builder(@NonNull Context context) {
+			this.context = context;
+		}
+
+		/**
+		 * Specifies a name for shared preferences that is used to create default preferences instance
+		 * in case when there is no explicit instance of preferences specified for this builder via
+		 * {@link #preferences(SharedPreferences)}.
+		 * <p>
+		 * Also the specified name may be used later in order to identify preferences instance via
+		 * {@link PreferencesManager#getPreferencesName()}.
+		 *
+		 * @param name The desired name for preferences. May be {@code null} in order to use default
+		 *             name for preferences.
+		 * @return This builder to allow methods chaining.
+		 * @see SharedPreferencesPolicy#defaultPreferencesName(Context)
+		 */
+		public Builder preferencesName(@Nullable String name) {
+			this.preferencesName = name;
+			return this;
+		}
+
+		/**
+		 * Specifies a file mode for shared preferences that is used to create default preferences
+		 * instance in case when there is no explicit instance of preferences specified for this builder
+		 * via {@link #preferences(SharedPreferences)}.
+		 * <p>
+		 * Also the specified mode may be used later in order to identify preferences file mode via
+		 * {@link PreferencesManager#getPreferencesFileMode()}.
+		 *
+		 * @param fileMode The desired file mode for preferences. Should be one of modes defined by
+		 *                 {@link SharedPreferencesPolicy.FileMode @SharedPreferencesPolicy.FileMode}
+		 *                 annotation.
+		 * @return This builder to allow methods chaining.
+		 */
+		public Builder preferencesFileMode(@SharedPreferencesPolicy.FileMode int fileMode) {
+			this.preferencesFileMode = fileMode;
+			return this;
+		}
+
+		/**
+		 * Builds a new instance of PreferencesManager from the configuration specified for this builder.
+		 *
+		 * @return Instance of preferences manager ready to be used.
+		 * @throws IllegalArgumentException If some of the required parameters are missing.
+		 */
+		@NonNull
+		@Override
+		public PreferencesManager build() {
+			if (TextUtils.isEmpty(preferencesName)) {
+				this.preferencesName = SharedPreferencesPolicy.defaultPreferencesName(context);
+			}
+			if (preferences == null) {
+				this.preferences = context.getSharedPreferences(preferencesName, preferencesFileMode);
+			}
+			return new PreferencesManager(this);
+		}
+	}
 }

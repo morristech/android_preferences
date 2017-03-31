@@ -18,6 +18,7 @@
  */
 package universum.studios.android.preference;
 
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -33,20 +34,28 @@ import java.util.Set;
 public interface SharedPreferencesFacade {
 
 	/**
-	 * Returns the name of {@link android.content.SharedPreferences SharedPreferences} that are hidden
-	 * behind this facade.
+	 * todo:
 	 *
-	 * @return Shared preferences name.
+	 * @param listener
+	 * @see SharedPreferences#registerOnSharedPreferenceChangeListener(SharedPreferences.OnSharedPreferenceChangeListener)
 	 */
-	@NonNull
-	String getPreferencesName();
+	void registerOnSharedPreferenceChangeListener(@NonNull SharedPreferences.OnSharedPreferenceChangeListener listener);
+
+	/**
+	 * todo:
+	 *
+	 * @param listener
+	 * @see SharedPreferences#unregisterOnSharedPreferenceChangeListener(SharedPreferences.OnSharedPreferenceChangeListener)
+	 */
+	void unregisterOnSharedPreferenceChangeListener(@NonNull SharedPreferences.OnSharedPreferenceChangeListener listener);
 
 	/**
 	 * Checks whether the {@code SharedPreferences} hidden behind this facade contain value for the
 	 * specified <var>key</var> or not.
 	 *
-	 * @param key The key of which value existence to check.
+	 * @param key The key of which value's existence to check.
 	 * @return {@code True} if there is value contained for the specified key, {@code false} otherwise.
+	 * @see SharedPreferences#contains(String)
 	 */
 	boolean contains(@NonNull String key);
 
@@ -57,6 +66,8 @@ public interface SharedPreferencesFacade {
 	 * @param key   The key for which to put the value into preferences.
 	 * @param value The desired value to put into preferences.
 	 * @return {@code True} if put has been successful, {@code false} otherwise.
+	 * @see SharedPreferences#edit()
+	 * @see SharedPreferences.Editor#putString(String, String)
 	 */
 	boolean putString(@NonNull String key, @Nullable String value);
 
@@ -68,6 +79,7 @@ public interface SharedPreferencesFacade {
 	 * @param defValue Default value to be returned in case when there is no value persisted for
 	 *                 the specified key.
 	 * @return Either persisted or default string value.
+	 * @see SharedPreferences#getString(String, String)
 	 */
 	@Nullable
 	String getString(@NonNull String key, @Nullable String defValue);
@@ -79,6 +91,8 @@ public interface SharedPreferencesFacade {
 	 * @param key    The key for which to put the values into preferences.
 	 * @param values The desired values to put into preferences.
 	 * @return {@code True} if put has been successful, {@code false} otherwise.
+	 * @see SharedPreferences#edit()
+	 * @see SharedPreferences.Editor#putStringSet(String, Set)
 	 */
 	boolean putStringSet(@NonNull String key, @Nullable Set<String> values);
 
@@ -90,6 +104,7 @@ public interface SharedPreferencesFacade {
 	 * @param defValues Default values to be returned in case when there are no values persisted for
 	 *                  the specified key.
 	 * @return Either persisted or default string values.
+	 * @see SharedPreferences#getStringSet(String, Set)
 	 */
 	@Nullable
 	Set<String> getStringSet(@NonNull String key, @Nullable Set<String> defValues);
@@ -101,6 +116,8 @@ public interface SharedPreferencesFacade {
 	 * @param key   The key for which to put the value into preferences.
 	 * @param value The desired value to put into preferences.
 	 * @return {@code True} if put has been successful, {@code false} otherwise.
+	 * @see SharedPreferences#edit()
+	 * @see SharedPreferences.Editor#putInt(String, int)
 	 */
 	boolean putInt(@NonNull String key, int value);
 
@@ -112,6 +129,7 @@ public interface SharedPreferencesFacade {
 	 * @param defValue Default value to be returned in case when there is no value persisted for
 	 *                 the specified key.
 	 * @return Either persisted or default integer value.
+	 * @see SharedPreferences#getInt(String, int)
 	 */
 	int getInt(@NonNull String key, int defValue);
 
@@ -122,6 +140,8 @@ public interface SharedPreferencesFacade {
 	 * @param key   The key for which to put the value into preferences.
 	 * @param value The desired value to put into preferences.
 	 * @return {@code True} if put has been successful, {@code false} otherwise.
+	 * @see SharedPreferences#edit()
+	 * @see SharedPreferences.Editor#putFloat(String, float)
 	 */
 	boolean putFloat(@NonNull String key, float value);
 
@@ -133,6 +153,7 @@ public interface SharedPreferencesFacade {
 	 * @param defValue Default value to be returned in case when there is no value persisted for
 	 *                 the specified key.
 	 * @return Either persisted or default float value.
+	 * @see SharedPreferences#getFloat(String, float)
 	 */
 	float getFloat(@NonNull String key, float defValue);
 
@@ -143,6 +164,8 @@ public interface SharedPreferencesFacade {
 	 * @param key   The key for which to put the value into preferences.
 	 * @param value The desired value to put into preferences.
 	 * @return {@code True} if put has been successful, {@code false} otherwise.
+	 * @see SharedPreferences#edit()
+	 * @see SharedPreferences.Editor#putLong(String, long)
 	 */
 	boolean putLong(@NonNull String key, long value);
 
@@ -154,6 +177,7 @@ public interface SharedPreferencesFacade {
 	 * @param defValue Default value to be returned in case when there is no value persisted for
 	 *                 the specified key.
 	 * @return Either persisted or default long value.
+	 * @see SharedPreferences#getLong(String, long)
 	 */
 	long getLong(@NonNull String key, long defValue);
 
@@ -164,6 +188,8 @@ public interface SharedPreferencesFacade {
 	 * @param key   The key for which to put the value into preferences.
 	 * @param value The desired value to put into preferences.
 	 * @return {@code True} if put has been successful, {@code false} otherwise.
+	 * @see SharedPreferences#edit()
+	 * @see SharedPreferences.Editor#putBoolean(String, boolean)
 	 */
 	boolean putBoolean(@NonNull String key, boolean value);
 
@@ -175,6 +201,7 @@ public interface SharedPreferencesFacade {
 	 * @param defValue Default value to be returned in case when there is no value persisted for
 	 *                 the specified key.
 	 * @return Either persisted or default boolean value.
+	 * @see SharedPreferences#getBoolean(String, boolean)
 	 */
 	boolean getBoolean(@NonNull String key, boolean defValue);
 
@@ -184,6 +211,8 @@ public interface SharedPreferencesFacade {
 	 *
 	 * @param key The key for which to remove its associated value.
 	 * @return {@code True} if removal has been successful, {@code false} otherwise.
+	 * @see SharedPreferences#edit()
+	 * @see SharedPreferences.Editor#remove(String)
 	 */
 	boolean remove(@NonNull String key);
 }

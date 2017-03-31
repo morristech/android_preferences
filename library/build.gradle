@@ -60,6 +60,9 @@ android {
                 '../library-common/src/androidTest/java',
                 '../library-collection/src/androidTest/java'
         ]
+        androidTest.res.srcDirs = [
+                '../library-manager/src/androidTest/res'
+        ]
     }
 
     compileOptions {
