@@ -46,7 +46,7 @@ public final class FloatPreference extends SharedPreference<Float> {
 	 *
 	 * @see SharedPreference#SharedPreference(String, Object)
 	 */
-	public FloatPreference(@NonNull String key, @NonNull Float defValue) {
+	public FloatPreference(@NonNull final String key, @NonNull final Float defValue) {
 		super(key, defValue);
 	}
 
@@ -71,7 +71,7 @@ public final class FloatPreference extends SharedPreference<Float> {
 	 */
 	@Override
 	@CheckResult
-	protected boolean onPutIntoPreferences(@NonNull SharedPreferences preferences) {
+	protected boolean onPutIntoPreferences(@NonNull final SharedPreferences preferences) {
 		return preferences.edit().putFloat(mKey, mValue).commit();
 	}
 
@@ -79,7 +79,7 @@ public final class FloatPreference extends SharedPreference<Float> {
 	 */
 	@Nullable
 	@Override
-	protected Float onGetFromPreferences(@NonNull SharedPreferences preferences) {
+	protected Float onGetFromPreferences(@NonNull final SharedPreferences preferences) {
 		return preferences.getFloat(mKey, mDefaultValue);
 	}
 }

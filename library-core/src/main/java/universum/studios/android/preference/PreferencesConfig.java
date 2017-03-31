@@ -37,7 +37,6 @@ public final class PreferencesConfig {
 	 *
 	 * @see Log#v(String, String)
 	 */
-	@Deprecated
 	public static boolean LOG_ENABLED = true;
 
 	/**
@@ -46,7 +45,6 @@ public final class PreferencesConfig {
 	 *
 	 * @see Log#d(String, String)
 	 */
-	@Deprecated
 	public static boolean DEBUG_LOG_ENABLED = false;
 
 	/**

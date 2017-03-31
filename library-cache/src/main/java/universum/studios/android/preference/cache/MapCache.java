@@ -78,14 +78,14 @@ final class MapCache implements SharedPreferencesCache {
 	/**
 	 */
 	@Override
-	public boolean contains(@NonNull String key) {
+	public boolean contains(@NonNull final String key) {
 		return mMap.containsKey(key);
 	}
 
 	/**
 	 */
 	@Override
-	public boolean putString(@NonNull String key, @Nullable String value) {
+	public boolean putString(@NonNull final String key, @Nullable final String value) {
 		mMap.put(key, value);
 		return true;
 	}
@@ -94,7 +94,7 @@ final class MapCache implements SharedPreferencesCache {
 	 */
 	@Nullable
 	@Override
-	public String getString(@NonNull String key) {
+	public String getString(@NonNull final String key) {
 		assertContainsOrThrow(key);
 		return (String) mMap.get(key);
 	}
@@ -102,7 +102,7 @@ final class MapCache implements SharedPreferencesCache {
 	/**
 	 */
 	@Override
-	public boolean putStringSet(@NonNull String key, @Nullable Set<String> values) {
+	public boolean putStringSet(@NonNull final String key, @Nullable final Set<String> values) {
 		mMap.put(key, values);
 		return true;
 	}
@@ -112,7 +112,7 @@ final class MapCache implements SharedPreferencesCache {
 	@Nullable
 	@Override
 	@SuppressWarnings("unchecked")
-	public Set<String> getStringSet(@NonNull String key) {
+	public Set<String> getStringSet(@NonNull final String key) {
 		assertContainsOrThrow(key);
 		return (Set<String>) mMap.get(key);
 	}
@@ -120,7 +120,7 @@ final class MapCache implements SharedPreferencesCache {
 	/**
 	 */
 	@Override
-	public boolean putInt(@NonNull String key, int value) {
+	public boolean putInt(@NonNull final String key, final int value) {
 		mMap.put(key, value);
 		return true;
 	}
@@ -128,7 +128,7 @@ final class MapCache implements SharedPreferencesCache {
 	/**
 	 */
 	@Override
-	public int getInt(@NonNull String key) {
+	public int getInt(@NonNull final String key) {
 		assertContainsOrThrow(key);
 		return (int) mMap.get(key);
 	}
@@ -136,7 +136,7 @@ final class MapCache implements SharedPreferencesCache {
 	/**
 	 */
 	@Override
-	public boolean putFloat(@NonNull String key, float value) {
+	public boolean putFloat(@NonNull final String key, final float value) {
 		mMap.put(key, value);
 		return true;
 	}
@@ -144,7 +144,7 @@ final class MapCache implements SharedPreferencesCache {
 	/**
 	 */
 	@Override
-	public float getFloat(@NonNull String key) {
+	public float getFloat(@NonNull final String key) {
 		assertContainsOrThrow(key);
 		return (float) mMap.get(key);
 	}
@@ -152,7 +152,7 @@ final class MapCache implements SharedPreferencesCache {
 	/**
 	 */
 	@Override
-	public boolean putLong(@NonNull String key, long value) {
+	public boolean putLong(@NonNull final String key, final long value) {
 		mMap.put(key, value);
 		return true;
 	}
@@ -160,7 +160,7 @@ final class MapCache implements SharedPreferencesCache {
 	/**
 	 */
 	@Override
-	public long getLong(@NonNull String key) {
+	public long getLong(@NonNull final String key) {
 		assertContainsOrThrow(key);
 		return (long) mMap.get(key);
 	}
@@ -168,7 +168,7 @@ final class MapCache implements SharedPreferencesCache {
 	/**
 	 */
 	@Override
-	public boolean putBoolean(@NonNull String key, boolean value) {
+	public boolean putBoolean(@NonNull final String key, final boolean value) {
 		mMap.put(key, value);
 		return true;
 	}
@@ -176,7 +176,7 @@ final class MapCache implements SharedPreferencesCache {
 	/**
 	 */
 	@Override
-	public boolean getBoolean(@NonNull String key) {
+	public boolean getBoolean(@NonNull final String key) {
 		assertContainsOrThrow(key);
 		return (boolean) mMap.get(key);
 	}
@@ -187,14 +187,14 @@ final class MapCache implements SharedPreferencesCache {
 	 *
 	 * @param key The of which value's presence to check.
 	 */
-	private void assertContainsOrThrow(String key) {
+	private void assertContainsOrThrow(final String key) {
 		if (!mMap.containsKey(key)) throw new NotInCacheException(key);
 	}
 
 	/**
 	 */
 	@Override
-	public boolean evict(@NonNull String key) {
+	public boolean evict(@NonNull final String key) {
 		return mMap.remove(key) != null;
 	}
 

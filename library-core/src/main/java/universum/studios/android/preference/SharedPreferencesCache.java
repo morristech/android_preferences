@@ -197,14 +197,14 @@ public interface SharedPreferencesCache {
 	 *
 	 * @author Martin Albedinsky
 	 */
-	final class NotInCacheException extends AndroidRuntimeException {
+	class NotInCacheException extends AndroidRuntimeException {
 
 		/**
 		 * Creates a new instance of NotInCacheException for the specified <var>key</var>.
 		 *
 		 * @param key The key for which to inform that it has no value associated within the cache.
 		 */
-		public NotInCacheException(@NonNull String key) {
+		public NotInCacheException(@NonNull final String key) {
 			super("There is no value associated with the key(" + key + ") in the cache.");
 		}
 	}

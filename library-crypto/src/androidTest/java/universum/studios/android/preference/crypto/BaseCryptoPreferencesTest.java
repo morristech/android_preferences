@@ -18,22 +18,42 @@
 */
 package universum.studios.android.preference.crypto;
 
-import android.support.test.runner.AndroidJUnit4;
+import android.content.SharedPreferences;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import universum.studios.android.preference.SharedPreferencesFacade;
+import universum.studios.android.preference.SharedPreferencesPolicy;
+import universum.studios.android.preference.SimpleSharedPreferencesFacade;
+import universum.studios.android.test.BaseInstrumentedTest;
 
 /**
  * @author Martin Albedinsky
  */
-@RunWith(AndroidJUnit4.class)
-public final class CryptoSharedPreferencesTest extends BaseCryptoPreferencesTest {
+abstract class BaseCryptoPreferencesTest extends BaseInstrumentedTest {
 
 	@SuppressWarnings("unused")
-	private static final String TAG = "CryptoSharedPreferencesTest";
+	private static final String TAG = "BaseCryptoPreferencesTest";
 
-	@Test
-	public void test() {
-		// todo:: implement test
+	SharedPreferences mPreferences;
+	SharedPreferencesFacade mPreferencesFacade;
+
+	@Override
+	public void beforeTest() throws Exception {
+		super.beforeTest();
+		this.mPreferences = mContext.getSharedPreferences(
+				mContext.getPackageName() + ":test_crypto_preferences",
+				SharedPreferencesPolicy.FILE_MODE_PRIVATE
+		);
+		this.mPreferencesFacade = new SimpleSharedPreferencesFacade.Builder<SimpleSharedPreferencesFacade.Builder>()
+				.preferences(mPreferences)
+				.build();
+		// Ensure that we have a clean slate before each test.
+		this.mPreferencesFacade.removeAll();
+	}
+
+	@Override
+	public void afterTest() throws Exception {
+		super.afterTest();
+		this.mPreferences = null;
+		this.mPreferencesFacade = null;
 	}
 }

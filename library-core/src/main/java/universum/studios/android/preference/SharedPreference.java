@@ -88,6 +88,7 @@ public abstract class SharedPreference<T> {
 	/**
 	 * The key for which will be the value of this preference persisted within shared preferences.
 	 */
+	// todo: make this field final on next release
 	String mKey = "";
 
 	/**
@@ -130,7 +131,7 @@ public abstract class SharedPreference<T> {
 	 *                 saved withing shared preference yet.
 	 * @throws IllegalArgumentException If the specified <var>key</var> is empty.
 	 */
-	protected SharedPreference(@NonNull String key, @Nullable T defValue) {
+	protected SharedPreference(@NonNull final String key, @Nullable final T defValue) {
 		if (TextUtils.isEmpty(key)) {
 			throw new IllegalArgumentException("Preference key cannot be empty.");
 		}
@@ -229,7 +230,7 @@ public abstract class SharedPreference<T> {
 			/**
 			 */
 			@Override
-			public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+			public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences, String key) {
 				if (mKey.equals(key)) {
 					// Ensure that we have always the actual value.
 					mValueIsActual = false;
@@ -264,7 +265,7 @@ public abstract class SharedPreference<T> {
 	 * @return This preference to allow methods chaining.
 	 * @see #getValue()
 	 */
-	public SharedPreference<T> updateValue(@Nullable T newValue) {
+	public SharedPreference<T> updateValue(@Nullable final T newValue) {
 		if (mValue == null || !mValue.equals(newValue)) {
 			this.mValue = newValue;
 			this.mValueIsActual = true;
@@ -282,9 +283,10 @@ public abstract class SharedPreference<T> {
 	 * @see #updateValue(Object)
 	 * @see #getValue()
 	 */
-	public final boolean putIntoPreferences(@NonNull SharedPreferences preferences) {
+	public final boolean putIntoPreferences(@NonNull final SharedPreferences preferences) {
 		this.ensureValidKeyOrThrow();
-		return mValueIsActual = onPutIntoPreferences(preferences);
+		this.mValueIsActual = onPutIntoPreferences(preferences);
+		return mValueIsActual;
 	}
 
 	/**
@@ -329,7 +331,7 @@ public abstract class SharedPreference<T> {
 	 * @see #getDefaultValue()
 	 * @see #putIntoPreferences(SharedPreferences)
 	 */
-	final T getFromPreferences(SharedPreferences preferences) {
+	final T getFromPreferences(final SharedPreferences preferences) {
 		this.ensureValidKeyOrThrow();
 		if (!mValueIsActual) {
 			this.mValue = onGetFromPreferences(preferences);
@@ -377,8 +379,8 @@ public abstract class SharedPreference<T> {
 		if (TextUtils.isEmpty(mKey)) {
 			final String preferenceType = getClass().getSimpleName();
 			throw new IllegalStateException(
-					"Key for preference(" + preferenceType + ") is not properly initialized. " +
-							"Didn't you forget to set it up via SharedPreference.attachKey(Resources)?"
+					"Key for preference(" + preferenceType + ") is not properly initialized. "
+							+ "Didn't you forget to set it up via SharedPreference.attachKey(Resources)?"
 			);
 		}
 	}

@@ -48,7 +48,7 @@ public final class EnumPreference<E extends Enum> extends SharedPreference<E> {
 	 *
 	 * @see SharedPreference#SharedPreference(String, Object)
 	 */
-	public EnumPreference(@NonNull String key, @Nullable E defValue) {
+	public EnumPreference(@NonNull final String key, @Nullable final E defValue) {
 		super(key, defValue);
 	}
 
@@ -73,7 +73,7 @@ public final class EnumPreference<E extends Enum> extends SharedPreference<E> {
 	 */
 	@Override
 	@CheckResult
-	protected boolean onPutIntoPreferences(@NonNull SharedPreferences preferences) {
+	protected boolean onPutIntoPreferences(@NonNull final SharedPreferences preferences) {
 		return preferences.edit().putString(mKey, mValue.name()).commit();
 	}
 
@@ -82,7 +82,7 @@ public final class EnumPreference<E extends Enum> extends SharedPreference<E> {
 	@Nullable
 	@Override
 	@SuppressWarnings("unchecked")
-	protected E onGetFromPreferences(@NonNull SharedPreferences preferences) {
+	protected E onGetFromPreferences(@NonNull final SharedPreferences preferences) {
 		final String enumName = preferences.getString(mKey, mDefaultValue == null ? "" : mDefaultValue.name());
 		return TextUtils.isEmpty(enumName) ? null : (E) E.valueOf(mDefaultValue.getClass(), enumName);
 	}

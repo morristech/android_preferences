@@ -59,6 +59,7 @@ public interface SharedPreferencesFacade {
 	 *
 	 * @param key The key of which value's presence to check.
 	 * @return {@code True} if there is value contained for the specified key, {@code false} otherwise.
+	 * @see #remove(String)
 	 * @see SharedPreferences#contains(String)
 	 */
 	boolean contains(@NonNull String key);
@@ -83,6 +84,7 @@ public interface SharedPreferencesFacade {
 	 * @param defValue Default value to be returned in case when there is no value persisted for
 	 *                 the specified key.
 	 * @return Either persisted or default string value.
+	 * @see #contains(String)
 	 * @see SharedPreferences#getString(String, String)
 	 */
 	@Nullable
@@ -108,6 +110,7 @@ public interface SharedPreferencesFacade {
 	 * @param defValues Default values to be returned in case when there are no values persisted for
 	 *                  the specified key.
 	 * @return Either persisted or default string values.
+	 * @see #contains(String)
 	 * @see SharedPreferences#getStringSet(String, Set)
 	 */
 	@Nullable
@@ -133,6 +136,7 @@ public interface SharedPreferencesFacade {
 	 * @param defValue Default value to be returned in case when there is no value persisted for
 	 *                 the specified key.
 	 * @return Either persisted or default integer value.
+	 * @see #contains(String)
 	 * @see SharedPreferences#getInt(String, int)
 	 */
 	int getInt(@NonNull String key, int defValue);
@@ -157,6 +161,7 @@ public interface SharedPreferencesFacade {
 	 * @param defValue Default value to be returned in case when there is no value persisted for
 	 *                 the specified key.
 	 * @return Either persisted or default float value.
+	 * @see #contains(String)
 	 * @see SharedPreferences#getFloat(String, float)
 	 */
 	float getFloat(@NonNull String key, float defValue);
@@ -181,6 +186,7 @@ public interface SharedPreferencesFacade {
 	 * @param defValue Default value to be returned in case when there is no value persisted for
 	 *                 the specified key.
 	 * @return Either persisted or default long value.
+	 * @see #contains(String)
 	 * @see SharedPreferences#getLong(String, long)
 	 */
 	long getLong(@NonNull String key, long defValue);
@@ -205,6 +211,7 @@ public interface SharedPreferencesFacade {
 	 * @param defValue Default value to be returned in case when there is no value persisted for
 	 *                 the specified key.
 	 * @return Either persisted or default boolean value.
+	 * @see #contains(String)
 	 * @see SharedPreferences#getBoolean(String, boolean)
 	 */
 	boolean getBoolean(@NonNull String key, boolean defValue);
@@ -215,8 +222,22 @@ public interface SharedPreferencesFacade {
 	 *
 	 * @param key The key for which to remove its associated value.
 	 * @return {@code True} if removal has been successful, {@code false} otherwise.
+	 * @see #removeAll()
+	 * @see #contains(String)
 	 * @see SharedPreferences#edit()
 	 * @see SharedPreferences.Editor#remove(String)
 	 */
 	boolean remove(@NonNull String key);
+
+	/**
+	 * Removes all values from the {@code SharedPreferences} hidden behind this facade.
+	 *
+	 * @return A none-negative number determining count of values that has been removed. May be {@code 0}
+	 * if there are no values persisted.
+	 * @see #remove(String)
+	 * @see SharedPreferences#getAll()
+	 * @see SharedPreferences#edit()
+	 * @see SharedPreferences.Editor#remove(String)
+	 */
+	int removeAll();
 }

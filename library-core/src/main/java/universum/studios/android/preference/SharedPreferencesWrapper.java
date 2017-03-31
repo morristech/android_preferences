@@ -58,8 +58,7 @@ public class SharedPreferencesWrapper implements SharedPreferences {
 	/**
 	 * Wrapped instance of SharedPreferences to which is this wrapper delegating all its calls.
 	 */
-	@NonNull
-	protected final SharedPreferences mPreferences;
+	private final SharedPreferences mPreferences;
 
 	/*
 	 * Constructors ================================================================================
@@ -71,7 +70,7 @@ public class SharedPreferencesWrapper implements SharedPreferences {
 	 *
 	 * @param preferences The shared preferences to be wrapped.
 	 */
-	public SharedPreferencesWrapper(@NonNull SharedPreferences preferences) {
+	public SharedPreferencesWrapper(@NonNull final SharedPreferences preferences) {
 		this.mPreferences = preferences;
 	}
 
@@ -92,14 +91,14 @@ public class SharedPreferencesWrapper implements SharedPreferences {
 	/**
 	 */
 	@Override
-	public void registerOnSharedPreferenceChangeListener(@NonNull OnSharedPreferenceChangeListener listener) {
+	public void registerOnSharedPreferenceChangeListener(@NonNull final OnSharedPreferenceChangeListener listener) {
 		mPreferences.registerOnSharedPreferenceChangeListener(listener);
 	}
 
 	/**
 	 */
 	@Override
-	public void unregisterOnSharedPreferenceChangeListener(@NonNull OnSharedPreferenceChangeListener listener) {
+	public void unregisterOnSharedPreferenceChangeListener(@NonNull final OnSharedPreferenceChangeListener listener) {
 		mPreferences.unregisterOnSharedPreferenceChangeListener(listener);
 	}
 
@@ -113,7 +112,7 @@ public class SharedPreferencesWrapper implements SharedPreferences {
 	/**
 	 */
 	@Override
-	public boolean contains(@NonNull String key) {
+	public boolean contains(@NonNull final String key) {
 		return mPreferences.contains(key);
 	}
 
@@ -121,7 +120,7 @@ public class SharedPreferencesWrapper implements SharedPreferences {
 	 */
 	@Nullable
 	@Override
-	public String getString(@NonNull String key, @Nullable String defValue) {
+	public String getString(@NonNull final String key, @Nullable final String defValue) {
 		return mPreferences.getString(key, defValue);
 	}
 
@@ -131,35 +130,35 @@ public class SharedPreferencesWrapper implements SharedPreferences {
 	 */
 	@Nullable
 	@Override
-	public Set<String> getStringSet(@NonNull String key, @Nullable Set<String> defValues) {
+	public Set<String> getStringSet(@NonNull final String key, @Nullable final Set<String> defValues) {
 		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB ? mPreferences.getStringSet(key, defValues) : null;
 	}
 
 	/**
 	 */
 	@Override
-	public int getInt(@NonNull String key, int defValue) {
+	public int getInt(@NonNull final String key, final int defValue) {
 		return mPreferences.getInt(key, defValue);
 	}
 
 	/**
 	 */
 	@Override
-	public long getLong(@NonNull String key, long defValue) {
+	public long getLong(@NonNull final String key, final long defValue) {
 		return mPreferences.getLong(key, defValue);
 	}
 
 	/**
 	 */
 	@Override
-	public float getFloat(@NonNull String key, float defValue) {
+	public float getFloat(@NonNull final String key, final float defValue) {
 		return mPreferences.getFloat(key, defValue);
 	}
 
 	/**
 	 */
 	@Override
-	public boolean getBoolean(@NonNull String key, boolean defValue) {
+	public boolean getBoolean(@NonNull final String key, final boolean defValue) {
 		return mPreferences.getBoolean(key, defValue);
 	}
 

@@ -46,7 +46,7 @@ public final class BooleanPreference extends SharedPreference<Boolean> {
 	 *
 	 * @see SharedPreference#SharedPreference(String, Object)
 	 */
-	public BooleanPreference(@NonNull String key, @NonNull Boolean defValue) {
+	public BooleanPreference(@NonNull final String key, @NonNull final Boolean defValue) {
 		super(key, defValue);
 	}
 
@@ -71,7 +71,7 @@ public final class BooleanPreference extends SharedPreference<Boolean> {
 	 */
 	@Override
 	@CheckResult
-	protected boolean onPutIntoPreferences(@NonNull SharedPreferences preferences) {
+	protected boolean onPutIntoPreferences(@NonNull final SharedPreferences preferences) {
 		return preferences.edit().putBoolean(mKey, mValue).commit();
 	}
 
@@ -79,7 +79,7 @@ public final class BooleanPreference extends SharedPreference<Boolean> {
 	 */
 	@Nullable
 	@Override
-	protected Boolean onGetFromPreferences(@NonNull SharedPreferences preferences) {
+	protected Boolean onGetFromPreferences(@NonNull final SharedPreferences preferences) {
 		return preferences.getBoolean(mKey, mDefaultValue);
 	}
 }

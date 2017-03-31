@@ -23,14 +23,16 @@ import android.support.test.runner.AndroidJUnit4;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import universum.studios.android.test.BaseInstrumentedTest;
+
 /**
  * @author Martin Albedinsky
  */
 @RunWith(AndroidJUnit4.class)
-public final class CryptoSharedPreferencesTest extends BaseCryptoPreferencesTest {
+public final class CryptoSharedPreferencesChangeListenersTest extends BaseInstrumentedTest {
 
 	@SuppressWarnings("unused")
-	private static final String TAG = "CryptoSharedPreferencesTest";
+	private static final String TAG = "CryptoSharedPreferencesChangeListenersTest";
 
 	@Test
 	public void test() {
