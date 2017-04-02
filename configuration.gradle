@@ -1,7 +1,7 @@
 // Defines configuration used across the library project.
 def buildConfig = [
         compileSdkVersion: 25,
-        minSdkVersion    : 9,
+        minSdkVersion    : 8,
         targetSdkVersion : 25,
         buildToolsVersion: '25.0.2'
 ]
@@ -11,7 +11,7 @@ def testConfig = [
 ]
 
 def libraryConfig = [
-        version: '1.0.1'
+        version: '2.0.0-beta1'
 ]
 
 def mavenConfig = [
@@ -32,7 +32,7 @@ def bintrayConfig = [
         packageName              : mavenConfig.groupId + ':' + mavenConfig.artifactId,
         packageLabels            : ['android', 'preferences'],
         packageVersionName       : mavenConfig.version,
-        packageVersionDescription: 'Version patch.',
+        packageVersionDescription: 'Major beta release.',
         packageVersionTag        : mavenConfig.version
 ]
 

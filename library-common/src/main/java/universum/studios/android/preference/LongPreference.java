@@ -25,8 +25,8 @@ import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 
 /**
- * A {@link SharedPreference} implementation that may be used to manage (store/retrieve) a {@link Long}
- * preference value within {@link SharedPreferences}.
+ * A {@link SharedPreference} implementation that may be used to persist a {@link Long} value via
+ * {@link SharedPreferences}.
  *
  * @author Martin Albedinsky
  * @see BooleanPreference
@@ -37,29 +37,33 @@ import android.support.annotation.StringRes;
  */
 public final class LongPreference extends SharedPreference<Long> {
 
-	/**
+	/*
 	 * Constructors ================================================================================
 	 */
 
 	/**
-	 * Creates a new instance of LongPreference.
+	 * Creates a new instance of LongPreference with the specified <var>key</var> and <var>defValue</var>.
 	 *
 	 * @see SharedPreference#SharedPreference(String, Object)
 	 */
-	public LongPreference(@NonNull String key, @NonNull Long defValue) {
+	public LongPreference(@NonNull final String key, @NonNull final Long defValue) {
 		super(key, defValue);
 	}
 
 	/**
+	 * <b>This constructor has been deprecated and will be removed in the next release.</b>
+	 * <p>
 	 * Creates a new instance of LongPreference.
 	 *
 	 * @see SharedPreference#SharedPreference(int, Object)
+	 * @deprecated Use {@link #LongPreference(String, Long)} instead.
 	 */
-	public LongPreference(@StringRes int keyResId, @NonNull Long defValue) {
+	@Deprecated
+	public LongPreference(@StringRes final int keyResId, @NonNull final Long defValue) {
 		super(keyResId, defValue);
 	}
 
-	/**
+	/*
 	 * Methods =====================================================================================
 	 */
 
@@ -67,7 +71,7 @@ public final class LongPreference extends SharedPreference<Long> {
 	 */
 	@Override
 	@CheckResult
-	protected boolean onPutIntoPreferences(@NonNull SharedPreferences preferences) {
+	protected boolean onPutIntoPreferences(@NonNull final SharedPreferences preferences) {
 		return preferences.edit().putLong(mKey, mValue).commit();
 	}
 
@@ -75,7 +79,7 @@ public final class LongPreference extends SharedPreference<Long> {
 	 */
 	@Nullable
 	@Override
-	protected Long onGetFromPreferences(@NonNull SharedPreferences preferences) {
+	protected Long onGetFromPreferences(@NonNull final SharedPreferences preferences) {
 		return preferences.getLong(mKey, mDefaultValue);
 	}
 }

@@ -44,6 +44,9 @@ android {
     sourceSets {
         release.java.srcDirs = [
                 '../library-core/src/main/java',
+                '../library-cache/src/main/java',
+                '../library-crypto/src/main/java',
+                '../library-manager/src/main/java',
                 '../library-common/src/main/java',
                 '../library-collection/src/main/java'
         ]
@@ -51,8 +54,14 @@ android {
         androidTest.java.srcDirs = [
                 '../library/src/androidTest/java',
                 '../library-core/src/androidTest/java',
+                '../library-cache/src/androidTest/java',
+                '../library-crypto/src/androidTest/java',
+                '../library-manager/src/androidTest/java',
                 '../library-common/src/androidTest/java',
                 '../library-collection/src/androidTest/java'
+        ]
+        androidTest.res.srcDirs = [
+                '../library-manager/src/androidTest/res'
         ]
     }
 
@@ -69,11 +78,18 @@ android {
 /**
  * Library dependencies ============================================================================
  */
+repositories {
+    mavenLocal()
+    maven { url repos.bintray.universumStudiosAndroid }
+}
+
 dependencies {
     /*
      * RELEASE DEPENDENCIES ------------------------------------------------------------------------
      */
     compile deps.androidSupport.annotations
+    compile deps.universumStudios.logger
+    compile deps.universumStudios.cryptoCore
 
     /*
      * TEST DEPENDENCIES ---------------------------------------------------------------------------

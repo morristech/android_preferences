@@ -25,8 +25,8 @@ import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 
 /**
- * A {@link SharedPreference} implementation that may be used to manage (store/retrieve) a {@link Float}
- * preference value within {@link SharedPreferences}.
+ * A {@link SharedPreference} implementation that may be used to persist a {@link Float} value via
+ * {@link SharedPreferences}.
  *
  * @author Martin Albedinsky
  * @see BooleanPreference
@@ -37,29 +37,33 @@ import android.support.annotation.StringRes;
  */
 public final class FloatPreference extends SharedPreference<Float> {
 
-	/**
+	/*
 	 * Constructors ================================================================================
 	 */
 
 	/**
-	 * Creates a new instance of FloatPreference.
+	 * Creates a new instance of FloatPreference with the specified <var>key</var> and <var>defValue</var>.
 	 *
 	 * @see SharedPreference#SharedPreference(String, Object)
 	 */
-	public FloatPreference(@NonNull String key, @NonNull Float defValue) {
+	public FloatPreference(@NonNull final String key, @NonNull final Float defValue) {
 		super(key, defValue);
 	}
 
 	/**
+	 * <b>This constructor has been deprecated and will be removed in the next release.</b>
+	 * <p>
 	 * Creates a new instance of FloatPreference.
 	 *
 	 * @see SharedPreference#SharedPreference(int, Object)
+	 * @deprecated Use {@link #FloatPreference(String, Float)} instead.
 	 */
+	@Deprecated
 	public FloatPreference(@StringRes int keyResId, @NonNull Float defValue) {
 		super(keyResId, defValue);
 	}
 
-	/**
+	/*
 	 * Methods =====================================================================================
 	 */
 
@@ -67,7 +71,7 @@ public final class FloatPreference extends SharedPreference<Float> {
 	 */
 	@Override
 	@CheckResult
-	protected boolean onPutIntoPreferences(@NonNull SharedPreferences preferences) {
+	protected boolean onPutIntoPreferences(@NonNull final SharedPreferences preferences) {
 		return preferences.edit().putFloat(mKey, mValue).commit();
 	}
 
@@ -75,7 +79,7 @@ public final class FloatPreference extends SharedPreference<Float> {
 	 */
 	@Nullable
 	@Override
-	protected Float onGetFromPreferences(@NonNull SharedPreferences preferences) {
+	protected Float onGetFromPreferences(@NonNull final SharedPreferences preferences) {
 		return preferences.getFloat(mKey, mDefaultValue);
 	}
 }

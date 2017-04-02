@@ -27,51 +27,22 @@ import android.support.annotation.StringRes;
 import android.text.TextUtils;
 
 /**
- * Base implementation of shared preference object used by {@link PreferencesManager} to manage
- * simplified storing and retrieving values from shared preferences.
+ * Base implementation of shared preference object which may be used to persist a desired value
+ * via {@link SharedPreferences} and then retrieve it.
  * <p>
- * This class implements API necessary to save its current value into {@link SharedPreferences}
+ * This class implements API necessary to persist its current value into {@link SharedPreferences}
  * via {@link #updateValue(Object)} followed by {@link #save(SharedPreferences)} and to retrieve such
- * saved value from the preferences via {@link #retrieve(SharedPreferences)} followed by {@link #getValue()}.
+ * persisted value from preferences via {@link #retrieve(SharedPreferences)} followed by {@link #getValue()}.
  * <p>
- * The key for shared preference must be passed during initialization to one of constructors and can
- * be later obtained via {@link #getKey()} or {@link #getKeyRes()}. <b>Note</b>, that if you will use
- * resource ids as keys, the raw string key need to be attached via {@link #attachKey(Resources)},
- * before any initial storing/obtaining.
+ * The key for shared preference must be passed via {@link #SharedPreference(String, Object)} constructor
+ * and may be later obtained via {@link #getKey()}.
  *
- * @param <Type> A type of the value that can this implementation of preference hold and manage its
- *               saving/obtaining.
+ * @param <T> Type of the value that can be persisted by this preference implementation.
  * @author Martin Albedinsky
  */
-public abstract class SharedPreference<Type> {
+public abstract class SharedPreference<T> {
 
-	/**
-	 * Interface ===================================================================================
-	 */
-
-	/**
-	 * Callback that can be used to listen for changes in value of a specific {@link SharedPreference}
-	 * implementation.
-	 *
-	 * @param <PreferenceType> A type of the preference, for which is this callback created.
-	 * @author Martin Albedinsky
-	 */
-	public interface PreferenceChangeCallback<PreferenceType> {
-
-		/**
-		 * Invoked whenever a value of the specified <var>preference</var> has been changed. The passed
-		 * preference already contains new value parsed from shared preferences which can be obtained
-		 * via {@link SharedPreference#getValue()}.
-		 * <p>
-		 * The preference can be identified by {@link SharedPreference#getKey()} or
-		 * {@link SharedPreference#getKeyRes()}.
-		 *
-		 * @param preference The preference, of which value was changed.
-		 */
-		void onPreferenceChanged(@NonNull SharedPreference<PreferenceType> preference);
-	}
-
-	/**
+	/*
 	 * Constants ===================================================================================
 	 */
 
@@ -80,42 +51,74 @@ public abstract class SharedPreference<Type> {
 	 */
 	// private static final String TAG = "SharedPreference";
 
-	/**
-	 * Static members ==============================================================================
+	/*
+	 * Interface ===================================================================================
 	 */
 
 	/**
+	 * Callback that may be used to listen for changes in value of a specific {@link SharedPreference}
+	 * implementation.
+	 *
+	 * @param <P> Type of the preference to which will be this callback attached.
+	 * @author Martin Albedinsky
+	 * @see #createOnChangeListener(PreferenceChangeCallback)
+	 */
+	public interface PreferenceChangeCallback<P> {
+
+		/**
+		 * Invoked whenever a value of the specified <var>preference</var> has been changed. The passed
+		 * preference already contains new value parsed from shared preferences which may be obtained
+		 * via {@link SharedPreference#getValue()}.
+		 * <p>
+		 * The preference can be identified by {@link SharedPreference#getKey()}.
+		 *
+		 * @param preference The preference of which value has changed.
+		 */
+		void onPreferenceChanged(@NonNull SharedPreference<P> preference);
+	}
+
+	/*
+	 * Static members ==============================================================================
+	 */
+
+	/*
 	 * Members =====================================================================================
 	 */
 
 	/**
-	 * The key under which will be the value of this preference mapped within shared preferences.
+	 * The key for which will be the value of this preference persisted within shared preferences.
 	 */
+	// todo: make this field final on next release
 	String mKey = "";
 
 	/**
-	 * Default value of this preference for case, when there is no value saved withing
-	 * shared preference yet.
+	 * Default value of this preference for case when there is no value persisted within shared
+	 * preference yet.
 	 */
-	Type mDefaultValue;
+	T mDefaultValue;
 
 	/**
-	 * Actual value of this shared preference to save.
+	 * Actual value of this shared preference. This is either already persisted value or yet to be
+	 * persisted if the value has been updated via {@link #updateValue(Object)} but not put into
+	 * preferences via {@link #putIntoPreferences(SharedPreferences)} yet.
 	 */
-	Type mValue;
+	T mValue;
 
 	/**
-	 * Xml resource
+	 * Boolean flag indicating whether the {@link #mValue} is the same as value persisted within
+	 * shared preferences.
 	 */
+	boolean mValueIsActual;
+
+	/**
+	 * Xml resource for the key.
+	 *
+	 * @deprecated Use {@link #mKey} instead.
+	 */
+	@Deprecated
 	private int mKeyRes = -1;
 
-	/**
-	 * Flag indicating whether the {@link #mValue} is same as value saved within shared
-	 * preferences.
-	 */
-	private boolean mAlreadyParsed;
-
-	/**
+	/*
 	 * Constructors ================================================================================
 	 */
 
@@ -128,7 +131,7 @@ public abstract class SharedPreference<Type> {
 	 *                 saved withing shared preference yet.
 	 * @throws IllegalArgumentException If the specified <var>key</var> is empty.
 	 */
-	protected SharedPreference(@NonNull String key, @Nullable Type defValue) {
+	protected SharedPreference(@NonNull final String key, @Nullable final T defValue) {
 		if (TextUtils.isEmpty(key)) {
 			throw new IllegalArgumentException("Preference key cannot be empty.");
 		}
@@ -137,6 +140,8 @@ public abstract class SharedPreference<Type> {
 	}
 
 	/**
+	 * <b>This constructor has been deprecated and will be removed in the next release.</b>
+	 * <p>
 	 * Creates a new instance of SharedPreference with the given key resource and default value.
 	 *
 	 * @param keyResId     Resource id of the desired key under which will be the value of this preference
@@ -145,8 +150,10 @@ public abstract class SharedPreference<Type> {
 	 *                     shared preference yet.
 	 * @throws IllegalArgumentException If the specified <var>keyResId</var> is invalid.
 	 * @see #attachKey(Resources)
+	 * @deprecated Use {@link #SharedPreference(String, Object)} instead.
 	 */
-	protected SharedPreference(@StringRes int keyResId, @Nullable Type defaultValue) {
+	@Deprecated
+	protected SharedPreference(@StringRes int keyResId, @Nullable T defaultValue) {
 		if (keyResId <= 0) {
 			throw new IllegalArgumentException("Resource id(" + keyResId + ") for preference key is not valid.");
 		}
@@ -154,7 +161,7 @@ public abstract class SharedPreference<Type> {
 		this.mDefaultValue = defaultValue;
 	}
 
-	/**
+	/*
 	 * Methods =====================================================================================
 	 */
 
@@ -169,24 +176,32 @@ public abstract class SharedPreference<Type> {
 	}
 
 	/**
+	 * <b>This method has been deprecated and will be removed in the next release.</b>
+	 * <p>
 	 * Return the resource id of the key of this preference.
 	 *
 	 * @return Same resource id as passed to {@link #SharedPreference(int, Object)} constructor.
+	 * @deprecated Use {@link #getKey()} instead.
 	 */
 	@StringRes
+	@Deprecated
 	public final int getKeyRes() {
 		return mKeyRes;
 	}
 
 	/**
+	 * <b>This method has been deprecated and will be removed in the next release.</b>
+	 * <p>
 	 * Attaches the key for this preference from the given resources using the current key's resource
 	 * id specified via {@link #SharedPreference(int, Object)}.
 	 *
 	 * @param resources An application's resources to obtain key.
 	 * @return This preference to allow methods chaining.
 	 * @throws IllegalArgumentException If key obtained from the resources for the resource id is empty.
+	 * @deprecated Due to dropped support of keys specified via resource ids, this method becomes obsolete.
 	 */
-	public SharedPreference<Type> attachKey(@NonNull Resources resources) {
+	@Deprecated
+	public SharedPreference<T> attachKey(@NonNull Resources resources) {
 		if (mKeyRes != -1) {
 			this.mKey = resources.getString(mKeyRes);
 			if (TextUtils.isEmpty(mKey)) {
@@ -197,56 +212,132 @@ public abstract class SharedPreference<Type> {
 	}
 
 	/**
+	 * Creates a new instance of {@link SharedPreferences.OnSharedPreferenceChangeListener} which
+	 * may be used to listen for changes in value of this preference within shared preferences.
+	 * <p>
+	 * <b>Note</b>, that the created listener will delegate the change event the given callback only
+	 * in case when the key of changed value matches the key of this preference.
+	 *
+	 * @param callback Callback to be invoked when the value of this preference changes.
+	 * @return OnSharedPreferenceListener ready to be used.
+	 * @see SharedPreferences#registerOnSharedPreferenceChangeListener(SharedPreferences.OnSharedPreferenceChangeListener)
+	 * @see SharedPreferences#unregisterOnSharedPreferenceChangeListener(SharedPreferences.OnSharedPreferenceChangeListener)
+	 */
+	@NonNull
+	public SharedPreferences.OnSharedPreferenceChangeListener createOnChangeListener(@NonNull final PreferenceChangeCallback<T> callback) {
+		return new SharedPreferences.OnSharedPreferenceChangeListener() {
+
+			/**
+			 */
+			@Override
+			public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences, String key) {
+				if (mKey.equals(key)) {
+					// Ensure that we have always the actual value.
+					mValueIsActual = false;
+					getFromPreferences(sharedPreferences);
+					callback.onPreferenceChanged(SharedPreference.this);
+				}
+			}
+		};
+	}
+
+	/**
 	 * Returns the default value of this preference.
 	 *
-	 * @return Same value as passed to {@link #SharedPreference(String, Object)}.
+	 * @return This preference's default value.
+	 * @see #SharedPreference(String, Object)
 	 */
 	@Nullable
-	public final Type getDefaultValue() {
+	public final T getDefaultValue() {
 		return mDefaultValue;
 	}
 
 	/**
-	 * Retrieves the current value of this preference from the given shared preferences.
+	 * Updates the actual value of this preference to the given one.
+	 * <p>
+	 * <b>Note</b>, that calling this method does not trigger persisting of the given value into
+	 * shared preferences.
+	 * <p>
+	 * In order to immediately persist the given new value of this preference into shared preferences,
+	 * this call need to be followed by {@link #putIntoPreferences(SharedPreferences)}.
 	 *
-	 * @param preferences The instance of shared preferences into which was the value of this preference
-	 *                    before saved.
+	 * @param newValue New value for this preference.
 	 * @return This preference to allow methods chaining.
 	 * @see #getValue()
 	 */
-	public SharedPreference<Type> retrieve(@NonNull SharedPreferences preferences) {
-		this.mValue = getFromPreferences(preferences);
+	public SharedPreference<T> updateValue(@Nullable final T newValue) {
+		if (mValue == null || !mValue.equals(newValue)) {
+			this.mValue = newValue;
+			this.mValueIsActual = true;
+		}
 		return this;
 	}
 
 	/**
-	 * Performs obtaining of the actual value of this preference from the given shared preferences.
+	 * Persists the actual value of this preference into the given shared <var>preferences</var>.
 	 *
-	 * @param preferences The instance of shared preferences into which was the value of this preference
-	 *                    before saved.
-	 * @return The actual value obtained from the given shared preferences or {@code null} if this
-	 * preference's key is invalid.
+	 * @param preferences The instance of shared preferences where should be the actual value of
+	 *                    this preference persisted.
+	 * @return {@code True} if put has been successful, {@code false} otherwise.
+	 * @see #getFromPreferences(SharedPreferences)
+	 * @see #updateValue(Object)
+	 * @see #getValue()
 	 */
-	final Type getFromPreferences(SharedPreferences preferences) {
+	public final boolean putIntoPreferences(@NonNull final SharedPreferences preferences) {
 		this.ensureValidKeyOrThrow();
-		if (!mAlreadyParsed) {
-			this.mValue = onGetFromPreferences(preferences);
-			this.mAlreadyParsed = true;
-		}
+		this.mValueIsActual = onPutIntoPreferences(preferences);
+		return mValueIsActual;
+	}
+
+	/**
+	 * Invoked to persist the actual value into the given shared <var>preferences</var>.
+	 *
+	 * @param preferences The instance of shared preferences into which should be the current value
+	 *                    of this preference persisted.
+	 * @return {@code True} if put has been successful, {@code false} otherwise.
+	 */
+	@CheckResult
+	protected abstract boolean onPutIntoPreferences(@NonNull SharedPreferences preferences);
+
+	/**
+	 * Returns the value which is at this time being hold by this preference object.
+	 * <p>
+	 * <b>Note</b>, that this does not need to be necessarily the same value as persisted (if) within
+	 * shared preferences for this preference if the actual value has been just updated via
+	 * {@link #updateValue(Object)} and not persisted via {@link #putIntoPreferences(SharedPreferences)}
+	 * or {@link #getFromPreferences(SharedPreferences)} was not called for this preference yet.
+	 * <p>
+	 * In order to always obtain the actual value of this preference from shared preferences use
+	 * {@link #getFromPreferences(SharedPreferences)} instead.
+	 *
+	 * @return The actual value of this preference.
+	 */
+	@Nullable
+	public final T getValue() {
 		return mValue;
 	}
 
 	/**
-	 * Ensures that the key of this preference is valid (not empty). If not throws an IllegalStateException.
+	 * Obtains the actual value of this preference that is persisted within the given shared
+	 * <var>preferences</var>.
+	 * <p>
+	 * <b>Note</b>, that the value is obtained only in case when this preference does not already
+	 * hold the actual value which may be obtained via {@link #getValue()}.
+	 *
+	 * @param preferences The instance of shared preferences from which to obtain the actual value
+	 *                    if needed.
+	 * @return The actual value either already hold by this preference or obtained from the preferences.
+	 * May be also the default value is there is no value persisted yet.
+	 * @see #getDefaultValue()
+	 * @see #putIntoPreferences(SharedPreferences)
 	 */
-	private void ensureValidKeyOrThrow() {
-		if (TextUtils.isEmpty(mKey)) {
-			final String preferenceType = getClass().getSimpleName();
-			throw new IllegalStateException(
-					"Key for preference(" + preferenceType + ") is not properly initialized. " +
-							"Didn't you forget to set it up via SharedPreference.attachKey(Resources)?"
-			);
+	final T getFromPreferences(final SharedPreferences preferences) {
+		this.ensureValidKeyOrThrow();
+		if (!mValueIsActual) {
+			this.mValue = onGetFromPreferences(preferences);
+			this.mValueIsActual = true;
 		}
+		return mValue;
 	}
 
 	/**
@@ -257,124 +348,69 @@ public abstract class SharedPreference<Type> {
 	 * @return The actual value of this preference from the given shared preferences.
 	 */
 	@Nullable
-	protected abstract Type onGetFromPreferences(@NonNull SharedPreferences preferences);
+	protected abstract T onGetFromPreferences(@NonNull SharedPreferences preferences);
 
 	/**
+	 * <b>This method has been deprecated and will be removed in the next release.</b>
+	 * <p>
+	 * Retrieves the current value of this preference from the given shared preferences.
+	 *
+	 * @param preferences The instance of shared preferences into which was the value of this preference
+	 *                    before saved.
+	 * @return This preference to allow methods chaining.
+	 * @see #getValue()
+	 * @deprecated Use {@link #getFromPreferences(SharedPreferences)} instead.
+	 */
+	@Deprecated
+	public SharedPreference<T> retrieve(@NonNull SharedPreferences preferences) {
+		getFromPreferences(preferences);
+		return this;
+	}
+
+	/**
+	 * <b>This method has been deprecated and will be removed in the next release.</b>
+	 * <p>
+	 * Ensures that the key of this preference is valid (not empty). If not throws an IllegalStateException.
+	 *
+	 * @deprecated When support for key specified via resource id is dropped this method becomes obsolete.
+	 */
+	@Deprecated
+	private void ensureValidKeyOrThrow() {
+		if (TextUtils.isEmpty(mKey)) {
+			final String preferenceType = getClass().getSimpleName();
+			throw new IllegalStateException(
+					"Key for preference(" + preferenceType + ") is not properly initialized. "
+							+ "Didn't you forget to set it up via SharedPreference.attachKey(Resources)?"
+			);
+		}
+	}
+
+	/**
+	 * <b>This method has been deprecated and will be removed in the next release.</b>
+	 * <p>
 	 * Saves the current value of this preference into the given shared preferences.
 	 *
 	 * @param preferences The instance of shared preferences into which will be the current value of
 	 *                    this preference saved.
 	 * @return {@code True} if saving operation succeed, {@code false} otherwise.
 	 * @see #updateValue(Object)
+	 * @deprecated Use {@link #putIntoPreferences(SharedPreferences)} instead.
 	 */
-	@CheckResult
+	@Deprecated
 	public boolean save(@NonNull SharedPreferences preferences) {
 		return putIntoPreferences(preferences);
 	}
 
 	/**
-	 * Performs saving of the actual value of this preference into the given shared preferences.
-	 *
-	 * @param preferences The instance of shared preferences into which should be the current value of
-	 *                    this preference saved.
-	 * @return {@code True} if saving operation succeed, {@code false} otherwise.
+	 * Invalidates the actual value of this preference so next call to {@link #getFromPreferences(SharedPreferences)}
+	 * will obtain the actual value from the specified preferences in order to refresh it.
 	 */
-	final boolean putIntoPreferences(SharedPreferences preferences) {
-		this.ensureValidKeyOrThrow();
-		return mAlreadyParsed = onPutIntoPreferences(preferences);
-	}
-
-	/**
-	 * Invoked to save the actual value into the given shared preferences.
-	 *
-	 * @param preferences The instance of shared preferences into which should be the current value of
-	 *                    this preference saved.
-	 * @return {@code True} if saving operation succeed, {@code false} otherwise.
-	 */
-	@CheckResult
-	protected abstract boolean onPutIntoPreferences(@NonNull SharedPreferences preferences);
-
-	/**
-	 * Creates new instance of {@link SharedPreferences.OnSharedPreferenceChangeListener} which can
-	 * be used to listen on changes provided up on the value of this preference within shared preferences.
-	 * <p>
-	 * <b>Note</b>, that here created listener will fire the given callback only in case, that the
-	 * key received in the callback from shared preferences will match the key of this preference.
-	 *
-	 * @param callback Callback to be invoked when the value of this preference changes.
-	 * @return New instance of OnSharedPreferenceListener.
-	 * @see SharedPreferences
-	 */
-	@NonNull
-	public SharedPreferences.OnSharedPreferenceChangeListener createOnChangeListener(@NonNull final PreferenceChangeCallback<Type> callback) {
-		return new SharedPreferences.OnSharedPreferenceChangeListener() {
-
-			/**
-			 */
-			@Override
-			public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-				if (mKey.equals(key)) {
-					// Parse actual value.
-					retrieve(sharedPreferences);
-					callback.onPreferenceChanged(SharedPreference.this);
-				}
-			}
-		};
-	}
-
-	/**
-	 * Returns the value, which is currently being hold by this preference object. <b>Note</b>, that
-	 * this isn't current value from shared preferences if this preference wasn't parsed or
-	 * {@link #retrieve(SharedPreferences)}) before this call.
-	 * <p>
-	 * To obtain always an actual value from shared preferences, perform this calls on the instance
-	 * of SharedPreference of which value you want to obtain:
-	 * <pre>
-	 * {@code <b>SharedPreference.parse(SharedPreferences).getActualValue()</b>} or
-	 * {@code <b>SharedPreference.parse(PreferencesManager).getActualValue()</b>}
-	 * </pre>
-	 *
-	 * @return The actual value of this preference or {@code null} if this preference's key is
-	 * invalid.
-	 * @see #retrieve(SharedPreferences)
-	 */
-	@Nullable
-	public final Type getValue() {
-		return mValue;
-	}
-
-	/**
-	 * Updates the actual value of this preference to the given one. <b>Note</b>, that
-	 * this doesn't updates the value within shared preferences.
-	 * <p>
-	 * To immediately save the given new value of this preference into shared preferences, perform
-	 * this calls on the instance of SharedPreference of which value you want to save:
-	 * <pre>
-	 * {@code <b>SharedPreference.updateValue(Type).save(SharedPreferences)</b>} or
-	 * {@code <b>SharedPreference.updateValue(Type).save(PreferencesManager)</b>}
-	 * </pre>
-	 *
-	 * @param newValue New value for this preference.
-	 * @return This preference to allow methods chaining.
-	 * @see #save(SharedPreferences)
-	 */
-	public SharedPreference<Type> updateValue(@Nullable Type newValue) {
-		if (mValue == null || !mValue.equals(newValue)) {
-			this.mValue = newValue;
-			this.mAlreadyParsed = true;
-		}
-		return this;
-	}
-
-	/**
-	 * Clears the actual value of this preference.
-	 */
-	final void clear() {
+	final void invalidate() {
 		this.mValue = null;
-		this.mAlreadyParsed = false;
+		this.mValueIsActual = false;
 	}
 
-	/**
+	/*
 	 * Inner classes ===============================================================================
 	 */
 }

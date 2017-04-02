@@ -27,7 +27,7 @@ android {
 
     defaultConfig {
         applicationId project.property('samples.applicationId')
-        minSdkVersion config.build.minSdkVersion
+        minSdkVersion 9
         targetSdkVersion config.build.targetSdkVersion
         versionCode Integer.valueOf((String) project.property('samples.versionCode'))
         versionName project.property('samples.versionName')

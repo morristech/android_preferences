@@ -33,62 +33,65 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * A {@link SharedPreference} implementation that may be used to manage (store/retrieve) an {@code array}
- * preference value within {@link SharedPreferences}.
+ * A {@link SharedPreference} implementation that may be used to persist an {@code array} of values
+ * via {@link SharedPreferences}.
  *
- * @param <T> A type of the items within an array that can this implementation of preference hold and
- *            manage its storing/retrieving.
+ * @param <T> Type of items within an array of which values should be persisted by ArrayPreference.
  * @author Martin Albedinsky
- * @see ListPreference
+ * @see CollectionPreference
  */
 public final class ArrayPreference<T> extends SharedPreference<T> {
 
-	/**
+	/*
 	 * Constants ===================================================================================
 	 */
 
 	/**
-	 * Matcher used to validate array preference value.
+	 * Pattern used to validate that a string contents represent an array value.
 	 */
-	private static final Matcher VALUE_MATCHER = Pattern.compile("^\\<(.+)\\[\\]\\>\\[(.*)\\]$").matcher("");
+	private static final Pattern VALUE_PATTERN = Pattern.compile("^\\<(.+)\\[\\]\\>\\[(.*)\\]$");
 
-	/**
+	/*
 	 * Constructors ================================================================================
 	 */
 
 	/**
-	 * Creates a new instance of universum.studios.android.preference.ArrayPreference.
+	 * Creates a new instance of ArrayPreference with the specified <var>key</var> and <var>defValue</var>.
 	 *
 	 * @throws IllegalArgumentException If the given <var>defValue</var> is not actually an array.
 	 * @see SharedPreference#SharedPreference(String, Object)
 	 */
-	public ArrayPreference(@NonNull String key, @Nullable T defValue) {
+	public ArrayPreference(@NonNull final String key, @Nullable final T defValue) {
 		super(key, defValue);
-		ensureIsArrayOrThrow(defValue);
+		assertIsArrayOrThrow(defValue);
 	}
 
 	/**
-	 * Creates a new instance of universum.studios.android.preference.ArrayPreference.
+	 * <b>This constructor has been deprecated and will be removed in the next release.</b>
+	 * <p>
+	 * Creates a new instance of ArrayPreference.
 	 *
 	 * @throws IllegalArgumentException If the given <var>defValue</var> is not actually an array.
 	 * @see SharedPreference#SharedPreference(int, Object)
+	 * @deprecated Use {@link #ArrayPreference(String, Object)} instead.
 	 */
+	@Deprecated
 	public ArrayPreference(@StringRes int keyResId, @Nullable T defValue) {
 		super(keyResId, defValue);
-		ensureIsArrayOrThrow(defValue);
+		assertIsArrayOrThrow(defValue);
 	}
 
-	/**
+	/*
 	 * Methods =====================================================================================
 	 */
 
 	/**
-	 * Ensures that the specified value is type of array (if not null). If it is not type of array
+	 * Asserts that the specified value is type of array (if not null). If it is not type of array
 	 * an IllegalArgumentException is thrown.
 	 *
 	 * @param value The value to be check if it is an array.
 	 */
-	private static void ensureIsArrayOrThrow(Object value) {
+	private static void assertIsArrayOrThrow(final Object value) {
 		if (value != null && !value.getClass().isArray()) {
 			throw new IllegalArgumentException("Not an array(" + value.getClass().getSimpleName() + ").");
 		}
@@ -99,34 +102,35 @@ public final class ArrayPreference<T> extends SharedPreference<T> {
 	 */
 	@Override
 	@CheckResult
-	protected boolean onPutIntoPreferences(@NonNull SharedPreferences preferences) {
+	protected boolean onPutIntoPreferences(@NonNull final SharedPreferences preferences) {
 		return putIntoPreferences(preferences, mKey, mValue);
 	}
 
 	/**
-	 * Saves the given <var>array</var> into the given shared <var>preferences</var>.
+	 * Persists the given array <var>value</var> for the specified <var>key</var> into the given
+	 * shared <var>preferences</var>.
 	 *
-	 * @param preferences The instance of shared preferences into which will be the given array saved.
-	 * @param key         The key under which will be the saved array mapped in the shared preferences.
-	 * @param array       Array to save into preferences.
-	 * @return {@code True} if saving succeeded, {@code false} otherwise.
-	 * @throws IllegalArgumentException If the given <var>array</var> is not actually an array.
+	 * @param preferences The instance of shared preferences into which should be the given array persisted.
+	 * @param key         The key for which should be the array mapped in the shared preferences.
+	 * @param value       The desired array value to be persisted.
+	 * @return {@code True} if put has been successful, {@code false} otherwise.
+	 * @throws IllegalArgumentException If the given value is not actually an array.
 	 */
 	@CheckResult
-	public static boolean putIntoPreferences(@NonNull SharedPreferences preferences, @NonNull String key, @Nullable Object array) {
-		if (array == null) {
+	public static boolean putIntoPreferences(@NonNull final SharedPreferences preferences, @NonNull final String key, @Nullable final Object value) {
+		if (value == null) {
 			return preferences.edit().putString(key, null).commit();
 		}
-		ensureIsArrayOrThrow(array);
-		final int n = Array.getLength(array);
+		assertIsArrayOrThrow(value);
+		final int n = Array.getLength(value);
 		final JSONArray jsonArray = new JSONArray();
 		for (int i = 0; i < n; i++) {
-			jsonArray.put(Array.get(array, i));
+			jsonArray.put(Array.get(value, i));
 		}
 		// Save also class of the array, so when obtaining it we will know exactly of which type it is.
-		final Class<?> arrayClass = resolveArrayClass(array);
+		final Class<?> arrayClass = resolveArrayClass(value);
 		if (arrayClass == null) {
-			final String componentName = array.getClass().getComponentType().getSimpleName();
+			final String componentName = value.getClass().getComponentType().getSimpleName();
 			throw new IllegalArgumentException(
 					"Failed to put array of(" + componentName + ") into shared preferences. " +
 							"Only arrays of primitive types or theirs boxed representations including String are supported."
@@ -136,13 +140,13 @@ public final class ArrayPreference<T> extends SharedPreference<T> {
 	}
 
 	/**
-	 * Returns class of the given <var>array</var>.
+	 * Resolves class of the given <var>array</var>.
 	 *
 	 * @param array The array of which class should be resolved.
 	 * @return Class of the given array or {@code null} if the given array is not supported by this
 	 * preference.
 	 */
-	static Class<?> resolveArrayClass(Object array) {
+	static Class<?> resolveArrayClass(final Object array) {
 		if (array instanceof boolean[]) {
 			return boolean[].class;
 		} else if (array instanceof byte[]) {
@@ -185,58 +189,56 @@ public final class ArrayPreference<T> extends SharedPreference<T> {
 	@Nullable
 	@Override
 	@SuppressWarnings("unchecked")
-	protected T onGetFromPreferences(@NonNull SharedPreferences preferences) {
+	protected T onGetFromPreferences(@NonNull final SharedPreferences preferences) {
 		return getFromPreferences(preferences, mKey, mDefaultValue);
 	}
 
 	/**
-	 * Returns an <b>array</b> mapped in the given shared <var>preferences</var> under the specified
-	 * <var>key</var>.
+	 * Obtains the <b>array</b> persisted within the given shared <var>preferences</var> for the
+	 * specified <var>key</var>.
 	 *
-	 * @param preferences The instance of shared preferences into which was the requested array before
-	 *                    saved.
-	 * @param key         The key under which is the saved list mapped in the shared preferences.
-	 * @param defValue    Default array to return if there is no mapping for the specified <var>key</var>
-	 *                    yet.
-	 * @param <A>         The type of an array to obtain.
-	 * @return An instance of the requested array or <var>defValue</var> if there is no mapping
-	 * for the specified key.
-	 * @throws ClassCastException       If value stored under the specified key does not represents
-	 *                                  an array.
-	 * @throws IllegalArgumentException If type of the requested array is not supported by the
-	 *                                  Preferences library.
-	 * @throws IllegalStateException    If the requested array was not stored by the Preferences library.
+	 * @param preferences The instance of shared preferences where is the desired array persisted.
+	 * @param key         The key for which is the desired array mapped in the shared preferences.
+	 * @param defValue    Default array value to return in case when there is no array value persisted
+	 *                    for the specified <var>key</var> yet.
+	 * @param <A>         Type of the array to obtain.
+	 * @return Instance of the requested array or <var>defValue</var> if there is no mapping for the
+	 * specified key.
+	 * @throws ClassCastException       If value stored for the specified key does not represent an
+	 *                                  array.
+	 * @throws IllegalArgumentException If type of the requested array is not supported by this library.
+	 * @throws IllegalStateException    If the requested array was not stored by means of this library.
 	 */
 	@SuppressWarnings("unchecked")
-	public static <A> A getFromPreferences(@NonNull SharedPreferences preferences, @NonNull String key, @Nullable Object defValue) {
+	public static <A> A getFromPreferences(@NonNull final SharedPreferences preferences, @NonNull final String key, @Nullable final Object defValue) {
 		Object array = defValue;
 		final String value = preferences.getString(key, null);
 		if (!TextUtils.isEmpty(value)) {
-			if (VALUE_MATCHER.reset(value).matches()) {
-				final String arrayClassName = VALUE_MATCHER.group(1) + "[]";
+			final Matcher valueMatcher = VALUE_PATTERN.matcher(value);
+			if (valueMatcher.reset(value).matches()) {
+				final String arrayClassName = valueMatcher.group(1) + "[]";
 				final Class<?> arrayClass = resolveArrayClassByName(arrayClassName);
-				if (arrayClass != null) {
-					final String jsonArrayValue = "[" + VALUE_MATCHER.group(2) + "]";
-					JSONArray jsonArray;
-					try {
-						jsonArray = new JSONArray(jsonArrayValue);
-					} catch (JSONException e) {
-						throw new ClassCastException(
-								"Cannot obtain an array for the key(" + key + ") from shared preferences. " +
-										"Value(" + jsonArrayValue + ") is not an array!"
-						);
-					}
-					final int n = jsonArray.length();
-					array = createArrayInSize(arrayClass.getComponentType(), n);
-					for (int i = 0; i < n; i++) {
-						setArrayValueAt(arrayClass, array, i, jsonArray.opt(i));
-					}
-				} else {
+				if (arrayClass == null) {
 					final String componentName = arrayClassName.substring(0, arrayClassName.length() - 2);
 					throw new IllegalArgumentException(
 							"Failed to obtain an array of(" + componentName + ") for the key(" + key + ") from shared preferences. " +
 									"Only arrays of primitive types or theirs boxed representations including String are supported."
 					);
+				}
+				final String jsonArrayValue = "[" + valueMatcher.group(2) + "]";
+				JSONArray jsonArray;
+				try {
+					jsonArray = new JSONArray(jsonArrayValue);
+				} catch (JSONException e) {
+					throw new ClassCastException(
+							"Cannot obtain an array for the key(" + key + ") from shared preferences. " +
+									"Value(" + jsonArrayValue + ") is not an array!"
+					);
+				}
+				final int n = jsonArray.length();
+				array = createArrayInSize(arrayClass.getComponentType(), n);
+				for (int i = 0; i < n; i++) {
+					setArrayValueAt(arrayClass, array, i, jsonArray.opt(i));
 				}
 			} else {
 				throw new IllegalStateException(
@@ -248,16 +250,17 @@ public final class ArrayPreference<T> extends SharedPreference<T> {
 	}
 
 	/**
-	 * Extracts part with array elements from the specified array preference <var>value</var>.
+	 * Extracts part with array elements from the specified array <var>value</var>.
 	 *
 	 * @param value The array preference value.
 	 * @return Extracted array elements as String or {@code null} if the specified value is empty
 	 * or does not match array preference structure.
 	 */
 	@Nullable
-	static String extractArrayValueFromPreferenceValue(String value) {
-		if (!TextUtils.isEmpty(value) && VALUE_MATCHER.reset(value).matches()) {
-			return VALUE_MATCHER.group(2);
+	static String extractArrayValueFromPreferenceValue(final String value) {
+		final Matcher matcher = VALUE_PATTERN.matcher(value);
+		if (!TextUtils.isEmpty(value) && matcher.matches()) {
+			return matcher.group(2);
 		}
 		return null;
 	}
@@ -268,9 +271,9 @@ public final class ArrayPreference<T> extends SharedPreference<T> {
 	 * @param arrayClass Class of the given array used to resolve proper setting of the given value.
 	 * @param array      The array of which specific value to update.
 	 * @param index      The index at which should be the value updated.
-	 * @param value      The value to update to.
+	 * @param value      The value to update.
 	 */
-	private static void setArrayValueAt(Class<?> arrayClass, Object array, int index, Object value) {
+	private static void setArrayValueAt(final Class<?> arrayClass, final Object array, final int index, final Object value) {
 		if (value == null) {
 			Array.set(array, index, null);
 			return;
@@ -289,13 +292,13 @@ public final class ArrayPreference<T> extends SharedPreference<T> {
 	}
 
 	/**
-	 * Returns array class for the specified <var>arrayClassName</var>.
+	 * Resolves array class for the specified <var>arrayClassName</var>.
 	 *
 	 * @param arrayClassName Name of the array class that should be resolved.
 	 * @return Array class associated with the specified name or {@code Object[].class} if the given
-	 * class name is associated to an array that is not supported by this preference.
+	 * class name is associated with an array that is not supported by this preference.
 	 */
-	static Class<?> resolveArrayClassByName(String arrayClassName) {
+	static Class<?> resolveArrayClassByName(final String arrayClassName) {
 		switch (arrayClassName) {
 			case "boolean[]":
 				return boolean[].class;
@@ -329,18 +332,19 @@ public final class ArrayPreference<T> extends SharedPreference<T> {
 				return Double[].class;
 			case "String[]":
 				return String[].class;
+			default:
+				return null;
 		}
-		return null;
 	}
 
 	/**
 	 * Creates a new instance of array of the type for the requested <var>componentClass</var>.
 	 *
 	 * @param componentClass Class of a component that can be stored within the new array.
-	 * @param size           Initial size of the array.
+	 * @param size           Fixed size for the new array.
 	 * @return New instance of the requested array.
 	 */
-	static Object createArrayInSize(Class<?> componentClass, int size) {
+	static Object createArrayInSize(final Class<?> componentClass, final int size) {
 		if (boolean.class.equals(componentClass)) {
 			return new boolean[size];
 		} else if (byte.class.equals(componentClass)) {

@@ -21,10 +21,14 @@ package universum.studios.android.preference;
 import android.util.Log;
 
 /**
+ * <b>This class has been deprecated and will be removed in the next release.</b>
+ * <p>
  * Configuration options for the Preferences library.
  *
  * @author Martin Albedinsky
+ * @deprecated To control library logs use {@link PreferencesLogging} utility class.
  */
+@Deprecated
 public final class PreferencesConfig {
 
 	/**
@@ -46,6 +50,6 @@ public final class PreferencesConfig {
 	/**
 	 */
 	private PreferencesConfig() {
-		// Creation of instances of this class is not publicly allowed.
+		// Not allowed to be instantiated publicly.
 	}
 }

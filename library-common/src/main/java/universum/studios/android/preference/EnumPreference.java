@@ -26,10 +26,10 @@ import android.support.annotation.StringRes;
 import android.text.TextUtils;
 
 /**
- * A {@link SharedPreference} implementation that may be used to manage (store/retrieve) an {@link Enum}
- * preference value within {@link SharedPreferences}.
+ * A {@link SharedPreference} implementation that may be used to persist an {@link Enum} value via
+ * {@link SharedPreferences}.
  *
- * @param <E> A type of the enum implementation of which value will this preference manage.
+ * @param <E> Type of the enum implementation of which value should be persisted.
  * @author Martin Albedinsky
  * @see BooleanPreference
  * @see IntegerPreference
@@ -39,29 +39,33 @@ import android.text.TextUtils;
  */
 public final class EnumPreference<E extends Enum> extends SharedPreference<E> {
 
-	/**
+	/*
 	 * Constructors ================================================================================
 	 */
 
 	/**
-	 * Creates a new instance of EnumPreference.
+	 * Creates a new instance of EnumPreference with the specified <var>key</var> and <var>defValue</var>.
 	 *
 	 * @see SharedPreference#SharedPreference(String, Object)
 	 */
-	public EnumPreference(@NonNull String key, @Nullable E defValue) {
+	public EnumPreference(@NonNull final String key, @Nullable final E defValue) {
 		super(key, defValue);
 	}
 
 	/**
+	 * <b>This constructor has been deprecated and will be removed in the next release.</b>
+	 * <p>
 	 * Creates a new instance of EnumPreference.
 	 *
 	 * @see SharedPreference#SharedPreference(int, Object)
+	 * @deprecated Use {@link #EnumPreference(String, Enum)} instead.
 	 */
+	@Deprecated
 	public EnumPreference(@StringRes int keyResId, @Nullable E defValue) {
 		super(keyResId, defValue);
 	}
 
-	/**
+	/*
 	 * Methods =====================================================================================
 	 */
 
@@ -69,7 +73,7 @@ public final class EnumPreference<E extends Enum> extends SharedPreference<E> {
 	 */
 	@Override
 	@CheckResult
-	protected boolean onPutIntoPreferences(@NonNull SharedPreferences preferences) {
+	protected boolean onPutIntoPreferences(@NonNull final SharedPreferences preferences) {
 		return preferences.edit().putString(mKey, mValue.name()).commit();
 	}
 
@@ -78,8 +82,8 @@ public final class EnumPreference<E extends Enum> extends SharedPreference<E> {
 	@Nullable
 	@Override
 	@SuppressWarnings("unchecked")
-	protected E onGetFromPreferences(@NonNull SharedPreferences preferences) {
-		final String enumName = preferences.getString(mKey, mDefaultValue != null ? mDefaultValue.name() : "");
-		return !TextUtils.isEmpty(enumName) ? (E) E.valueOf(mDefaultValue.getClass(), enumName) : null;
+	protected E onGetFromPreferences(@NonNull final SharedPreferences preferences) {
+		final String enumName = preferences.getString(mKey, mDefaultValue == null ? "" : mDefaultValue.name());
+		return TextUtils.isEmpty(enumName) ? null : (E) E.valueOf(mDefaultValue.getClass(), enumName);
 	}
 }

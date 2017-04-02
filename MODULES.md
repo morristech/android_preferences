@@ -26,5 +26,8 @@ as usually.
 > Following modules are available in the [latest](https://github.com/universum-studios/android_preferences/releases "Latest Releases page") release.
 
 - **[Core](https://github.com/universum-studios/android_preferences/tree/master/library-core)**
+- **[Cache](https://github.com/universum-studios/android_preferences/tree/master/library-cache)**
+- **[Crypto](https://github.com/universum-studios/android_preferences/tree/master/library-crypto)**
+- **[Manager](https://github.com/universum-studios/android_preferences/tree/master/library-manager)**
 - **[Common](https://github.com/universum-studios/android_preferences/tree/master/library-common)**
 - **[Collection](https://github.com/universum-studios/android_preferences/tree/master/library-collection)**

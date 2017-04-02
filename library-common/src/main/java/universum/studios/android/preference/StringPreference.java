@@ -25,8 +25,8 @@ import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 
 /**
- * A {@link SharedPreference} implementation that may be used to manage (store/retrieve) a {@link String}
- * preference value within {@link SharedPreferences}.
+ * A {@link SharedPreference} implementation that may be used to persist a {@link String} value via
+ * {@link SharedPreferences}.
  *
  * @author Martin Albedinsky
  * @see BooleanPreference
@@ -37,29 +37,33 @@ import android.support.annotation.StringRes;
  */
 public final class StringPreference extends SharedPreference<String> {
 
-	/**
+	/*
 	 * Constructors ================================================================================
 	 */
 
 	/**
-	 * Creates a new instance of StringPreference.
+	 * Creates a new instance of StringPreference with the specified <var>key</var> and <var>defValue</var>.
 	 *
 	 * @see SharedPreference#SharedPreference(String, Object)
 	 */
-	public StringPreference(@NonNull String key, @Nullable String defValue) {
+	public StringPreference(@NonNull final String key, @Nullable final String defValue) {
 		super(key, defValue);
 	}
 
 	/**
+	 * <b>This constructor has been deprecated and will be removed in the next release.</b>
+	 * <p>
 	 * Creates a new instance of StringPreference.
 	 *
 	 * @see SharedPreference#SharedPreference(int, Object)
+	 * @deprecated Use {@link #StringPreference(String, String)} instead.
 	 */
+	@Deprecated
 	public StringPreference(@StringRes int keyResId, @Nullable String defValue) {
 		super(keyResId, defValue);
 	}
 
-	/**
+	/*
 	 * Methods =====================================================================================
 	 */
 
@@ -67,7 +71,7 @@ public final class StringPreference extends SharedPreference<String> {
 	 */
 	@Override
 	@CheckResult
-	protected boolean onPutIntoPreferences(@NonNull SharedPreferences preferences) {
+	protected boolean onPutIntoPreferences(@NonNull final SharedPreferences preferences) {
 		return preferences.edit().putString(mKey, mValue).commit();
 	}
 
@@ -75,7 +79,7 @@ public final class StringPreference extends SharedPreference<String> {
 	 */
 	@Nullable
 	@Override
-	protected String onGetFromPreferences(@NonNull SharedPreferences preferences) {
+	protected String onGetFromPreferences(@NonNull final SharedPreferences preferences) {
 		return preferences.getString(mKey, mDefaultValue);
 	}
 }

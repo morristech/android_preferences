@@ -24,58 +24,63 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
- * A {@link SharedPreference} implementation that may be used to manage (store/retrieve) a {@link List}
- * preference value within {@link SharedPreferences}.
+ * <b>This class has been deprecated and will be removed in the next release.</b>
+ * <p>
+ * A {@link SharedPreference} implementation that may be used to persist a {@link List} of values
+ * via {@link SharedPreferences}.
  *
- * @param <T> A type of the items within a list that can this implementation of preference hold and
- *            manage its storing/retrieving.
+ * @param <T> Type of items within a list of which values should be persisted.
  * @author Martin Albedinsky
  * @see ArrayPreference
+ * @deprecated Use {@link CollectionPreference} instead.
  */
+@Deprecated
 public final class ListPreference<T> extends SharedPreference<List<T>> {
 
-	/**
+	/*
 	 * Members =====================================================================================
 	 */
 
 	/**
-	 * Class of components stored within a list managed by this preference.
 	 */
-	private final Class<T> mComponentType;
+	private final CollectionPreference<T> mDelegate;
 
-	/**
+	/*
 	 * Constructors ================================================================================
 	 */
 
 	/**
-	 * Creates a new instance of universum.studios.android.preference.ListPreference.
+	 * Creates a new instance of ListPreference.
 	 *
 	 * @param componentType Class of components that will be presented within a list managed by the
 	 *                      new list preference.
 	 * @see SharedPreference#SharedPreference(String, Object)
 	 */
-	public ListPreference(@NonNull String key, @NonNull Class<T> componentType, @Nullable List<T> defValue) {
+	public ListPreference(@NonNull final String key, @NonNull final Class<T> componentType, @Nullable final List<T> defValue) {
 		super(key, defValue);
-		this.mComponentType = componentType;
+		this.mDelegate = new CollectionPreference<>(key, componentType, defValue);
 	}
 
 	/**
-	 * Creates a new instance of universum.studios.android.preference.ListPreference.
+	 * <b>This constructor has been deprecated and will be removed in the next release.</b>
+	 * <p>
+	 * Creates a new instance of ListPreference.
 	 *
 	 * @param componentType Class of components that will be presented within a list managed by the
 	 *                      new list preference.
 	 * @see SharedPreference#SharedPreference(int, Object)
+	 * @deprecated Use {@link #ListPreference(String, Class, List)} instead.
 	 */
+	@Deprecated
 	public ListPreference(@StringRes int keyResId, @NonNull Class<T> componentType, @Nullable List<T> defValue) {
 		super(keyResId, defValue);
-		this.mComponentType = componentType;
+		this.mDelegate = new CollectionPreference<>(keyResId, componentType, defValue);
 	}
 
-	/**
+	/*
 	 * Methods =====================================================================================
 	 */
 
@@ -84,8 +89,8 @@ public final class ListPreference<T> extends SharedPreference<List<T>> {
 	 */
 	@Override
 	@CheckResult
-	protected boolean onPutIntoPreferences(@NonNull SharedPreferences preferences) {
-		return putIntoPreferences(preferences, mKey, mValue, mComponentType);
+	protected boolean onPutIntoPreferences(@NonNull final SharedPreferences preferences) {
+		return mDelegate.onPutIntoPreferences(preferences);
 	}
 
 	/**
@@ -100,23 +105,8 @@ public final class ListPreference<T> extends SharedPreference<List<T>> {
 	 */
 	@CheckResult
 	@SuppressWarnings("unchecked")
-	public static <T> boolean putIntoPreferences(@NonNull SharedPreferences preferences, @NonNull String key, @Nullable List<T> list, @NonNull Class<T> componentType) {
-		final SharedPreferences.Editor editor = preferences.edit();
-		if (list != null) {
-			final T[] array = (T[]) ArrayPreference.createArrayInSize(componentType, list.size());
-			if (array != null) {
-				list.toArray(array);
-				return ArrayPreference.putIntoPreferences(preferences, key, array);
-			}
-			final String componentName = componentType.getSimpleName();
-			throw new IllegalArgumentException(
-					"Failed to put list of(" + componentName + ") into shared preferences. " +
-							"Only lists of primitive types or theirs boxed representations including String are supported."
-			);
-		} else {
-			editor.putString(key, null);
-		}
-		return editor.commit();
+	public static <T> boolean putIntoPreferences(@NonNull final SharedPreferences preferences, @NonNull final String key, @Nullable final List<T> list, @NonNull final Class<T> componentType) {
+		return CollectionPreference.putIntoPreferences(preferences, key, list, componentType);
 	}
 
 	/**
@@ -124,7 +114,7 @@ public final class ListPreference<T> extends SharedPreference<List<T>> {
 	 */
 	@Nullable
 	@Override
-	protected List<T> onGetFromPreferences(@NonNull SharedPreferences preferences) {
+	protected List<T> onGetFromPreferences(@NonNull final SharedPreferences preferences) {
 		return getFromPreferences(preferences, mKey, mDefaultValue);
 	}
 
@@ -147,29 +137,7 @@ public final class ListPreference<T> extends SharedPreference<List<T>> {
 	 * @throws IllegalStateException    If the requested list was not stored by the Preferences  library.
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> List<T> getFromPreferences(@NonNull SharedPreferences preferences, @NonNull String key, @Nullable List<T> defValue) {
-		final String value = preferences.getString(key, null);
-		if (value != null) {
-			try {
-				final T[] array = ArrayPreference.getFromPreferences(preferences, key, null);
-				return Arrays.asList(array);
-			} catch (ClassCastException e) {
-				final String arrayValue = ArrayPreference.extractArrayValueFromPreferenceValue(value);
-				throw new ClassCastException(
-						"Cannot obtain a list for the key(" + key + ") from shared preferences. " +
-								"Value(" + arrayValue + ") is not a list!"
-				);
-			} catch (IllegalArgumentException e) {
-				throw new IllegalArgumentException(
-						"Failed to obtain list for the key(" + key + ") from shared preferences. " +
-								"Only lists of primitive types or theirs boxed representations including String are supported."
-				);
-			} catch (IllegalStateException e) {
-				throw new IllegalStateException(
-						"Trying to obtain a list for the key(" + key + ") from shared preferences not saved by the Preferences library."
-				);
-			}
-		}
-		return defValue;
+	public static <T> List<T> getFromPreferences(@NonNull final SharedPreferences preferences, @NonNull final String key, @Nullable final List<T> defValue) {
+		return (List<T>) CollectionPreference.getFromPreferences(preferences, key, defValue);
 	}
 }

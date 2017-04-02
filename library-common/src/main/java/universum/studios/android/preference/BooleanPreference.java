@@ -25,8 +25,8 @@ import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 
 /**
- * A {@link SharedPreference} implementation that may be used to manage (store/retrieve) a {@link Boolean}
- * preference value within {@link SharedPreferences}.
+ * A {@link SharedPreference} implementation that may be used to persist a {@link Boolean} value via
+ * {@link SharedPreferences}.
  *
  * @author Martin Albedinsky
  * @see StringPreference
@@ -37,29 +37,33 @@ import android.support.annotation.StringRes;
  */
 public final class BooleanPreference extends SharedPreference<Boolean> {
 
-	/**
+	/*
 	 * Constructors ================================================================================
 	 */
 
 	/**
-	 * Creates a new instance of BooleanPreference.
+	 * Creates a new instance of BooleanPreference with the specified <var>key</var> and <var>defValue</var>.
 	 *
 	 * @see SharedPreference#SharedPreference(String, Object)
 	 */
-	public BooleanPreference(@NonNull String key, @NonNull Boolean defValue) {
+	public BooleanPreference(@NonNull final String key, @NonNull final Boolean defValue) {
 		super(key, defValue);
 	}
 
 	/**
+	 * <b>This constructor has been deprecated and will be removed in the next release.</b>
+	 * <p>
 	 * Creates a new instance of BooleanPreference.
 	 *
 	 * @see SharedPreference#SharedPreference(int, Object)
+	 * @deprecated Use {@link #BooleanPreference(String, Boolean)} instead.
 	 */
+	@Deprecated
 	public BooleanPreference(@StringRes int keyResId, @NonNull Boolean defValue) {
 		super(keyResId, defValue);
 	}
 
-	/**
+	/*
 	 * Methods =====================================================================================
 	 */
 
@@ -67,7 +71,7 @@ public final class BooleanPreference extends SharedPreference<Boolean> {
 	 */
 	@Override
 	@CheckResult
-	protected boolean onPutIntoPreferences(@NonNull SharedPreferences preferences) {
+	protected boolean onPutIntoPreferences(@NonNull final SharedPreferences preferences) {
 		return preferences.edit().putBoolean(mKey, mValue).commit();
 	}
 
@@ -75,7 +79,7 @@ public final class BooleanPreference extends SharedPreference<Boolean> {
 	 */
 	@Nullable
 	@Override
-	protected Boolean onGetFromPreferences(@NonNull SharedPreferences preferences) {
+	protected Boolean onGetFromPreferences(@NonNull final SharedPreferences preferences) {
 		return preferences.getBoolean(mKey, mDefaultValue);
 	}
 }
