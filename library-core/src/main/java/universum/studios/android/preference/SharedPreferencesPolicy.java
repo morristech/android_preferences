@@ -84,6 +84,7 @@ public final class SharedPreferencesPolicy {
 	 */
 	private SharedPreferencesPolicy() {
 		// Not allowed to be instantiated publicly.
+		throw new UnsupportedOperationException();
 	}
 
 	/*

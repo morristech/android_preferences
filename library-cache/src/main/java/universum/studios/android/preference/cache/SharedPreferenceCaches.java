@@ -24,20 +24,19 @@ import universum.studios.android.preference.SharedPreferencesCache;
 
 /**
  * Factory that provides common implementations of {@link SharedPreferencesCache}.
- *
- * <h3>Provided caches</h3>
  * <ul>
  * <li>{@link #mapCache()}</li>
  * </ul>
  *
  * @author Martin Albedinsky
  */
-public final class SharedPreferencesCaches {
+public final class SharedPreferenceCaches {
 
 	/**
 	 */
-	private SharedPreferencesCaches() {
+	private SharedPreferenceCaches() {
 		// Not allowed to be instantiated publicly.
+		throw new UnsupportedOperationException();
 	}
 
 	/**

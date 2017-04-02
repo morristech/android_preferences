@@ -21,6 +21,10 @@ package universum.studios.android.test;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+
 /**
  * Class providing simple utility methods for tests.
  *
@@ -64,5 +68,18 @@ public final class TestUtils {
 	 */
 	public static boolean isLibraryRootTestPackageName(@NonNull String packageName) {
 		return LIBRARY_ROOT_PACKAGE_NAME.equals(packageName);
+	}
+
+	/**
+	 * Creates a new {@link Collection} with contents of the given <var>array</var>.
+	 *
+	 * @param array The desired array from which to create a new collection.
+	 * @return Mutable collection with the array's contents.
+	 */
+	@NonNull
+	public static Collection<String> mutableCollectionFrom(@NonNull String[] array) {
+		final Collection<String> collection = new ArrayList<>(array.length);
+		Collections.addAll(collection, array);
+		return collection;
 	}
 }

@@ -44,7 +44,7 @@ public final class EnumPreference<E extends Enum> extends SharedPreference<E> {
 	 */
 
 	/**
-	 * Creates a new instance of EnumPreference.
+	 * Creates a new instance of EnumPreference with the specified <var>key</var> and <var>defValue</var>.
 	 *
 	 * @see SharedPreference#SharedPreference(String, Object)
 	 */

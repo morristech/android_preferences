@@ -42,7 +42,7 @@ public final class BooleanPreference extends SharedPreference<Boolean> {
 	 */
 
 	/**
-	 * Creates a new instance of BooleanPreference.
+	 * Creates a new instance of BooleanPreference with the specified <var>key</var> and <var>defValue</var>.
 	 *
 	 * @see SharedPreference#SharedPreference(String, Object)
 	 */

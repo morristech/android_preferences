@@ -54,6 +54,9 @@ public interface SharedPreferencesCache {
 
 	/**
 	 * Puts the given string <var>value</var> for the specified <var>key</var> into this cache.
+	 * <p>
+	 * If there is already stored value for the specified <var>key</var> in this cache it will be
+	 * replaced by the new one.
 	 *
 	 * @param key   The key for which to put the value into cache.
 	 * @param value The desired value to put into cache.
@@ -74,6 +77,9 @@ public interface SharedPreferencesCache {
 
 	/**
 	 * Puts the given set of string <var>values</var> for the specified <var>key</var> into this cache.
+	 * <p>
+	 * If there is already stored value for the specified <var>key</var> in this cache it will be
+	 * replaced by the new one.
 	 *
 	 * @param key    The key for which to put the value into cache.
 	 * @param values The desired set of values to put into cache.
@@ -94,6 +100,9 @@ public interface SharedPreferencesCache {
 
 	/**
 	 * Puts the given integer <var>value</var> for the specified <var>key</var> into this cache.
+	 * <p>
+	 * If there is already stored value for the specified <var>key</var> in this cache it will be
+	 * replaced by the new one.
 	 *
 	 * @param key   The key for which to put the value into cache.
 	 * @param value The desired value to put into cache.
@@ -113,6 +122,9 @@ public interface SharedPreferencesCache {
 
 	/**
 	 * Puts the given float <var>value</var> for the specified <var>key</var> into this cache.
+	 * <p>
+	 * If there is already stored value for the specified <var>key</var> in this cache it will be
+	 * replaced by the new one.
 	 *
 	 * @param key   The key for which to put the value into cache.
 	 * @param value The desired value to put into cache.
@@ -132,6 +144,9 @@ public interface SharedPreferencesCache {
 
 	/**
 	 * Puts the given long <var>value</var> for the specified <var>key</var> into this cache.
+	 * <p>
+	 * If there is already stored value for the specified <var>key</var> in this cache it will be
+	 * replaced by the new one.
 	 *
 	 * @param key   The key for which to put the value into cache.
 	 * @param value The desired value to put into cache.
@@ -151,6 +166,9 @@ public interface SharedPreferencesCache {
 
 	/**
 	 * Puts the given boolean <var>value</var> for the specified <var>key</var> into this cache.
+	 * <p>
+	 * If there is already stored value for the specified <var>key</var> in this cache it will be
+	 * replaced by the new one.
 	 *
 	 * @param key   The key for which to put the value into cache.
 	 * @param value The desired value to put into cache.
@@ -172,7 +190,8 @@ public interface SharedPreferencesCache {
 	 * Evicts a value for the specified <var>key</var> stored in this cache.
 	 *
 	 * @param key The key for which to evict its associated value.
-	 * @return {@code True} if eviction has been successful, {@code false} otherwise.
+	 * @return {@code True} if value associated with the key has been evicted, {@code false} if there
+	 * was no value stored in this cache for the specified key.
 	 */
 	boolean evict(@NonNull String key);
 

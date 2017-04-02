@@ -195,7 +195,11 @@ final class MapCache implements SharedPreferencesCache {
 	 */
 	@Override
 	public boolean evict(@NonNull final String key) {
-		return mMap.remove(key) != null;
+		if (mMap.containsKey(key)) {
+			mMap.remove(key);
+			return true;
+		}
+		return false;
 	}
 
 	/**

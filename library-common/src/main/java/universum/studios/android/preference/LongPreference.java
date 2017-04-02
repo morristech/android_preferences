@@ -42,7 +42,7 @@ public final class LongPreference extends SharedPreference<Long> {
 	 */
 
 	/**
-	 * Creates a new instance of LongPreference.
+	 * Creates a new instance of LongPreference with the specified <var>key</var> and <var>defValue</var>.
 	 *
 	 * @see SharedPreference#SharedPreference(String, Object)
 	 */

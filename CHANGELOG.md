@@ -2,9 +2,25 @@ Change-Log
 ===============
 
 ### Release 2.0.0-beta1 ###
-> --.--.2017
+> 02.04.2017
 
-- todo:
+- First major beta release.
+- Added `SharedPreferencesFacade`, `SimpleSharedPreferencesFacade` and `SharedPreferencesWrapper`
+  into **[preferences-core](https://github.com/universum-studios/android_preferences/MODULES.md)**
+  library module.
+- `PreferencesManager` has been refactored in order to extend `SimpleSharedPreferencesFacade` and has
+  been moved into separate library module named **[preferences-manager](https://github.com/universum-studios/android_preferences/MODULES.md)**.
+- `SharedPreference` has been refactored along with all its direct implementations provided by the
+  library via **[preferences-common](https://github.com/universum-studios/android_preferences/MODULES.md)**
+  and **[preferences-collection](https://github.com/universum-studios/android_preferences/MODULES.md)**
+  modules.
+- Added new library module name **[preferences-crypto](https://github.com/universum-studios/android_preferences/MODULES.md)**
+  which todo:
+- Added new library module named **[preferences-cache](https://github.com/universum-studios/android_preferences/MODULES.md)**
+  which contains common implementations of `SharedPreferencesCache` which may be used in association
+  with `CryptoSharedPreferences` in order to supply desired cache for secure preferences.
+- `ListPreference` has been deprecated in favor of `CollectionPreference` and will be removed in
+  the next release.
 
 ### Release 1.0.1 ###
 > 22.01.2017

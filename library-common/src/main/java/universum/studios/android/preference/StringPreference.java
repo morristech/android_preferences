@@ -42,7 +42,7 @@ public final class StringPreference extends SharedPreference<String> {
 	 */
 
 	/**
-	 * Creates a new instance of StringPreference.
+	 * Creates a new instance of StringPreference with the specified <var>key</var> and <var>defValue</var>.
 	 *
 	 * @see SharedPreference#SharedPreference(String, Object)
 	 */
