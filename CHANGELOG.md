@@ -30,3 +30,5 @@ Change-Log
 
 ### [Release 1.0.0](https://github.com/universum-studios/android_preferences/releases/tag/1.0.0) ###
 > 21.12.2016
+
+- First production release.
