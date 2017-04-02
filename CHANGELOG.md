@@ -1,7 +1,7 @@
 Change-Log
 ===============
 
-### Release 2.0.0-beta1 ###
+### [Release 2.0.0-beta1](https://github.com/universum-studios/android_preferences/releases/tag/2.0.0-beta1) ###
 > 02.04.2017
 
 - Added `SharedPreferencesFacade`, `SimpleSharedPreferencesFacade` and `SharedPreferencesWrapper`
@@ -22,11 +22,11 @@ Change-Log
 - `ListPreference` has been deprecated in favor of `CollectionPreference` and will be removed in
   the next release.
 
-### Release 1.0.1 ###
+### [Release 1.0.1](https://github.com/universum-studios/android_preferences/releases/tag/1.0.1) ###
 > 22.01.2017
 
 - Fixed issue when preferences file creation mode specified via `PreferencesManager(..., int)`
   constructor has been ignored.
 
-### Release 1.0.0 ###
+### [Release 1.0.0](https://github.com/universum-studios/android_preferences/releases/tag/1.0.0) ###
 > 21.12.2016
