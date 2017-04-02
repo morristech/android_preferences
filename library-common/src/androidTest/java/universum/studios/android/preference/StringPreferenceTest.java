@@ -27,7 +27,7 @@ import universum.studios.android.test.PreferencesTest;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.IsNull.nullValue;
+import static org.hamcrest.Matchers.nullValue;
 
 /**
  * @author Martin Albedinsky

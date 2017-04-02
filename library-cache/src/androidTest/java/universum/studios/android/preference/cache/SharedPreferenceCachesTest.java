@@ -27,22 +27,22 @@ import universum.studios.android.test.BaseInstrumentedTest;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.core.IsNot.not;
-import static org.hamcrest.core.IsNull.nullValue;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 
 /**
  * @author Martin Albedinsky
  */
 @RunWith(AndroidJUnit4.class)
-public final class SharedPreferencesCachesTest extends BaseInstrumentedTest {
+public final class SharedPreferenceCachesTest extends BaseInstrumentedTest {
 
 	@SuppressWarnings("unused")
-	private static final String TAG = "SharedPreferencesCachesTest";
+	private static final String TAG = "SharedPreferenceCachesTest";
 
 	@Test
 	public void testMapCache() {
 		// Only test that the factory provides valid instance as the MapCache implementation should
 		// be tested by MapCacheTest.
-		assertThat(SharedPreferencesCaches.mapCache(), is(not(nullValue())));
+		assertThat(SharedPreferenceCaches.mapCache(), is(not(nullValue())));
 	}
 }

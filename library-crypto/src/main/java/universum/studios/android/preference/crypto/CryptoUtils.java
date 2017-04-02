@@ -40,6 +40,7 @@ final class CryptoUtils {
 	 */
 	private CryptoUtils() {
 		// Not allowed to be instantiated publicly.
+		throw new UnsupportedOperationException();
 	}
 
 	/**

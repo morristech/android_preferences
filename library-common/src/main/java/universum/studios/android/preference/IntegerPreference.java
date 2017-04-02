@@ -42,7 +42,7 @@ public final class IntegerPreference extends SharedPreference<Integer> {
 	 */
 
 	/**
-	 * Creates a new instance of IntegerPreference.
+	 * Creates a new instance of IntegerPreference with the specified <var>key</var> and <var>defValue</var>.
 	 *
 	 * @see SharedPreference#SharedPreference(String, Object)
 	 */

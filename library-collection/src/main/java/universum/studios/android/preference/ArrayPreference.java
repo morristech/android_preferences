@@ -36,9 +36,9 @@ import java.util.regex.Pattern;
  * A {@link SharedPreference} implementation that may be used to persist an {@code array} of values
  * via {@link SharedPreferences}.
  *
- * @param <T> Type of items within an array of which values should be persisted.
+ * @param <T> Type of items within an array of which values should be persisted by ArrayPreference.
  * @author Martin Albedinsky
- * @see ListPreference
+ * @see CollectionPreference
  */
 public final class ArrayPreference<T> extends SharedPreference<T> {
 
@@ -47,16 +47,16 @@ public final class ArrayPreference<T> extends SharedPreference<T> {
 	 */
 
 	/**
-	 * Matcher used to validate array preference value.
+	 * Pattern used to validate that a string contents represent an array value.
 	 */
-	private static final Matcher VALUE_MATCHER = Pattern.compile("^\\<(.+)\\[\\]\\>\\[(.*)\\]$").matcher("");
+	private static final Pattern VALUE_PATTERN = Pattern.compile("^\\<(.+)\\[\\]\\>\\[(.*)\\]$");
 
 	/*
 	 * Constructors ================================================================================
 	 */
 
 	/**
-	 * Creates a new instance of ArrayPreference.
+	 * Creates a new instance of ArrayPreference with the specified <var>key</var> and <var>defValue</var>.
 	 *
 	 * @throws IllegalArgumentException If the given <var>defValue</var> is not actually an array.
 	 * @see SharedPreference#SharedPreference(String, Object)
@@ -107,29 +107,30 @@ public final class ArrayPreference<T> extends SharedPreference<T> {
 	}
 
 	/**
-	 * Saves the given <var>array</var> into the given shared <var>preferences</var>.
+	 * Persists the given array <var>value</var> for the specified <var>key</var> into the given
+	 * shared <var>preferences</var>.
 	 *
-	 * @param preferences The instance of shared preferences into which will be the given array saved.
-	 * @param key         The key under which will be the saved array mapped in the shared preferences.
-	 * @param array       Array to save into preferences.
-	 * @return {@code True} if saving succeeded, {@code false} otherwise.
-	 * @throws IllegalArgumentException If the given <var>array</var> is not actually an array.
+	 * @param preferences The instance of shared preferences into which should be the given array persisted.
+	 * @param key         The key for which should be the array mapped in the shared preferences.
+	 * @param value       The desired array value to be persisted.
+	 * @return {@code True} if put has been successful, {@code false} otherwise.
+	 * @throws IllegalArgumentException If the given value is not actually an array.
 	 */
 	@CheckResult
-	public static boolean putIntoPreferences(@NonNull final SharedPreferences preferences, @NonNull final String key, @Nullable final Object array) {
-		if (array == null) {
+	public static boolean putIntoPreferences(@NonNull final SharedPreferences preferences, @NonNull final String key, @Nullable final Object value) {
+		if (value == null) {
 			return preferences.edit().putString(key, null).commit();
 		}
-		assertIsArrayOrThrow(array);
-		final int n = Array.getLength(array);
+		assertIsArrayOrThrow(value);
+		final int n = Array.getLength(value);
 		final JSONArray jsonArray = new JSONArray();
 		for (int i = 0; i < n; i++) {
-			jsonArray.put(Array.get(array, i));
+			jsonArray.put(Array.get(value, i));
 		}
 		// Save also class of the array, so when obtaining it we will know exactly of which type it is.
-		final Class<?> arrayClass = resolveArrayClass(array);
+		final Class<?> arrayClass = resolveArrayClass(value);
 		if (arrayClass == null) {
-			final String componentName = array.getClass().getComponentType().getSimpleName();
+			final String componentName = value.getClass().getComponentType().getSimpleName();
 			throw new IllegalArgumentException(
 					"Failed to put array of(" + componentName + ") into shared preferences. " +
 							"Only arrays of primitive types or theirs boxed representations including String are supported."
@@ -139,7 +140,7 @@ public final class ArrayPreference<T> extends SharedPreference<T> {
 	}
 
 	/**
-	 * Returns class of the given <var>array</var>.
+	 * Resolves class of the given <var>array</var>.
 	 *
 	 * @param array The array of which class should be resolved.
 	 * @return Class of the given array or {@code null} if the given array is not supported by this
@@ -193,30 +194,29 @@ public final class ArrayPreference<T> extends SharedPreference<T> {
 	}
 
 	/**
-	 * Returns an <b>array</b> mapped in the given shared <var>preferences</var> under the specified
-	 * <var>key</var>.
+	 * Obtains the <b>array</b> persisted within the given shared <var>preferences</var> for the
+	 * specified <var>key</var>.
 	 *
-	 * @param preferences The instance of shared preferences into which was the requested array before
-	 *                    saved.
-	 * @param key         The key under which is the saved list mapped in the shared preferences.
-	 * @param defValue    Default array to return if there is no mapping for the specified <var>key</var>
-	 *                    yet.
-	 * @param <A>         The type of an array to obtain.
-	 * @return An instance of the requested array or <var>defValue</var> if there is no mapping
-	 * for the specified key.
-	 * @throws ClassCastException       If value stored under the specified key does not represents
-	 *                                  an array.
-	 * @throws IllegalArgumentException If type of the requested array is not supported by the
-	 *                                  Preferences library.
-	 * @throws IllegalStateException    If the requested array was not stored by the Preferences library.
+	 * @param preferences The instance of shared preferences where is the desired array persisted.
+	 * @param key         The key for which is the desired array mapped in the shared preferences.
+	 * @param defValue    Default array value to return in case when there is no array value persisted
+	 *                    for the specified <var>key</var> yet.
+	 * @param <A>         Type of the array to obtain.
+	 * @return Instance of the requested array or <var>defValue</var> if there is no mapping for the
+	 * specified key.
+	 * @throws ClassCastException       If value stored for the specified key does not represent an
+	 *                                  array.
+	 * @throws IllegalArgumentException If type of the requested array is not supported by this library.
+	 * @throws IllegalStateException    If the requested array was not stored by means of this library.
 	 */
 	@SuppressWarnings("unchecked")
 	public static <A> A getFromPreferences(@NonNull final SharedPreferences preferences, @NonNull final String key, @Nullable final Object defValue) {
 		Object array = defValue;
 		final String value = preferences.getString(key, null);
 		if (!TextUtils.isEmpty(value)) {
-			if (VALUE_MATCHER.reset(value).matches()) {
-				final String arrayClassName = VALUE_MATCHER.group(1) + "[]";
+			final Matcher valueMatcher = VALUE_PATTERN.matcher(value);
+			if (valueMatcher.reset(value).matches()) {
+				final String arrayClassName = valueMatcher.group(1) + "[]";
 				final Class<?> arrayClass = resolveArrayClassByName(arrayClassName);
 				if (arrayClass == null) {
 					final String componentName = arrayClassName.substring(0, arrayClassName.length() - 2);
@@ -225,7 +225,7 @@ public final class ArrayPreference<T> extends SharedPreference<T> {
 									"Only arrays of primitive types or theirs boxed representations including String are supported."
 					);
 				}
-				final String jsonArrayValue = "[" + VALUE_MATCHER.group(2) + "]";
+				final String jsonArrayValue = "[" + valueMatcher.group(2) + "]";
 				JSONArray jsonArray;
 				try {
 					jsonArray = new JSONArray(jsonArrayValue);
@@ -250,7 +250,7 @@ public final class ArrayPreference<T> extends SharedPreference<T> {
 	}
 
 	/**
-	 * Extracts part with array elements from the specified array preference <var>value</var>.
+	 * Extracts part with array elements from the specified array <var>value</var>.
 	 *
 	 * @param value The array preference value.
 	 * @return Extracted array elements as String or {@code null} if the specified value is empty
@@ -258,8 +258,9 @@ public final class ArrayPreference<T> extends SharedPreference<T> {
 	 */
 	@Nullable
 	static String extractArrayValueFromPreferenceValue(final String value) {
-		if (!TextUtils.isEmpty(value) && VALUE_MATCHER.reset(value).matches()) {
-			return VALUE_MATCHER.group(2);
+		final Matcher matcher = VALUE_PATTERN.matcher(value);
+		if (!TextUtils.isEmpty(value) && matcher.matches()) {
+			return matcher.group(2);
 		}
 		return null;
 	}
@@ -270,7 +271,7 @@ public final class ArrayPreference<T> extends SharedPreference<T> {
 	 * @param arrayClass Class of the given array used to resolve proper setting of the given value.
 	 * @param array      The array of which specific value to update.
 	 * @param index      The index at which should be the value updated.
-	 * @param value      The value to update to.
+	 * @param value      The value to update.
 	 */
 	private static void setArrayValueAt(final Class<?> arrayClass, final Object array, final int index, final Object value) {
 		if (value == null) {
@@ -291,11 +292,11 @@ public final class ArrayPreference<T> extends SharedPreference<T> {
 	}
 
 	/**
-	 * Returns array class for the specified <var>arrayClassName</var>.
+	 * Resolves array class for the specified <var>arrayClassName</var>.
 	 *
 	 * @param arrayClassName Name of the array class that should be resolved.
 	 * @return Array class associated with the specified name or {@code Object[].class} if the given
-	 * class name is associated to an array that is not supported by this preference.
+	 * class name is associated with an array that is not supported by this preference.
 	 */
 	static Class<?> resolveArrayClassByName(final String arrayClassName) {
 		switch (arrayClassName) {
@@ -340,7 +341,7 @@ public final class ArrayPreference<T> extends SharedPreference<T> {
 	 * Creates a new instance of array of the type for the requested <var>componentClass</var>.
 	 *
 	 * @param componentClass Class of a component that can be stored within the new array.
-	 * @param size           Initial size of the array.
+	 * @param size           Fixed size for the new array.
 	 * @return New instance of the requested array.
 	 */
 	static Object createArrayInSize(final Class<?> componentClass, final int size) {

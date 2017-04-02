@@ -23,6 +23,10 @@ import android.support.test.runner.AndroidJUnit4;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import universum.studios.android.crypto.Crypto;
+
+import static org.mockito.Mockito.mock;
+
 /**
  * @author Martin Albedinsky
  */
@@ -32,8 +36,78 @@ public final class CryptoSharedPreferencesHelperTest extends BaseCryptoPreferenc
 	@SuppressWarnings("unused")
 	private static final String TAG = "CryptoSharedPreferencesHelperTest";
 
+	private Crypto mMockCrypto;
+	private CryptoSharedPreferences.CryptoHelper mEmptyHelper;
+
+	@Override
+	public void beforeTest() throws Exception {
+		super.beforeTest();
+		this.mMockCrypto = mock(Crypto.class);
+		this.mEmptyHelper = new CryptoSharedPreferences.CryptoHelper(null, null);
+	}
+
 	@Test
-	public void test() {
+	public void testAreValuesEqual() {
 		// todo:: implement test
+	}
+
+	@Test
+	public void testEncryptKey() {
+		// todo:: implement test
+	}
+
+	@Test
+	public void testEncryptKeyOnEmptyHelper() {
+		// todo:: implement test
+	}
+
+	@Test
+	public void testDecryptKey() {
+		// todo:: implement test
+	}
+
+	@Test
+	public void testDecryptKeyOnEmptyHelper() {
+		// todo:: implement test
+	}
+
+	@Test
+	public void testEncryptValue() {
+		// todo:: implement test
+	}
+
+	@Test
+	public void testEncryptValueOnEmptyHelper() {
+		// todo:: implement test
+	}
+
+	@Test
+	public void testDecryptValue() {
+		// todo: implement test
+	}
+
+	@Test
+	public void testDecryptValueOnEmptyHelper() {
+		// todo: implement test
+	}
+
+	@Test
+	public void testEncryptValuesSet() {
+		// todo:: implement test
+	}
+
+	@Test
+	public void testEncryptValuesSetOnEmptyHelper() {
+		// todo:: implement test
+	}
+
+	@Test
+	public void testDecryptValuesSet() {
+		// todo: implement test
+	}
+
+	@Test
+	public void testDecryptValuesSetOnEmptyHelper() {
+		// todo: implement test
 	}
 }

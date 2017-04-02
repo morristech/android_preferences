@@ -22,7 +22,6 @@ import android.content.SharedPreferences;
 import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
 import android.support.test.runner.AndroidJUnit4;
 
 import org.junit.Test;
@@ -30,10 +29,10 @@ import org.junit.runner.RunWith;
 
 import universum.studios.android.test.PreferencesTest;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.IsNot.not;
-import static org.hamcrest.core.IsNull.nullValue;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 
 /**
  * @author Martin Albedinsky
@@ -76,20 +75,20 @@ public final class SharedPreferenceTest extends PreferencesTest {
 	public void testUpdateAndGetValue() {
 		final SharedPreference<String> preference = new PreferenceImpl(PREF_KEY, PREF_DEF_VALUE);
 		// Test case 1.
-		preference.updateValue("newValue");
+		assertThat(preference.updateValue("newValue"), is(preference));
 		assertThat(preference.getValue(), is("newValue"));
 		// Test case 2.
-		preference.updateValue("newValue");
+		assertThat(preference.updateValue("newValue"), is(preference));
 		assertThat(preference.getValue(), is("newValue"));
 		// Test case 3.
-		preference.updateValue(null);
+		assertThat(preference.updateValue(null), is(preference));
 		assertThat(preference.getValue(), is(nullValue()));
 	}
 
 	@Test
 	public void testClear() {
 		final SharedPreference<String> preference = new PreferenceImpl(PREF_KEY, PREF_DEF_VALUE);
-		preference.updateValue("newValue");
+		assertThat(preference.updateValue("newValue"), is(preference));
 		preference.invalidate();
 		assertThat(preference.getValue(), is(nullValue()));
 	}
@@ -100,14 +99,14 @@ public final class SharedPreferenceTest extends PreferencesTest {
 		assertThat(preference.getFromPreferences(mPreferences), is(PREF_DEF_VALUE));
 		assertThat(preference.getValue(), is(PREF_DEF_VALUE));
 		// Test again to cover case when the value of preference has been already obtained.
-		preference.getFromPreferences(mPreferences);
+		assertThat(preference.getFromPreferences(mPreferences), is(PREF_DEF_VALUE));
 		assertThat(preference.getValue(), is(PREF_DEF_VALUE));
 	}
 
 	@Test
 	public void testPutIntoPreferences() {
 		final SharedPreference<String> preference = new PreferenceImpl(PREF_KEY, PREF_DEF_VALUE);
-		preference.updateValue("newValue");
+		assertThat(preference.updateValue("newValue"), is(preference));
 		assertThat(preference.putIntoPreferences(mPreferences), is(true));
 		assertThat(preference.getValue(), is("newValue"));
 	}
@@ -130,10 +129,6 @@ public final class SharedPreferenceTest extends PreferencesTest {
 
 		private PreferenceImpl(@NonNull String key, @Nullable String defValue) {
 			super(key, defValue);
-		}
-
-		private PreferenceImpl(@StringRes int keyResId, @Nullable String defaultValue) {
-			super(keyResId, defaultValue);
 		}
 
 		@CheckResult

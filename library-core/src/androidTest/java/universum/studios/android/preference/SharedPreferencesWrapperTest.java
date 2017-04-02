@@ -30,13 +30,16 @@ import org.junit.runner.RunWith;
 import universum.studios.android.test.BaseInstrumentedTest;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assume.assumeTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 /**
+ * Tests only delegation for all provided methods by {@link SharedPreferencesWrapper} to the
+ * {@link SharedPreferences} instance wrapped by instance of such wrapper.
+ *
  * @author Martin Albedinsky
  */
 @RunWith(AndroidJUnit4.class)

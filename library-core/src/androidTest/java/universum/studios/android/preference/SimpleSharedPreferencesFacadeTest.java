@@ -33,7 +33,7 @@ import java.util.Map;
 import universum.studios.android.test.BaseInstrumentedTest;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assume.assumeTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -41,6 +41,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
+ * Tests only delegation for all provided methods by {@link SimpleSharedPreferencesFacade} to the
+ * {@link SharedPreferences} instance hidden behind instance of such facade.
+ *
  * @author Martin Albedinsky
  */
 @RunWith(AndroidJUnit4.class)

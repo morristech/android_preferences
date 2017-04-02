@@ -257,7 +257,7 @@ public final class CryptoSharedPreferences implements SharedPreferences {
 			} else if (value instanceof String) {
 				decryptedValues.put(decryptedKey, mHelper.decryptValue(value.toString()));
 			} else if (value instanceof Set) {
-				decryptedValues.put(decryptedKey, mHelper.decryptSetValues((Set<String>) value));
+				decryptedValues.put(decryptedKey, mHelper.decryptValuesSet((Set<String>) value));
 			} else {
 				throw new IllegalStateException("Found encrypted value of unsupported type!");
 			}
@@ -305,7 +305,7 @@ public final class CryptoSharedPreferences implements SharedPreferences {
 			if (CryptoHelper.areValuesEqual(encryptedValues, defValues)) {
 				return defValues;
 			}
-			final Set<String> decryptedValues = mHelper.decryptSetValues(encryptedValues);
+			final Set<String> decryptedValues = mHelper.decryptValuesSet(encryptedValues);
 			if (mCache != null) {
 				mCache.putStringSet(key, decryptedValues);
 			}
@@ -546,10 +546,13 @@ public final class CryptoSharedPreferences implements SharedPreferences {
 	/**
 	 * Helper used by {@link CryptoSharedPreferences} to perform <b>encryption</b> and <b>decryption</b>
 	 * for preference keys and values.
+	 * <p>
+	 * <b>Note</b>, that this class has not been made final on purpose so it may be easily mocked
+	 * in tests, thought it should not been extended.
 	 */
 	@VisibleForTesting
 	@SuppressWarnings("WeakerAccess")
-	static final class CryptoHelper {
+	static /*final*/ class CryptoHelper {
 
 		/**
 		 * Crypto implementation used to <b>encrypt</b> and <b>decrypt</b> preference keys.
@@ -638,7 +641,7 @@ public final class CryptoSharedPreferences implements SharedPreferences {
 		 *
 		 * @param value The value to decrypt.
 		 * @return Decrypted value or the same value if this helper does not have value Crypto specified.
-		 * @see #encryptSetValues(Set)
+		 * @see #encryptValuesSet(Set)
 		 * @see #CryptoHelper(Crypto, Crypto)
 		 * @see Crypto#decrypt(byte[])
 		 */
@@ -653,11 +656,11 @@ public final class CryptoSharedPreferences implements SharedPreferences {
 		 * @param values The set of values to encrypt.
 		 * @return Set of the same size with encrypted values or with the same values if this helper
 		 * does not have value Crypto specified.
-		 * @see #decryptSetValues(Set)
+		 * @see #decryptValuesSet(Set)
 		 * @see #CryptoHelper(Crypto, Crypto)
 		 * @see Crypto#encrypt(byte[])
 		 */
-		Set<String> encryptSetValues(final Set<String> values) {
+		Set<String> encryptValuesSet(final Set<String> values) {
 			if (valueCrypto == null || values == null) {
 				return null;
 			}
@@ -675,11 +678,11 @@ public final class CryptoSharedPreferences implements SharedPreferences {
 		 * @param values The set of values to decrypt.
 		 * @return Set of the same size with decrypted values or with the same values if this helper
 		 * does not have value Crypto specified.
-		 * @see #encryptSetValues(Set)
+		 * @see #encryptValuesSet(Set)
 		 * @see #CryptoHelper(Crypto, Crypto)
 		 * @see Crypto#decrypt(byte[])
 		 */
-		Set<String> decryptSetValues(final Set<String> values) {
+		Set<String> decryptValuesSet(final Set<String> values) {
 			if (valueCrypto == null || values == null) {
 				return null;
 			}
@@ -767,7 +770,7 @@ public final class CryptoSharedPreferences implements SharedPreferences {
 		public Editor putStringSet(final String key, @Nullable final Set<String> values) {
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
 				this.invalidateCachedValue(key);
-				delegate.putStringSet(helper.encryptKey(key), helper.encryptSetValues(values));
+				delegate.putStringSet(helper.encryptKey(key), helper.encryptValuesSet(values));
 			}
 			return this;
 		}

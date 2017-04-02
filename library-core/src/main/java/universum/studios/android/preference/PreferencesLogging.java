@@ -53,6 +53,7 @@ public final class PreferencesLogging {
 	 */
 	private PreferencesLogging() {
 		// Not allowed to be instantiated publicly.
+		throw new UnsupportedOperationException();
 	}
 
 	/**

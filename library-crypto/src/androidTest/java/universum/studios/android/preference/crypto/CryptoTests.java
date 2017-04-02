@@ -18,7 +18,41 @@
  */
 package universum.studios.android.preference.crypto;
 
+import android.support.annotation.NonNull;
+import android.util.Base64;
+
+import universum.studios.android.crypto.Crypto;
+import universum.studios.android.crypto.CryptographyException;
+
 /**
  * @author Martin Albedinsky
  */
-@SuppressWarnings("unused") final class CryptoTests {}
+@SuppressWarnings("unused") final class CryptoTests {
+
+	/**
+	 * Creates a new {@link Crypto} implementation for purpose of tests of <b>crypto</b> package.
+	 *
+	 * @return Crypto that is ready to be used.
+	 */
+	@NonNull
+	static Crypto testCrypto() {
+		return new Crypto() {
+
+			/**
+			 */
+			@NonNull
+			@Override
+			public byte[] decrypt(@NonNull byte[] data) throws CryptographyException {
+				return Base64.decode(data, Base64.DEFAULT);
+			}
+
+			/**
+			 */
+			@NonNull
+			@Override
+			public byte[] encrypt(@NonNull byte[] data) throws CryptographyException {
+				return Base64.encode(data, Base64.DEFAULT);
+			}
+		};
+	}
+}

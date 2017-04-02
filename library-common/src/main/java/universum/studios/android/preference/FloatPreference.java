@@ -42,7 +42,7 @@ public final class FloatPreference extends SharedPreference<Float> {
 	 */
 
 	/**
-	 * Creates a new instance of FloatPreference.
+	 * Creates a new instance of FloatPreference with the specified <var>key</var> and <var>defValue</var>.
 	 *
 	 * @see SharedPreference#SharedPreference(String, Object)
 	 */

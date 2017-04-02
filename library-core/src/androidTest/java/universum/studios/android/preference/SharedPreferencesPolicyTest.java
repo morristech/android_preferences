@@ -27,7 +27,7 @@ import org.junit.runner.RunWith;
 import universum.studios.android.test.BaseInstrumentedTest;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+import static org.hamcrest.Matchers.is;
 
 /**
  * @author Martin Albedinsky

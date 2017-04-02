@@ -136,57 +136,6 @@ public final class PreferencesManagerTest extends BaseInstrumentedTest {
 	}
 
 	@Test
-	public void testPutGetBoolean() {
-		assertThat(mManager.getBoolean(PREF_KEY, true), is(true));
-		assertThat(mManager.putBoolean(PREF_KEY, false), is(true));
-		assertThat(mManager.getBoolean(PREF_KEY, true), is(false));
-	}
-
-	@Test
-	public void testPutGetInt() {
-		assertThat(mManager.getInt(PREF_KEY, 100), is(100));
-		assertThat(mManager.putInt(PREF_KEY, 14), is(true));
-		assertThat(mManager.getInt(PREF_KEY, 0), is(14));
-	}
-
-	@Test
-	public void testPutGetLong() {
-		assertThat(mManager.getLong(PREF_KEY, 124589L), is(124589L));
-		assertThat(mManager.putLong(PREF_KEY, 1545454L), is(true));
-		assertThat(mManager.getLong(PREF_KEY, 0), is(1545454L));
-	}
-
-	@Test
-	public void testPutGetFloat() {
-		assertThat(mManager.getFloat(PREF_KEY, 0.5f), is(0.5f));
-		assertThat(mManager.putFloat(PREF_KEY, 0.324234f), is(true));
-		assertThat(mManager.getFloat(PREF_KEY, 0), is(0.324234f));
-	}
-
-	@Test
-	public void testPutGetString() {
-		assertThat(mManager.getString(PREF_KEY, "default"), is("default"));
-		assertThat(mManager.putString(PREF_KEY, "new value"), is(true));
-		assertThat(mManager.getString(PREF_KEY, null), is("new value"));
-	}
-
-	@Test
-	public void testContains() {
-		assertThat(mManager.contains(PREF_KEY), is(false));
-		mManager.putFloat(PREF_KEY, 0.324234f);
-		assertThat(mManager.contains(PREF_KEY), is(true));
-		mManager.remove(PREF_KEY);
-		assertThat(mManager.contains(PREF_KEY), is(false));
-	}
-
-	@Test
-	public void testRemove() {
-		mManager.putInt(PREF_KEY, 14);
-		assertThat(mManager.remove(PREF_KEY), is(true));
-		assertThat(mManager.contains(PREF_KEY), is(false));
-	}
-
-	@Test
 	public void testPutGetPreference() {
 		final StringPreference preference = new StringPreference(PREF_KEY, "default value");
 		assertThat(mManager.getPreference(preference), is("default value"));
@@ -198,16 +147,16 @@ public final class PreferencesManagerTest extends BaseInstrumentedTest {
 	public void testContainsPreference() {
 		final StringPreference preference = new StringPreference(PREF_KEY, "default value");
 		assertThat(mManager.containsPreference(preference), is(false));
-		mManager.putPreference(preference, "some value");
+		assertThat(mManager.putPreference(preference, "some value"), is(true));
 		assertThat(mManager.containsPreference(preference), is(true));
-		mManager.removePreference(preference);
+		assertThat(mManager.removePreference(preference), is(true));
 		assertThat(mManager.containsPreference(preference), is(false));
 	}
 
 	@Test
 	public void testRemovePreference() {
 		final StringPreference preference = new StringPreference(PREF_KEY, "default value");
-		mManager.putPreference(preference, "new value");
+		assertThat(mManager.putPreference(preference, "new value"), is(true));
 		assertThat(mManager.removePreference(preference), is(true));
 		assertThat(mManager.getPreference(preference), is("default value"));
 	}
@@ -217,10 +166,10 @@ public final class PreferencesManagerTest extends BaseInstrumentedTest {
 		assertThat(mManager.isCachingEnabled(), is(false));
 		mManager.setCachingEnabled(true);
 		assertThat(mManager.isCachingEnabled(), is(true));
-		mManager.putPreference(mPreference, false);
+		assertThat(mManager.putPreference(mPreference, false), is(true));
 		assertThat(mManager.getPreference(mPreference), is(false));
 		mManager.setCachingEnabled(false);
-		mManager.putPreference(mPreference, true);
+		assertThat(mManager.putPreference(mPreference, true), is(true));
 		assertThat(mManager.getPreference(mPreference), is(true));
 	}
 }
