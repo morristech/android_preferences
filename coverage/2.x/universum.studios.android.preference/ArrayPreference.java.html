@@ -1,0 +1,384 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>ArrayPreference.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debugAndroidTest</a> &gt; <a href="index.source.html" class="el_package">universum.studios.android.preference</a> &gt; <span class="el_source">ArrayPreference.java</span></div><h1>ArrayPreference.java</h1><pre class="source lang-java linenums">/*
+ * =================================================================================================
+ *                             Copyright (C) 2016 Universum Studios
+ * =================================================================================================
+ *         Licensed under the Apache License, Version 2.0 or later (further &quot;License&quot; only).
+ * -------------------------------------------------------------------------------------------------
+ * You may use this file only in compliance with the License. More details and copy of this License
+ * you may obtain at
+ *
+ * 		http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * You can redistribute, modify or publish any part of the code written within this file but as it
+ * is described in the License, the software distributed under the License is distributed on an
+ * &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES or CONDITIONS OF ANY KIND.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ * =================================================================================================
+ */
+package universum.studios.android.preference;
+
+import android.content.SharedPreferences;
+import android.support.annotation.CheckResult;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
+import android.text.TextUtils;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import java.lang.reflect.Array;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+/**
+ * A {@link SharedPreference} implementation that may be used to persist an {@code array} of values
+ * via {@link SharedPreferences}.
+ *
+ * @param &lt;T&gt; Type of items within an array of which values should be persisted by ArrayPreference.
+ * @author Martin Albedinsky
+ * @see CollectionPreference
+ */
+public final class ArrayPreference&lt;T&gt; extends SharedPreference&lt;T&gt; {
+
+	/*
+	 * Constants ===================================================================================
+	 */
+
+	/**
+	 * Pattern used to validate that a string contents represent an array value.
+	 */
+<span class="fc" id="L52">	private static final Pattern VALUE_PATTERN = Pattern.compile(&quot;^\\&lt;(.+)\\[\\]\\&gt;\\[(.*)\\]$&quot;);</span>
+
+	/*
+	 * Constructors ================================================================================
+	 */
+
+	/**
+	 * Creates a new instance of ArrayPreference with the specified &lt;var&gt;key&lt;/var&gt; and &lt;var&gt;defValue&lt;/var&gt;.
+	 *
+	 * @throws IllegalArgumentException If the given &lt;var&gt;defValue&lt;/var&gt; is not actually an array.
+	 * @see SharedPreference#SharedPreference(String, Object)
+	 */
+	public ArrayPreference(@NonNull final String key, @Nullable final T defValue) {
+<span class="fc" id="L65">		super(key, defValue);</span>
+<span class="fc" id="L66">		assertIsArrayOrThrow(defValue);</span>
+<span class="fc" id="L67">	}</span>
+
+	/**
+	 * &lt;b&gt;This constructor has been deprecated and will be removed in the next release.&lt;/b&gt;
+	 * &lt;p&gt;
+	 * Creates a new instance of ArrayPreference.
+	 *
+	 * @throws IllegalArgumentException If the given &lt;var&gt;defValue&lt;/var&gt; is not actually an array.
+	 * @see SharedPreference#SharedPreference(int, Object)
+	 * @deprecated Use {@link #ArrayPreference(String, Object)} instead.
+	 */
+	@Deprecated
+	public ArrayPreference(@StringRes int keyResId, @Nullable T defValue) {
+<span class="nc" id="L80">		super(keyResId, defValue);</span>
+<span class="nc" id="L81">		assertIsArrayOrThrow(defValue);</span>
+<span class="nc" id="L82">	}</span>
+
+	/*
+	 * Methods =====================================================================================
+	 */
+
+	/**
+	 * Asserts that the specified value is type of array (if not null). If it is not type of array
+	 * an IllegalArgumentException is thrown.
+	 *
+	 * @param value The value to be check if it is an array.
+	 */
+	private static void assertIsArrayOrThrow(final Object value) {
+<span class="fc bfc" id="L95" title="All 4 branches covered.">		if (value != null &amp;&amp; !value.getClass().isArray()) {</span>
+<span class="fc" id="L96">			throw new IllegalArgumentException(&quot;Not an array(&quot; + value.getClass().getSimpleName() + &quot;).&quot;);</span>
+		}
+<span class="fc" id="L98">	}</span>
+
+	/**
+	 * @see #putIntoPreferences(SharedPreferences, String, Object)
+	 */
+	@Override
+	@CheckResult
+	protected boolean onPutIntoPreferences(@NonNull final SharedPreferences preferences) {
+<span class="fc" id="L106">		return putIntoPreferences(preferences, mKey, mValue);</span>
+	}
+
+	/**
+	 * Persists the given array &lt;var&gt;value&lt;/var&gt; for the specified &lt;var&gt;key&lt;/var&gt; into the given
+	 * shared &lt;var&gt;preferences&lt;/var&gt;.
+	 *
+	 * @param preferences The instance of shared preferences into which should be the given array persisted.
+	 * @param key         The key for which should be the array mapped in the shared preferences.
+	 * @param value       The desired array value to be persisted.
+	 * @return {@code True} if put has been successful, {@code false} otherwise.
+	 * @throws IllegalArgumentException If the given value is not actually an array.
+	 */
+	@CheckResult
+	public static boolean putIntoPreferences(@NonNull final SharedPreferences preferences, @NonNull final String key, @Nullable final Object value) {
+<span class="fc bfc" id="L121" title="All 2 branches covered.">		if (value == null) {</span>
+<span class="fc" id="L122">			return preferences.edit().putString(key, null).commit();</span>
+		}
+<span class="fc" id="L124">		assertIsArrayOrThrow(value);</span>
+<span class="fc" id="L125">		final int n = Array.getLength(value);</span>
+<span class="fc" id="L126">		final JSONArray jsonArray = new JSONArray();</span>
+<span class="fc bfc" id="L127" title="All 2 branches covered.">		for (int i = 0; i &lt; n; i++) {</span>
+<span class="fc" id="L128">			jsonArray.put(Array.get(value, i));</span>
+		}
+		// Save also class of the array, so when obtaining it we will know exactly of which type it is.
+<span class="fc" id="L131">		final Class&lt;?&gt; arrayClass = resolveArrayClass(value);</span>
+<span class="fc bfc" id="L132" title="All 2 branches covered.">		if (arrayClass == null) {</span>
+<span class="fc" id="L133">			final String componentName = value.getClass().getComponentType().getSimpleName();</span>
+<span class="fc" id="L134">			throw new IllegalArgumentException(</span>
+					&quot;Failed to put array of(&quot; + componentName + &quot;) into shared preferences. &quot; +
+							&quot;Only arrays of primitive types or theirs boxed representations including String are supported.&quot;
+			);
+		}
+<span class="fc" id="L139">		return preferences.edit().putString(key, &quot;&lt;&quot; + arrayClass.getSimpleName() + &quot;&gt;&quot; + jsonArray.toString()).commit();</span>
+	}
+
+	/**
+	 * Resolves class of the given &lt;var&gt;array&lt;/var&gt;.
+	 *
+	 * @param array The array of which class should be resolved.
+	 * @return Class of the given array or {@code null} if the given array is not supported by this
+	 * preference.
+	 */
+	static Class&lt;?&gt; resolveArrayClass(final Object array) {
+<span class="fc bfc" id="L150" title="All 2 branches covered.">		if (array instanceof boolean[]) {</span>
+<span class="fc" id="L151">			return boolean[].class;</span>
+<span class="fc bfc" id="L152" title="All 2 branches covered.">		} else if (array instanceof byte[]) {</span>
+<span class="fc" id="L153">			return byte[].class;</span>
+<span class="fc bfc" id="L154" title="All 2 branches covered.">		} else if (array instanceof char[]) {</span>
+<span class="fc" id="L155">			return char[].class;</span>
+<span class="fc bfc" id="L156" title="All 2 branches covered.">		} else if (array instanceof short[]) {</span>
+<span class="fc" id="L157">			return short[].class;</span>
+<span class="fc bfc" id="L158" title="All 2 branches covered.">		} else if (array instanceof int[]) {</span>
+<span class="fc" id="L159">			return int[].class;</span>
+<span class="fc bfc" id="L160" title="All 2 branches covered.">		} else if (array instanceof float[]) {</span>
+<span class="fc" id="L161">			return float[].class;</span>
+<span class="fc bfc" id="L162" title="All 2 branches covered.">		} else if (array instanceof long[]) {</span>
+<span class="fc" id="L163">			return long[].class;</span>
+<span class="fc bfc" id="L164" title="All 2 branches covered.">		} else if (array instanceof double[]) {</span>
+<span class="fc" id="L165">			return double[].class;</span>
+<span class="fc bfc" id="L166" title="All 2 branches covered.">		} else if (array instanceof Boolean[]) {</span>
+<span class="fc" id="L167">			return Boolean[].class;</span>
+<span class="fc bfc" id="L168" title="All 2 branches covered.">		} else if (array instanceof Byte[]) {</span>
+<span class="fc" id="L169">			return Byte[].class;</span>
+<span class="fc bfc" id="L170" title="All 2 branches covered.">		} else if (array instanceof Short[]) {</span>
+<span class="fc" id="L171">			return Short[].class;</span>
+<span class="fc bfc" id="L172" title="All 2 branches covered.">		} else if (array instanceof Integer[]) {</span>
+<span class="fc" id="L173">			return Integer[].class;</span>
+<span class="fc bfc" id="L174" title="All 2 branches covered.">		} else if (array instanceof Float[]) {</span>
+<span class="fc" id="L175">			return Float[].class;</span>
+<span class="fc bfc" id="L176" title="All 2 branches covered.">		} else if (array instanceof Long[]) {</span>
+<span class="fc" id="L177">			return Long[].class;</span>
+<span class="fc bfc" id="L178" title="All 2 branches covered.">		} else if (array instanceof Double[]) {</span>
+<span class="fc" id="L179">			return Double[].class;</span>
+<span class="fc bfc" id="L180" title="All 2 branches covered.">		} else if (array instanceof String[]) {</span>
+<span class="fc" id="L181">			return String[].class;</span>
+		}
+<span class="fc" id="L183">		return null;</span>
+	}
+
+	/**
+	 * @see #getFromPreferences(SharedPreferences, String, Object)
+	 */
+	@Nullable
+	@Override
+	@SuppressWarnings(&quot;unchecked&quot;)
+	protected T onGetFromPreferences(@NonNull final SharedPreferences preferences) {
+<span class="fc" id="L193">		return getFromPreferences(preferences, mKey, mDefaultValue);</span>
+	}
+
+	/**
+	 * Obtains the &lt;b&gt;array&lt;/b&gt; persisted within the given shared &lt;var&gt;preferences&lt;/var&gt; for the
+	 * specified &lt;var&gt;key&lt;/var&gt;.
+	 *
+	 * @param preferences The instance of shared preferences where is the desired array persisted.
+	 * @param key         The key for which is the desired array mapped in the shared preferences.
+	 * @param defValue    Default array value to return in case when there is no array value persisted
+	 *                    for the specified &lt;var&gt;key&lt;/var&gt; yet.
+	 * @param &lt;A&gt;         Type of the array to obtain.
+	 * @return Instance of the requested array or &lt;var&gt;defValue&lt;/var&gt; if there is no mapping for the
+	 * specified key.
+	 * @throws ClassCastException       If value stored for the specified key does not represent an
+	 *                                  array.
+	 * @throws IllegalArgumentException If type of the requested array is not supported by this library.
+	 * @throws IllegalStateException    If the requested array was not stored by means of this library.
+	 */
+	@SuppressWarnings(&quot;unchecked&quot;)
+	public static &lt;A&gt; A getFromPreferences(@NonNull final SharedPreferences preferences, @NonNull final String key, @Nullable final Object defValue) {
+<span class="fc" id="L214">		Object array = defValue;</span>
+<span class="fc" id="L215">		final String value = preferences.getString(key, null);</span>
+<span class="fc bfc" id="L216" title="All 2 branches covered.">		if (!TextUtils.isEmpty(value)) {</span>
+<span class="fc" id="L217">			final Matcher valueMatcher = VALUE_PATTERN.matcher(value);</span>
+<span class="fc bfc" id="L218" title="All 2 branches covered.">			if (valueMatcher.reset(value).matches()) {</span>
+<span class="fc" id="L219">				final String arrayClassName = valueMatcher.group(1) + &quot;[]&quot;;</span>
+<span class="fc" id="L220">				final Class&lt;?&gt; arrayClass = resolveArrayClassByName(arrayClassName);</span>
+<span class="fc bfc" id="L221" title="All 2 branches covered.">				if (arrayClass == null) {</span>
+<span class="fc" id="L222">					final String componentName = arrayClassName.substring(0, arrayClassName.length() - 2);</span>
+<span class="fc" id="L223">					throw new IllegalArgumentException(</span>
+							&quot;Failed to obtain an array of(&quot; + componentName + &quot;) for the key(&quot; + key + &quot;) from shared preferences. &quot; +
+									&quot;Only arrays of primitive types or theirs boxed representations including String are supported.&quot;
+					);
+				}
+<span class="fc" id="L228">				final String jsonArrayValue = &quot;[&quot; + valueMatcher.group(2) + &quot;]&quot;;</span>
+				JSONArray jsonArray;
+				try {
+<span class="fc" id="L231">					jsonArray = new JSONArray(jsonArrayValue);</span>
+<span class="nc" id="L232">				} catch (JSONException e) {</span>
+<span class="nc" id="L233">					throw new ClassCastException(</span>
+							&quot;Cannot obtain an array for the key(&quot; + key + &quot;) from shared preferences. &quot; +
+									&quot;Value(&quot; + jsonArrayValue + &quot;) is not an array!&quot;
+					);
+<span class="fc" id="L237">				}</span>
+<span class="fc" id="L238">				final int n = jsonArray.length();</span>
+<span class="fc" id="L239">				array = createArrayInSize(arrayClass.getComponentType(), n);</span>
+<span class="fc bfc" id="L240" title="All 2 branches covered.">				for (int i = 0; i &lt; n; i++) {</span>
+<span class="fc" id="L241">					setArrayValueAt(arrayClass, array, i, jsonArray.opt(i));</span>
+				}
+<span class="fc" id="L243">			} else {</span>
+<span class="fc" id="L244">				throw new IllegalStateException(</span>
+						&quot;Trying to obtain an array for the key(&quot; + key + &quot;) from shared preferences not saved by the Preferences library.&quot;
+				);
+			}
+		}
+<span class="fc" id="L249">		return (A) array;</span>
+	}
+
+	/**
+	 * Extracts part with array elements from the specified array &lt;var&gt;value&lt;/var&gt;.
+	 *
+	 * @param value The array preference value.
+	 * @return Extracted array elements as String or {@code null} if the specified value is empty
+	 * or does not match array preference structure.
+	 */
+	@Nullable
+	static String extractArrayValueFromPreferenceValue(final String value) {
+<span class="nc" id="L261">		final Matcher matcher = VALUE_PATTERN.matcher(value);</span>
+<span class="nc bnc" id="L262" title="All 4 branches missed.">		if (!TextUtils.isEmpty(value) &amp;&amp; matcher.matches()) {</span>
+<span class="nc" id="L263">			return matcher.group(2);</span>
+		}
+<span class="nc" id="L265">		return null;</span>
+	}
+
+	/**
+	 * Sets a value of the given &lt;var&gt;array&lt;/var&gt; at the specified &lt;var&gt;index&lt;/var&gt; to the given one.
+	 *
+	 * @param arrayClass Class of the given array used to resolve proper setting of the given value.
+	 * @param array      The array of which specific value to update.
+	 * @param index      The index at which should be the value updated.
+	 * @param value      The value to update.
+	 */
+	private static void setArrayValueAt(final Class&lt;?&gt; arrayClass, final Object array, final int index, final Object value) {
+<span class="pc bpc" id="L277" title="1 of 2 branches missed.">		if (value == null) {</span>
+<span class="nc" id="L278">			Array.set(array, index, null);</span>
+<span class="nc" id="L279">			return;</span>
+		}
+<span class="fc bfc" id="L281" title="All 4 branches covered.">		if (byte[].class.equals(arrayClass) || Byte[].class.equals(arrayClass)) {</span>
+<span class="fc" id="L282">			Array.set(array, index, Byte.valueOf(value.toString()));</span>
+<span class="fc bfc" id="L283" title="All 4 branches covered.">		} else if (short[].class.equals(arrayClass) || Short[].class.equals(arrayClass)) {</span>
+<span class="fc" id="L284">			Array.set(array, index, Short.valueOf(value.toString()));</span>
+<span class="fc bfc" id="L285" title="All 4 branches covered.">		} else if (float[].class.equals(arrayClass) || Float[].class.equals(arrayClass)) {</span>
+<span class="fc" id="L286">			Array.set(array, index, Float.valueOf(value.toString()));</span>
+<span class="fc bfc" id="L287" title="All 4 branches covered.">		} else if (long[].class.equals(arrayClass) || Long[].class.equals(arrayClass)) {</span>
+<span class="fc" id="L288">			Array.set(array, index, Long.valueOf(value.toString()));</span>
+		} else {
+<span class="fc" id="L290">			Array.set(array, index, value);</span>
+		}
+<span class="fc" id="L292">	}</span>
+
+	/**
+	 * Resolves array class for the specified &lt;var&gt;arrayClassName&lt;/var&gt;.
+	 *
+	 * @param arrayClassName Name of the array class that should be resolved.
+	 * @return Array class associated with the specified name or {@code Object[].class} if the given
+	 * class name is associated with an array that is not supported by this preference.
+	 */
+	static Class&lt;?&gt; resolveArrayClassByName(final String arrayClassName) {
+<span class="pc bpc" id="L302" title="16 of 66 branches missed.">		switch (arrayClassName) {</span>
+			case &quot;boolean[]&quot;:
+<span class="fc" id="L304">				return boolean[].class;</span>
+			case &quot;byte[]&quot;:
+<span class="fc" id="L306">				return byte[].class;</span>
+			case &quot;char[]&quot;:
+<span class="fc" id="L308">				return char[].class;</span>
+			case &quot;short[]&quot;:
+<span class="fc" id="L310">				return short[].class;</span>
+			case &quot;int[]&quot;:
+<span class="fc" id="L312">				return int[].class;</span>
+			case &quot;float[]&quot;:
+<span class="fc" id="L314">				return float[].class;</span>
+			case &quot;long[]&quot;:
+<span class="fc" id="L316">				return long[].class;</span>
+			case &quot;double[]&quot;:
+<span class="fc" id="L318">				return double[].class;</span>
+			case &quot;Boolean[]&quot;:
+<span class="fc" id="L320">				return Boolean[].class;</span>
+			case &quot;Byte[]&quot;:
+<span class="fc" id="L322">				return Byte[].class;</span>
+			case &quot;Short[]&quot;:
+<span class="fc" id="L324">				return Short[].class;</span>
+			case &quot;Integer[]&quot;:
+<span class="fc" id="L326">				return Integer[].class;</span>
+			case &quot;Float[]&quot;:
+<span class="fc" id="L328">				return Float[].class;</span>
+			case &quot;Long[]&quot;:
+<span class="fc" id="L330">				return Long[].class;</span>
+			case &quot;Double[]&quot;:
+<span class="fc" id="L332">				return Double[].class;</span>
+			case &quot;String[]&quot;:
+<span class="fc" id="L334">				return String[].class;</span>
+			default:
+<span class="fc" id="L336">				return null;</span>
+		}
+	}
+
+	/**
+	 * Creates a new instance of array of the type for the requested &lt;var&gt;componentClass&lt;/var&gt;.
+	 *
+	 * @param componentClass Class of a component that can be stored within the new array.
+	 * @param size           Fixed size for the new array.
+	 * @return New instance of the requested array.
+	 */
+	static Object createArrayInSize(final Class&lt;?&gt; componentClass, final int size) {
+<span class="fc bfc" id="L348" title="All 2 branches covered.">		if (boolean.class.equals(componentClass)) {</span>
+<span class="fc" id="L349">			return new boolean[size];</span>
+<span class="fc bfc" id="L350" title="All 2 branches covered.">		} else if (byte.class.equals(componentClass)) {</span>
+<span class="fc" id="L351">			return new byte[size];</span>
+<span class="pc bpc" id="L352" title="1 of 2 branches missed.">		} else if (char.class.equals(componentClass)) {</span>
+<span class="nc" id="L353">			return new char[size];</span>
+<span class="fc bfc" id="L354" title="All 2 branches covered.">		} else if (short.class.equals(componentClass)) {</span>
+<span class="fc" id="L355">			return new short[size];</span>
+<span class="fc bfc" id="L356" title="All 2 branches covered.">		} else if (int.class.equals(componentClass)) {</span>
+<span class="fc" id="L357">			return new int[size];</span>
+<span class="fc bfc" id="L358" title="All 2 branches covered.">		} else if (float.class.equals(componentClass)) {</span>
+<span class="fc" id="L359">			return new float[size];</span>
+<span class="fc bfc" id="L360" title="All 2 branches covered.">		} else if (long.class.equals(componentClass)) {</span>
+<span class="fc" id="L361">			return new long[size];</span>
+<span class="fc bfc" id="L362" title="All 2 branches covered.">		} else if (double.class.equals(componentClass)) {</span>
+<span class="fc" id="L363">			return new double[size];</span>
+<span class="fc bfc" id="L364" title="All 2 branches covered.">		} else if (Boolean.class.equals(componentClass)) {</span>
+<span class="fc" id="L365">			return new Boolean[size];</span>
+<span class="fc bfc" id="L366" title="All 2 branches covered.">		} else if (Byte.class.equals(componentClass)) {</span>
+<span class="fc" id="L367">			return new Byte[size];</span>
+<span class="fc bfc" id="L368" title="All 2 branches covered.">		} else if (Short.class.equals(componentClass)) {</span>
+<span class="fc" id="L369">			return new Short[size];</span>
+<span class="fc bfc" id="L370" title="All 2 branches covered.">		} else if (Integer.class.equals(componentClass)) {</span>
+<span class="fc" id="L371">			return new Integer[size];</span>
+<span class="fc bfc" id="L372" title="All 2 branches covered.">		} else if (Float.class.equals(componentClass)) {</span>
+<span class="fc" id="L373">			return new Float[size];</span>
+<span class="fc bfc" id="L374" title="All 2 branches covered.">		} else if (Long.class.equals(componentClass)) {</span>
+<span class="fc" id="L375">			return new Long[size];</span>
+<span class="fc bfc" id="L376" title="All 2 branches covered.">		} else if (Double.class.equals(componentClass)) {</span>
+<span class="fc" id="L377">			return new Double[size];</span>
+<span class="fc bfc" id="L378" title="All 2 branches covered.">		} else if (String.class.equals(componentClass)) {</span>
+<span class="fc" id="L379">			return new String[size];</span>
+		}
+<span class="fc" id="L381">		return null;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span>Generated by the Android Gradle plugin 2.3.0</div></body></html>

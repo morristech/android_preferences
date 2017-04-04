@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>SharedPreferencesCache.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debugAndroidTest</a> &gt; <a href="index.source.html" class="el_package">universum.studios.android.preference</a> &gt; <span class="el_source">SharedPreferencesCache.java</span></div><h1>SharedPreferencesCache.java</h1><pre class="source lang-java linenums">/*
+* =================================================================================================
+*                             Copyright (C) 2017 Universum Studios
+* =================================================================================================
+*         Licensed under the Apache License, Version 2.0 or later (further &quot;License&quot; only).
+* -------------------------------------------------------------------------------------------------
+* You may use this file only in compliance with the License. More details and copy of this License 
+* you may obtain at
+* 
+* 		http://www.apache.org/licenses/LICENSE-2.0
+* 
+* You can redistribute, modify or publish any part of the code written within this file but as it 
+* is described in the License, the software distributed under the License is distributed on an 
+* &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES or CONDITIONS OF ANY KIND.
+* 
+* See the License for the specific language governing permissions and limitations under the License.
+* =================================================================================================
+*/
+package universum.studios.android.preference;
+
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.util.AndroidRuntimeException;
+
+import java.util.Set;
+
+/**
+ * Interface that specifies a layer for caches that may be used to store values of {@code SharedPreferences}
+ * in a memory.
+ *
+ * @author Martin Albedinsky
+ */
+public interface SharedPreferencesCache {
+
+	/*
+	 * Methods =====================================================================================
+	 */
+
+	/**
+	 * Checks whether this cache is empty or not.
+	 *
+	 * @return {@code True} if this cache does not have any values stored, {@code false} if there
+	 * is at least one value stored.
+	 */
+	boolean isEmpty();
+
+	/**
+	 * Checks whether there is stored value for the specified &lt;var&gt;key&lt;/var&gt; in this cache.
+	 *
+	 * @param key The key of which value presence to check.
+	 * @return {@code True} if there is value presented for the specified key, {@code false} otherwise.
+	 */
+	boolean contains(@NonNull String key);
+
+	/**
+	 * Puts the given string &lt;var&gt;value&lt;/var&gt; for the specified &lt;var&gt;key&lt;/var&gt; into this cache.
+	 * &lt;p&gt;
+	 * If there is already stored value for the specified &lt;var&gt;key&lt;/var&gt; in this cache it will be
+	 * replaced by the new one.
+	 *
+	 * @param key   The key for which to put the value into cache.
+	 * @param value The desired value to put into cache.
+	 * @return {@code True} if put has been successful, {@code false} otherwise.
+	 */
+	boolean putString(@NonNull String key, @Nullable String value);
+
+	/**
+	 * Retrieves the string value for the specified &lt;var&gt;key&lt;/var&gt; stored in this cache.
+	 *
+	 * @param key The key for which to retrieve its associated value.
+	 * @return The value associated with the key.
+	 * @throws NotInCacheException If there is no value stored in this cache for the requested key.
+	 * @see #contains(String)
+	 */
+	@Nullable
+	String getString(@NonNull String key);
+
+	/**
+	 * Puts the given set of string &lt;var&gt;values&lt;/var&gt; for the specified &lt;var&gt;key&lt;/var&gt; into this cache.
+	 * &lt;p&gt;
+	 * If there is already stored value for the specified &lt;var&gt;key&lt;/var&gt; in this cache it will be
+	 * replaced by the new one.
+	 *
+	 * @param key    The key for which to put the value into cache.
+	 * @param values The desired set of values to put into cache.
+	 * @return {@code True} if put has been successful, {@code false} otherwise.
+	 */
+	boolean putStringSet(@NonNull String key, @Nullable Set&lt;String&gt; values);
+
+	/**
+	 * Retrieves the set of string values for the specified &lt;var&gt;key&lt;/var&gt; stored in this cache.
+	 *
+	 * @param key The key for which to retrieve its associated value.
+	 * @return The set of values associated with the key.
+	 * @throws NotInCacheException If there is no value stored in this cache for the requested key.
+	 * @see #contains(String)
+	 */
+	@Nullable
+	Set&lt;String&gt; getStringSet(@NonNull String key);
+
+	/**
+	 * Puts the given integer &lt;var&gt;value&lt;/var&gt; for the specified &lt;var&gt;key&lt;/var&gt; into this cache.
+	 * &lt;p&gt;
+	 * If there is already stored value for the specified &lt;var&gt;key&lt;/var&gt; in this cache it will be
+	 * replaced by the new one.
+	 *
+	 * @param key   The key for which to put the value into cache.
+	 * @param value The desired value to put into cache.
+	 * @return {@code True} if put has been successful, {@code false} otherwise.
+	 */
+	boolean putInt(@NonNull String key, int value);
+
+	/**
+	 * Retrieves the integer value for the specified &lt;var&gt;key&lt;/var&gt; stored in this cache.
+	 *
+	 * @param key The key for which to retrieve its associated value.
+	 * @return The value associated with the key.
+	 * @throws NotInCacheException If there is no value stored in this cache for the requested key.
+	 * @see #contains(String)
+	 */
+	int getInt(@NonNull String key);
+
+	/**
+	 * Puts the given float &lt;var&gt;value&lt;/var&gt; for the specified &lt;var&gt;key&lt;/var&gt; into this cache.
+	 * &lt;p&gt;
+	 * If there is already stored value for the specified &lt;var&gt;key&lt;/var&gt; in this cache it will be
+	 * replaced by the new one.
+	 *
+	 * @param key   The key for which to put the value into cache.
+	 * @param value The desired value to put into cache.
+	 * @return {@code True} if put has been successful, {@code false} otherwise.
+	 */
+	boolean putFloat(@NonNull String key, float value);
+
+	/**
+	 * Retrieves the float value for the specified &lt;var&gt;key&lt;/var&gt; stored in this cache.
+	 *
+	 * @param key The key for which to retrieve its associated value.
+	 * @return The value associated with the key.
+	 * @throws NotInCacheException If there is no value stored in this cache for the requested key.
+	 * @see #contains(String)
+	 */
+	float getFloat(@NonNull String key);
+
+	/**
+	 * Puts the given long &lt;var&gt;value&lt;/var&gt; for the specified &lt;var&gt;key&lt;/var&gt; into this cache.
+	 * &lt;p&gt;
+	 * If there is already stored value for the specified &lt;var&gt;key&lt;/var&gt; in this cache it will be
+	 * replaced by the new one.
+	 *
+	 * @param key   The key for which to put the value into cache.
+	 * @param value The desired value to put into cache.
+	 * @return {@code True} if put has been successful, {@code false} otherwise.
+	 */
+	boolean putLong(@NonNull String key, long value);
+
+	/**
+	 * Retrieves the long value for the specified &lt;var&gt;key&lt;/var&gt; stored in this cache.
+	 *
+	 * @param key The key for which to retrieve its associated value.
+	 * @return The value associated with the key.
+	 * @throws NotInCacheException If there is no value stored in this cache for the requested key.
+	 * @see #contains(String)
+	 */
+	long getLong(@NonNull String key);
+
+	/**
+	 * Puts the given boolean &lt;var&gt;value&lt;/var&gt; for the specified &lt;var&gt;key&lt;/var&gt; into this cache.
+	 * &lt;p&gt;
+	 * If there is already stored value for the specified &lt;var&gt;key&lt;/var&gt; in this cache it will be
+	 * replaced by the new one.
+	 *
+	 * @param key   The key for which to put the value into cache.
+	 * @param value The desired value to put into cache.
+	 * @return {@code True} if put has been successful, {@code false} otherwise.
+	 */
+	boolean putBoolean(@NonNull String key, boolean value);
+
+	/**
+	 * Retrieves the boolean value for the specified &lt;var&gt;key&lt;/var&gt; stored in this cache.
+	 *
+	 * @param key The key for which to retrieve its associated value.
+	 * @return The value associated with the key.
+	 * @throws NotInCacheException If there is no value stored in this cache for the requested key.
+	 * @see #contains(String)
+	 */
+	boolean getBoolean(@NonNull String key);
+
+	/**
+	 * Evicts a value for the specified &lt;var&gt;key&lt;/var&gt; stored in this cache.
+	 *
+	 * @param key The key for which to evict its associated value.
+	 * @return {@code True} if value associated with the key has been evicted, {@code false} if there
+	 * was no value stored in this cache for the specified key.
+	 */
+	boolean evict(@NonNull String key);
+
+	/**
+	 * Evicts all values stored in this cache.
+	 *
+	 * @return The number of values that has been evicted. May be {@code 0} if this cache is empty.
+	 */
+	int evictAll();
+
+	/*
+	 * Inner classes ===============================================================================
+	 */
+
+	/**
+	 * An exception that may be used by implementations of {@link SharedPreferencesCache} to indicate
+	 * that they have no value stored for a requested key.
+	 * &lt;p&gt;
+	 * A client that uses a {@link SharedPreferencesCache} to store and retrieve preference values
+	 * should always check whether the cache contains the desired value via {@link #contains(String)}
+	 * to avoid this exception.
+	 *
+	 * @author Martin Albedinsky
+	 */
+	class NotInCacheException extends AndroidRuntimeException {
+
+		/**
+		 * Creates a new instance of NotInCacheException for the specified &lt;var&gt;key&lt;/var&gt;.
+		 *
+		 * @param key The key for which to inform that it has no value associated within the cache.
+		 */
+		public NotInCacheException(@NonNull final String key) {
+<span class="fc" id="L227">			super(&quot;There is no value associated with the key(&quot; + key + &quot;) in the cache.&quot;);</span>
+<span class="fc" id="L228">		}</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span>Generated by the Android Gradle plugin 2.3.0</div></body></html>

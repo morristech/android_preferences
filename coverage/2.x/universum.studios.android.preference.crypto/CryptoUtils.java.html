@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>CryptoUtils.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debugAndroidTest</a> &gt; <a href="index.source.html" class="el_package">universum.studios.android.preference.crypto</a> &gt; <span class="el_source">CryptoUtils.java</span></div><h1>CryptoUtils.java</h1><pre class="source lang-java linenums">/*
+* =================================================================================================
+*                             Copyright (C) 2017 Universum Studios
+* =================================================================================================
+*         Licensed under the Apache License, Version 2.0 or later (further &quot;License&quot; only).
+* -------------------------------------------------------------------------------------------------
+* You may use this file only in compliance with the License. More details and copy of this License 
+* you may obtain at
+* 
+* 		http://www.apache.org/licenses/LICENSE-2.0
+* 
+* You can redistribute, modify or publish any part of the code written within this file but as it 
+* is described in the License, the software distributed under the License is distributed on an 
+* &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES or CONDITIONS OF ANY KIND.
+* 
+* See the License for the specific language governing permissions and limitations under the License.
+* =================================================================================================
+*/
+package universum.studios.android.preference.crypto;
+
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
+import java.io.UnsupportedEncodingException;
+
+import universum.studios.android.crypto.Cryptography;
+import universum.studios.android.crypto.CryptographyException;
+import universum.studios.android.crypto.Decrypto;
+import universum.studios.android.crypto.Encrypto;
+
+/**
+ * Utility class used by {@link CryptoSharedPreferences} to perform encryption and decryption related
+ * operations.
+ *
+ * @author Martin Albedinsky
+ */
+final class CryptoUtils {
+
+	/**
+	 */
+<span class="nc" id="L41">	private CryptoUtils() {</span>
+		// Not allowed to be instantiated publicly.
+<span class="nc" id="L43">		throw new UnsupportedOperationException();</span>
+	}
+
+	/**
+	 * Performs encryption operation for the specified {@link String} &lt;var&gt;value&lt;/var&gt; using the
+	 * given &lt;var&gt;encrypto&lt;/var&gt;.
+	 * &lt;p&gt;
+	 * &lt;b&gt;Note&lt;/b&gt;, that data of the specified value will be obtained as
+	 * {@link String#getBytes(String) value.getBytes(Cryptography.CHARSET_NAME)}.
+	 * &lt;p&gt;
+	 * Also note, that this method may additionally throw a {@link CryptographyException} thrown by
+	 * the provided decrypto implementation.
+	 *
+	 * @param value    The desired value to be encrypted. May be {@code null} in which case this method
+	 *                 does nothing.
+	 * @param encrypto Encrypto implementation to be used to perform the desired encryption.
+	 * @return Encrypted value or the same value if the value is {@code null} or empty.
+	 * @see #decrypt(String, Decrypto)
+	 * @see Cryptography#CHARSET_NAME
+	 */
+	@Nullable
+	static String encrypt(@Nullable final String value, @NonNull final Encrypto encrypto) {
+<span class="nc bnc" id="L65" title="All 4 branches missed.">		if (value == null || value.length() == 0) {</span>
+<span class="nc" id="L66">			return value;</span>
+		}
+		try {
+<span class="nc" id="L69">			return new String(encrypto.encrypt(value.getBytes(Cryptography.CHARSET_NAME)), Cryptography.CHARSET_NAME);</span>
+<span class="nc" id="L70">		} catch (UnsupportedEncodingException e) {</span>
+<span class="nc" id="L71">			e.printStackTrace();</span>
+<span class="nc" id="L72">			throw new AssertionError(Cryptography.CHARSET_NAME + &quot; encoding is not supported!&quot;);</span>
+		}
+	}
+
+	/**
+	 * Performs decryption operation for the specified {@link String} &lt;var&gt;value&lt;/var&gt; using the
+	 * given &lt;var&gt;decrypto&lt;/var&gt;.
+	 * &lt;p&gt;
+	 * &lt;b&gt;Note&lt;/b&gt;, that data of the specified value will be obtained as
+	 * {@link String#getBytes(String) value.getBytes(Cryptography.CHARSET_NAME)}.
+	 * &lt;p&gt;
+	 * Also note, that this method may additionally throw a {@link CryptographyException} thrown by
+	 * the provided decrypto implementation.
+	 *
+	 * @param value    The desired value to be decrypted. May be {@code null} in which case this method
+	 *                 does nothing.
+	 * @param decrypto Decrypto implementation to be used to perform the desired decryption.
+	 * @return Decrypted value or the same value if the value is {@code null} or empty.
+	 * @see #encrypt(String, Encrypto)
+	 * @see Cryptography#CHARSET_NAME
+	 */
+	@Nullable
+	static String decrypt(@Nullable final String value, @NonNull final Decrypto decrypto) {
+<span class="nc bnc" id="L95" title="All 4 branches missed.">		if (value == null || value.length() == 0) {</span>
+<span class="nc" id="L96">			return value;</span>
+		}
+		try {
+<span class="nc" id="L99">			return new String(decrypto.decrypt(value.getBytes(Cryptography.CHARSET_NAME)), Cryptography.CHARSET_NAME);</span>
+<span class="nc" id="L100">		} catch (UnsupportedEncodingException e) {</span>
+<span class="nc" id="L101">			e.printStackTrace();</span>
+<span class="nc" id="L102">			throw new AssertionError(Cryptography.CHARSET_NAME + &quot; encoding is not supported!&quot;);</span>
+		}
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span>Generated by the Android Gradle plugin 2.3.0</div></body></html>

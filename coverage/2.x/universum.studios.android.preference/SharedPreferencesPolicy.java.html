@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>SharedPreferencesPolicy.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debugAndroidTest</a> &gt; <a href="index.source.html" class="el_package">universum.studios.android.preference</a> &gt; <span class="el_source">SharedPreferencesPolicy.java</span></div><h1>SharedPreferencesPolicy.java</h1><pre class="source lang-java linenums">/*
+* =================================================================================================
+*                             Copyright (C) 2017 Universum Studios
+* =================================================================================================
+*         Licensed under the Apache License, Version 2.0 or later (further &quot;License&quot; only).
+* -------------------------------------------------------------------------------------------------
+* You may use this file only in compliance with the License. More details and copy of this License 
+* you may obtain at
+* 
+* 		http://www.apache.org/licenses/LICENSE-2.0
+* 
+* You can redistribute, modify or publish any part of the code written within this file but as it 
+* is described in the License, the software distributed under the License is distributed on an 
+* &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES or CONDITIONS OF ANY KIND.
+* 
+* See the License for the specific language governing permissions and limitations under the License.
+* =================================================================================================
+*/
+package universum.studios.android.preference;
+
+import android.content.Context;
+import android.preference.PreferenceManager;
+import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
+/**
+ * Simple class that declares basic policies for {@code SharedPreferences}.
+ *
+ * @author Martin Albedinsky
+ */
+public final class SharedPreferencesPolicy {
+
+	/*
+	 * Constants ===================================================================================
+	 */
+
+	/**
+	 * Suffix for default name used by the &lt;b&gt;Android&lt;/b&gt; for shared preferences.
+	 */
+	public static final String DEFAULT_PREFERENCES_NAME_SUFFIX = &quot;_preferences&quot;;
+
+	/**
+	 * Copied flag from {@link Context#MODE_PRIVATE}.
+	 */
+	public static final int FILE_MODE_PRIVATE = Context.MODE_PRIVATE;
+
+	/**
+	 * Copied flag from {@link Context#MODE_APPEND}.
+	 */
+	public static final int FILE_MODE_APPEND = Context.MODE_APPEND;
+
+	/**
+	 * Defines an annotation for determining allowed file creation modes for {@code SharedPreferences}
+	 * file.
+	 */
+	@IntDef(flag = true, value = {
+			FILE_MODE_PRIVATE,
+			FILE_MODE_APPEND
+	})
+	@Retention(RetentionPolicy.SOURCE)
+	public @interface FileMode {
+	}
+
+	/*
+	 * Interface ===================================================================================
+	 */
+
+	/*
+	 * Static members ==============================================================================
+	 */
+
+	/*
+	 * Members =====================================================================================
+	 */
+
+	/*
+	 * Constructors ================================================================================
+	 */
+
+	/**
+	 */
+<span class="nc" id="L85">	private SharedPreferencesPolicy() {</span>
+		// Not allowed to be instantiated publicly.
+<span class="nc" id="L87">		throw new UnsupportedOperationException();</span>
+	}
+
+	/*
+	 * Methods =====================================================================================
+	 */
+
+	/**
+	 * Creates a default name for shared preferences for the specified &lt;var&gt;context&lt;/var&gt; that is
+	 * the same one as created by default by the &lt;b&gt;Android&lt;/b&gt; framework.
+	 *
+	 * @param context The context for which to create preferences name.
+	 * @return Preferences name that may be used in association with {@link Context#getSharedPreferences(String, int)}.
+	 * @see #preferencesName(Context, String)
+	 * @see PreferenceManager#getDefaultSharedPreferencesName(Context)
+	 */
+	public static String defaultPreferencesName(@NonNull final Context context) {
+<span class="fc" id="L104">		return preferencesName(context, DEFAULT_PREFERENCES_NAME_SUFFIX);</span>
+	}
+
+	/**
+	 * Creates a name for shared preferences with the given &lt;var&gt;nameSuffix&lt;/var&gt; for the specified
+	 * &lt;var&gt;context&lt;/var&gt;.
+	 *
+	 * @param context    The context for which to create preferences name.
+	 * @param nameSuffix Suffix to be added into preferences name.
+	 * @return Preferences name that may be used in association with {@link Context#getSharedPreferences(String, int)}.
+	 * @see #defaultPreferencesName(Context)
+	 */
+	public static String preferencesName(@NonNull final Context context, @NonNull final String nameSuffix) {
+<span class="fc" id="L117">		return context.getPackageName() + nameSuffix;</span>
+	}
+
+	/*
+	 * Inner classes ===============================================================================
+	 */
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span>Generated by the Android Gradle plugin 2.3.0</div></body></html>

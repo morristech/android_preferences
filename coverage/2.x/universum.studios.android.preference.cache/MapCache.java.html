@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MapCache.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debugAndroidTest</a> &gt; <a href="index.source.html" class="el_package">universum.studios.android.preference.cache</a> &gt; <span class="el_source">MapCache.java</span></div><h1>MapCache.java</h1><pre class="source lang-java linenums">/*
+* =================================================================================================
+*                             Copyright (C) 2017 Universum Studios
+* =================================================================================================
+*         Licensed under the Apache License, Version 2.0 or later (further &quot;License&quot; only).
+* -------------------------------------------------------------------------------------------------
+* You may use this file only in compliance with the License. More details and copy of this License 
+* you may obtain at
+* 
+* 		http://www.apache.org/licenses/LICENSE-2.0
+* 
+* You can redistribute, modify or publish any part of the code written within this file but as it 
+* is described in the License, the software distributed under the License is distributed on an 
+* &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES or CONDITIONS OF ANY KIND.
+* 
+* See the License for the specific language governing permissions and limitations under the License.
+* =================================================================================================
+*/
+package universum.studios.android.preference.cache;
+
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import universum.studios.android.preference.SharedPreferencesCache;
+
+/**
+ * A {@link SharedPreferencesCache} implementation backed by implementation of {@link Map}.
+ *
+ * @author Martin Albedinsky
+ */
+<span class="fc" id="L35">final class MapCache implements SharedPreferencesCache {</span>
+
+    /*
+	 * Constants ===================================================================================
+	 */
+
+	/**
+	 * Log TAG.
+	 */
+	// private static final String TAG = &quot;MapCache&quot;;
+
+    /*
+	 * Interface ===================================================================================
+	 */
+
+	/*
+	 * Static members ==============================================================================
+	 */
+
+	/*
+	 * Members =====================================================================================
+	 */
+
+	/**
+	 * Map used to store all values available through this cache.
+	 */
+<span class="fc" id="L61">	private final Map&lt;String, Object&gt; mMap = new HashMap&lt;&gt;();</span>
+	 
+	/*
+	 * Constructors ================================================================================
+	 */
+	 
+	/*
+	 * Methods =====================================================================================
+	 */
+
+	/**
+	 */
+	@Override
+	public boolean isEmpty() {
+<span class="fc" id="L75">		return mMap.isEmpty();</span>
+	}
+
+	/**
+	 */
+	@Override
+	public boolean contains(@NonNull final String key) {
+<span class="fc" id="L82">		return mMap.containsKey(key);</span>
+	}
+
+	/**
+	 */
+	@Override
+	public boolean putString(@NonNull final String key, @Nullable final String value) {
+<span class="fc" id="L89">		mMap.put(key, value);</span>
+<span class="fc" id="L90">		return true;</span>
+	}
+
+	/**
+	 */
+	@Nullable
+	@Override
+	public String getString(@NonNull final String key) {
+<span class="fc" id="L98">		assertContainsOrThrow(key);</span>
+<span class="fc" id="L99">		return (String) mMap.get(key);</span>
+	}
+
+	/**
+	 */
+	@Override
+	public boolean putStringSet(@NonNull final String key, @Nullable final Set&lt;String&gt; values) {
+<span class="fc" id="L106">		mMap.put(key, values);</span>
+<span class="fc" id="L107">		return true;</span>
+	}
+
+	/**
+	 */
+	@Nullable
+	@Override
+	@SuppressWarnings(&quot;unchecked&quot;)
+	public Set&lt;String&gt; getStringSet(@NonNull final String key) {
+<span class="fc" id="L116">		assertContainsOrThrow(key);</span>
+<span class="fc" id="L117">		return (Set&lt;String&gt;) mMap.get(key);</span>
+	}
+
+	/**
+	 */
+	@Override
+	public boolean putInt(@NonNull final String key, final int value) {
+<span class="fc" id="L124">		mMap.put(key, value);</span>
+<span class="fc" id="L125">		return true;</span>
+	}
+
+	/**
+	 */
+	@Override
+	public int getInt(@NonNull final String key) {
+<span class="fc" id="L132">		assertContainsOrThrow(key);</span>
+<span class="fc" id="L133">		return (int) mMap.get(key);</span>
+	}
+
+	/**
+	 */
+	@Override
+	public boolean putFloat(@NonNull final String key, final float value) {
+<span class="fc" id="L140">		mMap.put(key, value);</span>
+<span class="fc" id="L141">		return true;</span>
+	}
+
+	/**
+	 */
+	@Override
+	public float getFloat(@NonNull final String key) {
+<span class="fc" id="L148">		assertContainsOrThrow(key);</span>
+<span class="fc" id="L149">		return (float) mMap.get(key);</span>
+	}
+
+	/**
+	 */
+	@Override
+	public boolean putLong(@NonNull final String key, final long value) {
+<span class="fc" id="L156">		mMap.put(key, value);</span>
+<span class="fc" id="L157">		return true;</span>
+	}
+
+	/**
+	 */
+	@Override
+	public long getLong(@NonNull final String key) {
+<span class="fc" id="L164">		assertContainsOrThrow(key);</span>
+<span class="fc" id="L165">		return (long) mMap.get(key);</span>
+	}
+
+	/**
+	 */
+	@Override
+	public boolean putBoolean(@NonNull final String key, final boolean value) {
+<span class="fc" id="L172">		mMap.put(key, value);</span>
+<span class="fc" id="L173">		return true;</span>
+	}
+
+	/**
+	 */
+	@Override
+	public boolean getBoolean(@NonNull final String key) {
+<span class="fc" id="L180">		assertContainsOrThrow(key);</span>
+<span class="fc" id="L181">		return (boolean) mMap.get(key);</span>
+	}
+
+	/**
+	 * Asserts that this cache contains value for the specified &lt;var&gt;key&lt;/var&gt;. If there is no value
+	 * for the key stored in this cache, a new {@link NotInCacheException} is thrown.
+	 *
+	 * @param key The of which value's presence to check.
+	 */
+	private void assertContainsOrThrow(final String key) {
+<span class="fc bfc" id="L191" title="All 2 branches covered.">		if (!mMap.containsKey(key)) throw new NotInCacheException(key);</span>
+<span class="fc" id="L192">	}</span>
+
+	/**
+	 */
+	@Override
+	public boolean evict(@NonNull final String key) {
+<span class="fc bfc" id="L198" title="All 2 branches covered.">		if (mMap.containsKey(key)) {</span>
+<span class="fc" id="L199">			mMap.remove(key);</span>
+<span class="fc" id="L200">			return true;</span>
+		}
+<span class="fc" id="L202">		return false;</span>
+	}
+
+	/**
+	 */
+	@Override
+	public int evictAll() {
+<span class="fc" id="L209">		final int size = mMap.size();</span>
+<span class="fc bfc" id="L210" title="All 2 branches covered.">		if (size &gt; 0) {</span>
+<span class="fc" id="L211">			mMap.clear();</span>
+		}
+<span class="fc" id="L213">		return size;</span>
+	}
+	 
+	/*
+	 * Inner classes ===============================================================================
+	 */
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span>Generated by the Android Gradle plugin 2.3.0</div></body></html>

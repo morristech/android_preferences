@@ -1,0 +1,933 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>CryptoSharedPreferences.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debugAndroidTest</a> &gt; <a href="index.source.html" class="el_package">universum.studios.android.preference.crypto</a> &gt; <span class="el_source">CryptoSharedPreferences.java</span></div><h1>CryptoSharedPreferences.java</h1><pre class="source lang-java linenums">/*
+ * =================================================================================================
+ *                             Copyright (C) 2017 Universum Studios
+ * =================================================================================================
+ *         Licensed under the Apache License, Version 2.0 or later (further &quot;License&quot; only).
+ * -------------------------------------------------------------------------------------------------
+ * You may use this file only in compliance with the License. More details and copy of this License 
+ * you may obtain at
+ * 
+ * 		http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * You can redistribute, modify or publish any part of the code written within this file but as it 
+ * is described in the License, the software distributed under the License is distributed on an 
+ * &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES or CONDITIONS OF ANY KIND.
+ * 
+ * See the License for the specific language governing permissions and limitations under the License.
+ * =================================================================================================
+ */
+package universum.studios.android.preference.crypto;
+
+import android.annotation.SuppressLint;
+import android.content.SharedPreferences;
+import android.os.Build;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import universum.studios.android.crypto.Crypto;
+import universum.studios.android.preference.PreferencesLogging;
+import universum.studios.android.preference.SharedPreferencesCache;
+
+/**
+ * A {@link SharedPreferences} implementation that supports &lt;b&gt;encryption&lt;/b&gt; for both &lt;b&gt;keys&lt;/b&gt;
+ * and &lt;b&gt;values&lt;/b&gt; that are persisted in shared preferences. New instances of {@link CryptoSharedPreferences}
+ * may be created via {@link Builder} and its {@link Builder#build()} method.
+ *
+ * &lt;h3&gt;Values Encryption&lt;/h3&gt;
+ * Primary functionality provided by {@link CryptoSharedPreferences} is the fact that all values
+ * persisted via these preferences implementation are &lt;b&gt;encrypted&lt;/b&gt;. Encryption of values stored
+ * in shared preferences should improve security standards of an Android application as the encrypted
+ * values that are stored within a corresponding preferences Xml file are &lt;b&gt;obscured&lt;/b&gt; so any
+ * possible attacker that gains access to preferences files containing encrypted values will have
+ * hard time reading them. Each instance of {@link CryptoSharedPreferences} is required to be created
+ * with at least {@link Crypto} implementation that will be used for values encryption and decryption.
+ * A desired {@link Crypto} should be supplied via {@link Builder#valueCrypto(Crypto)} otherwise
+ * the builder will throw an exception if a new instance of crypto preferences is tried to be created
+ * via {@link Builder#build()}. See other sections of this description to get more info.
+ * &lt;p&gt;
+ * Below snippet shows contents of a shared preferences Xml without and with encryption applied to
+ * both keys and values:
+ * &lt;pre&gt;
+ * &amp;lt;!-- Preference data without encryption applied. --&amp;gt;
+ * &amp;lt;?xml version='1.0' encoding='utf-8' standalone='yes'?&amp;gt;
+ * &amp;lt;map&amp;gt;
+ *     &amp;lt;string name=&quot;universum.studios.android.preference.crypto.PREFERENCE.UserName&quot;&amp;gt;
+ *          Android User
+ *     &amp;lt;/string&amp;gt;
+ *
+ *     &amp;lt;long name=&quot;universum.studios.android.preference.crypto.PREFERENCE.UserBirthDate&quot;&amp;gt;
+ *          1490986235741
+ *     &amp;lt;/long&amp;gt;
+ * &amp;lt;/map&amp;gt;
+ *
+ * &amp;lt;!-- Preference data with encryption applied. --&amp;gt;
+ * &amp;lt;?xml version='1.0' encoding='utf-8' standalone='yes'?&amp;gt;
+ * &amp;lt;map&amp;gt;
+ *     &amp;lt;string name=&quot;dW5pdmVyc3VtLnN0dWRpb3MuYW5kcm9pZC5wcmVmZXJlbmNlLmNyeXB0by5QUkVGRVJFTkNFLlVzZXJOYW1l&quot;&amp;gt;
+ *          QW5kcm9pZCBVc2Vy
+ *     &amp;lt;/string&amp;gt;
+ *
+ *     &amp;lt;string name=&quot;dW5pdmVyc3VtLnN0dWRpb3MuYW5kcm9pZC5wcmVmZXJlbmNlLmNyeXB0by5QUkVGRVJFTkNFLlVzZXJCaXJ0aERhdGU=&quot;&amp;gt;
+ *          MTQ5MDk4NjIzNTc0MQ==
+ *     &amp;lt;/string&amp;gt;
+ * &amp;lt;/map&amp;gt;
+ * &lt;/pre&gt;
+ *
+ * &lt;h3&gt;Keys Encryption&lt;/h3&gt;
+ * Keys that are used to map with them associated values in shared preferences may be also encrypted
+ * in order to improve security standards of an Android application. Unlike values encryption, keys
+ * encryption is optional. If keys encryption is required to be enabled a desired {@link Crypto}
+ * implementation should be supplied via {@link Builder#keyCrypto(Crypto)} for {@link CryptoSharedPreferences}.
+ * The specified crypto will be then used by the crypto preferences for encryption of preference keys
+ * whenever a preference value is requested to be persisted or obtained and for decryption whenever
+ * a change callback for registered {@link OnSharedPreferenceChangeListener} is about to be dispatched
+ * (see paragraph below).
+ * &lt;p&gt;
+ * In order to receive callback of {@link OnSharedPreferenceChangeListener} with instance of
+ * {@link CryptoSharedPreferences crypto preferences} along with decrypted key so the listener does
+ * not need to deal with either key nor value decryption such listener should be registered via
+ * {@link #registerOnSharedPreferenceChangeListener(OnSharedPreferenceChangeListener)} and later
+ * unregistered via {@link #unregisterOnSharedPreferenceChangeListener(OnSharedPreferenceChangeListener)}.
+ * Then each listener's {@link OnSharedPreferenceChangeListener#onSharedPreferenceChanged(SharedPreferences, String) callback}
+ * will cary instance of the crypto preferences and already decrypted key of which associated value
+ * has changed. The changed value may be obtained in a standard fashion via one of {@code get...(...)}
+ * methods directly via the dispatched preferences instance like shown below:
+ * &lt;pre&gt;
+ * CryptoSharedPreferences.registerOnSharedPreferenceChangeListener(new OnSharedPreferenceChangeListener() {
+ *
+ *      &amp;#64;Override
+ *      public void onSharedPreferenceChanged(&amp;#64;NonNull SharedPreferences preferences, &amp;#64;NonNull String key) {
+ *          // ... preferences are actually CryptoSharedPreferences and the key is already decrypted
+ *          switch (key) {
+ *              SamplePreferenceKey.USER_NAME:
+ *                  final String userName = preferences.getString(key, &quot;Unknown&quot;);
+ *                  // ... userName will contain decrypted value
+ *                  break;
+ *              // ... handle changes for other preference keys
+ *          }
+ *      }
+ * });
+ * &lt;/pre&gt;
+ *
+ * &lt;h3&gt;Caching&lt;/h3&gt;
+ * Due to the fact that preference values that are to be returned via one of {@code get...(...)}
+ * methods need to be always decrypted, obtaining of such values may be potentially a time consuming
+ * task. In order to speed up this operation an implementation of {@link SharedPreferencesCache} may
+ * be supplied via {@link Builder#valueCache(SharedPreferencesCache)} for {@link CryptoSharedPreferences}.
+ * Such cache will be then used by the crypto preferences for storing of already decrypted values
+ * which may be retrieved whenever they are requested in a much faster fashion. When cache is used
+ * it is simply asked if it contains value for the requested key, if YES, that value is returned, if
+ * NO, an encrypted value is obtained from the wrapped preferences, decrypted, stored in the cache
+ * and returned. A specific value stored in the cache is invalidated (evicted from the cache) whenever
+ * a new edit session is started for key associated with that value, that is whenever {@link #edit()}
+ * is called and followed by {@code put...(...)} call with that key.
+ *
+ * In order to speed up obtaining of preference values that need to be decrypted whenever they are
+ * to be returned to the caller where this task may potentially a time consuming operation
+ *
+ * @author Martin Albedinsky
+ */
+public final class CryptoSharedPreferences implements SharedPreferences {
+
+	/*
+	 * Constants ===================================================================================
+	 */
+
+	/**
+	 * Log TAG.
+	 */
+	private static final String TAG = &quot;CryptoSharedPreferences&quot;;
+
+	/*
+	 * Interface ===================================================================================
+	 */
+
+	/*
+	 * Static members ==============================================================================
+	 */
+
+	/*
+	 * Members =====================================================================================
+	 */
+
+	/**
+	 * Instance of shared preferences to which is this crypto preferences implementation delegating
+	 * requests to put or get encrypted values mapped to encrypted keys.
+	 */
+	private final SharedPreferences mDelegate;
+
+	/**
+	 * Helper used by crypto preferences to support cryptographic (encryption &amp; decryption) operations.
+	 */
+	private final CryptoHelper mHelper;
+
+	/**
+	 * Editor that supports encryption for keys and values that are delegated to it in order to be
+	 * persisted in shared preferences.
+	 */
+	private CryptoEditor mEditor;
+
+	/**
+	 * Registry containing registered {@link OnSharedPreferenceChangeListener OnSharedPreferenceChangeListeners}.
+	 * This registry is used to properly dispatch preference change callbacks with encrypted key to
+	 * all registered listeners.
+	 */
+	private final ChangeListeners mChangeListeners;
+
+	/**
+	 * Boolean flag indicating whether {@link #mChangeListeners} registry is registered as
+	 * {@link OnSharedPreferenceChangeListener} upon {@link #mDelegate} preferences or not.
+	 */
+<span class="nc" id="L190">	private final AtomicBoolean mChangeListenersRegistered = new AtomicBoolean(false);</span>
+
+	/**
+	 * Cache that is used by this crypto preferences for storing of already decrypted preference values.
+	 */
+	private final SharedPreferencesCache mCache;
+
+	/*
+	 * Constructors ================================================================================
+	 */
+
+	/**
+	 * Creates a new instance of CryptoSharedPreferences with cryptography related configuration
+	 * provided by the specified &lt;var&gt;builder&lt;/var&gt;.
+	 *
+	 * @param builder The builder used to configure the new crypto preferences.
+	 */
+<span class="nc" id="L207">	private CryptoSharedPreferences(final Builder builder) {</span>
+<span class="nc" id="L208">		this.mDelegate = builder.preferences;</span>
+<span class="nc" id="L209">		this.mHelper = new CryptoHelper(builder.keyCrypto, builder.valueCrypto);</span>
+<span class="nc" id="L210">		this.mChangeListeners = new ChangeListeners(mHelper, this);</span>
+<span class="nc" id="L211">		this.mCache = builder.cache;</span>
+
+<span class="nc" id="L213">	}</span>
+
+	/*
+	 * Methods =====================================================================================
+	 */
+
+	/**
+	 */
+	@Override
+	public void registerOnSharedPreferenceChangeListener(@NonNull final OnSharedPreferenceChangeListener listener) {
+<span class="nc" id="L223">		synchronized (mChangeListeners) {</span>
+<span class="nc" id="L224">			mChangeListeners.register(listener);</span>
+<span class="nc bnc" id="L225" title="All 2 branches missed.">			if (!mChangeListenersRegistered.get()) {</span>
+<span class="nc" id="L226">				mDelegate.registerOnSharedPreferenceChangeListener(mChangeListeners);</span>
+<span class="nc" id="L227">				mChangeListenersRegistered.set(true);</span>
+			}
+<span class="nc" id="L229">		}</span>
+<span class="nc" id="L230">	}</span>
+
+	/**
+	 */
+	@Override
+	public void unregisterOnSharedPreferenceChangeListener(@NonNull final OnSharedPreferenceChangeListener listener) {
+<span class="nc" id="L236">		synchronized (mChangeListeners) {</span>
+<span class="nc" id="L237">			mChangeListeners.unregister(listener);</span>
+<span class="nc bnc" id="L238" title="All 4 branches missed.">			if (mChangeListenersRegistered.get() &amp;&amp; mChangeListeners.isEmpty()) {</span>
+<span class="nc" id="L239">				mDelegate.unregisterOnSharedPreferenceChangeListener(mChangeListeners);</span>
+<span class="nc" id="L240">				mChangeListenersRegistered.set(false);</span>
+			}
+<span class="nc" id="L242">		}</span>
+<span class="nc" id="L243">	}</span>
+
+	/**
+	 */
+	@Override
+	@SuppressWarnings(&quot;unchecked&quot;)
+	public Map&lt;String, ?&gt; getAll() {
+<span class="nc" id="L250">		final Map&lt;String, ?&gt; encryptedValues = mDelegate.getAll();</span>
+<span class="nc" id="L251">		final Map&lt;String, Object&gt; decryptedValues = new HashMap&lt;&gt;(encryptedValues.size());</span>
+<span class="nc bnc" id="L252" title="All 2 branches missed.">		for (final String key : encryptedValues.keySet()) {</span>
+<span class="nc" id="L253">			final Object value = encryptedValues.get(key);</span>
+<span class="nc" id="L254">			final String decryptedKey = mHelper.decryptKey(key);</span>
+<span class="nc bnc" id="L255" title="All 2 branches missed.">			if (value == null) {</span>
+<span class="nc" id="L256">				decryptedValues.put(decryptedKey, null);</span>
+<span class="nc bnc" id="L257" title="All 2 branches missed.">			} else if (value instanceof String) {</span>
+<span class="nc" id="L258">				decryptedValues.put(decryptedKey, mHelper.decryptValue(value.toString()));</span>
+<span class="nc bnc" id="L259" title="All 2 branches missed.">			} else if (value instanceof Set) {</span>
+<span class="nc" id="L260">				decryptedValues.put(decryptedKey, mHelper.decryptValuesSet((Set&lt;String&gt;) value));</span>
+			} else {
+<span class="nc" id="L262">				throw new IllegalStateException(&quot;Found encrypted value of unsupported type!&quot;);</span>
+			}
+<span class="nc" id="L264">		}</span>
+<span class="nc" id="L265">		return decryptedValues;</span>
+	}
+
+	/**
+	 */
+	@Override
+	public boolean contains(@NonNull final String key) {
+<span class="nc" id="L272">		return mDelegate.contains(mHelper.encryptKey(key));</span>
+	}
+
+	/**
+	 */
+	@Nullable
+	@Override
+	public String getString(@NonNull final String key, @Nullable final String defValue) {
+<span class="nc bnc" id="L280" title="All 4 branches missed.">		if (mCache == null || !mCache.contains(key)) {</span>
+<span class="nc" id="L281">			final String encryptedValue = mDelegate.getString(mHelper.encryptKey(key), defValue);</span>
+<span class="nc bnc" id="L282" title="All 2 branches missed.">			if (CryptoHelper.areValuesEqual(encryptedValue, defValue)) {</span>
+<span class="nc" id="L283">				return defValue;</span>
+			}
+<span class="nc" id="L285">			final String decryptedValue = mHelper.decryptValue(encryptedValue);</span>
+<span class="nc bnc" id="L286" title="All 2 branches missed.">			if (mCache != null) {</span>
+<span class="nc" id="L287">				mCache.putString(key, decryptedValue);</span>
+			}
+<span class="nc" id="L289">			return decryptedValue;</span>
+		}
+<span class="nc" id="L291">		PreferencesLogging.d(TAG, &quot;Retrieving String value for key(&quot; + key + &quot;) from the cache.&quot;);</span>
+<span class="nc" id="L292">		return mCache.getString(key);</span>
+	}
+
+	/**
+	 */
+	@Nullable
+	@Override
+	public Set&lt;String&gt; getStringSet(@NonNull final String key, @Nullable final Set&lt;String&gt; defValues) {
+<span class="nc bnc" id="L300" title="All 2 branches missed.">		if (Build.VERSION.SDK_INT &lt; Build.VERSION_CODES.HONEYCOMB) {</span>
+<span class="nc" id="L301">			return defValues;</span>
+		}
+<span class="nc bnc" id="L303" title="All 4 branches missed.">		if (mCache == null || !mCache.contains(key)) {</span>
+<span class="nc" id="L304">			final Set&lt;String&gt; encryptedValues = mDelegate.getStringSet(mHelper.encryptKey(key), defValues);</span>
+<span class="nc bnc" id="L305" title="All 2 branches missed.">			if (CryptoHelper.areValuesEqual(encryptedValues, defValues)) {</span>
+<span class="nc" id="L306">				return defValues;</span>
+			}
+<span class="nc" id="L308">			final Set&lt;String&gt; decryptedValues = mHelper.decryptValuesSet(encryptedValues);</span>
+<span class="nc bnc" id="L309" title="All 2 branches missed.">			if (mCache != null) {</span>
+<span class="nc" id="L310">				mCache.putStringSet(key, decryptedValues);</span>
+			}
+<span class="nc" id="L312">			return decryptedValues;</span>
+		}
+<span class="nc" id="L314">		PreferencesLogging.d(TAG, &quot;Retrieving Set&lt;String&gt; value for key(&quot; + key + &quot;) from the cache.&quot;);</span>
+<span class="nc" id="L315">		return mCache.getStringSet(key);</span>
+	}
+
+	/**
+	 */
+	@Override
+	public int getInt(@NonNull final String key, final int defValue) {
+<span class="nc bnc" id="L322" title="All 4 branches missed.">		if (mCache == null || !mCache.contains(key)) {</span>
+<span class="nc" id="L323">			final String encryptedValue = mDelegate.getString(mHelper.encryptKey(key), Integer.toString(defValue));</span>
+<span class="nc bnc" id="L324" title="All 2 branches missed.">			if (CryptoHelper.areValuesEqual(encryptedValue, defValue)) {</span>
+<span class="nc" id="L325">				return defValue;</span>
+			}
+<span class="nc" id="L327">			final int decryptedValue = Integer.parseInt(mHelper.decryptValue(encryptedValue));</span>
+<span class="nc bnc" id="L328" title="All 2 branches missed.">			if (mCache != null) {</span>
+<span class="nc" id="L329">				mCache.putInt(key, decryptedValue);</span>
+			}
+<span class="nc" id="L331">			return decryptedValue;</span>
+		}
+<span class="nc" id="L333">		PreferencesLogging.d(TAG, &quot;Retrieving int value for key(&quot; + key + &quot;) from the cache.&quot;);</span>
+<span class="nc" id="L334">		return mCache.getInt(key);</span>
+	}
+
+	/**
+	 */
+	@Override
+	public long getLong(@NonNull final String key, final long defValue) {
+<span class="nc bnc" id="L341" title="All 4 branches missed.">		if (mCache == null || !mCache.contains(key)) {</span>
+<span class="nc" id="L342">			final String encryptedValue = mDelegate.getString(mHelper.encryptKey(key), Long.toString(defValue));</span>
+<span class="nc bnc" id="L343" title="All 2 branches missed.">			if (CryptoHelper.areValuesEqual(encryptedValue, defValue)) {</span>
+<span class="nc" id="L344">				return defValue;</span>
+			}
+<span class="nc" id="L346">			final long decryptedValue = Long.parseLong(mHelper.decryptValue(encryptedValue));</span>
+<span class="nc bnc" id="L347" title="All 2 branches missed.">			if (mCache != null) {</span>
+<span class="nc" id="L348">				mCache.putLong(key, decryptedValue);</span>
+			}
+<span class="nc" id="L350">			return decryptedValue;</span>
+		}
+<span class="nc" id="L352">		PreferencesLogging.d(TAG, &quot;Retrieving long value for key(&quot; + key + &quot;) from the cache.&quot;);</span>
+<span class="nc" id="L353">		return mCache.getLong(key);</span>
+	}
+
+	/**
+	 */
+	@Override
+	public float getFloat(@NonNull final String key, final float defValue) {
+<span class="nc bnc" id="L360" title="All 4 branches missed.">		if (mCache == null || !mCache.contains(key)) {</span>
+<span class="nc" id="L361">			final String encryptedValue = mDelegate.getString(mHelper.encryptKey(key), Float.toString(defValue));</span>
+<span class="nc bnc" id="L362" title="All 2 branches missed.">			if (CryptoHelper.areValuesEqual(encryptedValue, defValue)) {</span>
+<span class="nc" id="L363">				return defValue;</span>
+			}
+<span class="nc" id="L365">			final float decryptedValue = Float.parseFloat(mHelper.decryptValue(encryptedValue));</span>
+<span class="nc bnc" id="L366" title="All 2 branches missed.">			if (mCache != null) {</span>
+<span class="nc" id="L367">				mCache.putFloat(key, decryptedValue);</span>
+			}
+<span class="nc" id="L369">			return decryptedValue;</span>
+		}
+<span class="nc" id="L371">		PreferencesLogging.d(TAG, &quot;Retrieving float value for key(&quot; + key + &quot;) from the cache.&quot;);</span>
+<span class="nc" id="L372">		return mCache.getFloat(key);</span>
+	}
+
+	/**
+	 */
+	@Override
+	public boolean getBoolean(@NonNull final String key, final boolean defValue) {
+<span class="nc bnc" id="L379" title="All 4 branches missed.">		if (mCache == null || !mCache.contains(key)) {</span>
+<span class="nc" id="L380">			final String encryptedValue = mDelegate.getString(mHelper.encryptKey(key), Boolean.toString(defValue));</span>
+<span class="nc bnc" id="L381" title="All 2 branches missed.">			if (CryptoHelper.areValuesEqual(encryptedValue, defValue)) {</span>
+<span class="nc" id="L382">				return defValue;</span>
+			}
+<span class="nc" id="L384">			final boolean decryptedValue = Boolean.parseBoolean(mHelper.decryptValue(encryptedValue));</span>
+<span class="nc bnc" id="L385" title="All 2 branches missed.">			if (mCache != null) {</span>
+<span class="nc" id="L386">				mCache.putBoolean(key, decryptedValue);</span>
+			}
+<span class="nc" id="L388">			return decryptedValue;</span>
+		}
+<span class="nc" id="L390">		PreferencesLogging.d(TAG, &quot;Retrieving boolean value for key(&quot; + key + &quot;) from the cache.&quot;);</span>
+<span class="nc" id="L391">		return mCache.getBoolean(key);</span>
+	}
+
+	/**
+	 */
+	@Override
+	@SuppressLint(&quot;CommitPrefEdits&quot;)
+	public SharedPreferences.Editor edit() {
+<span class="nc bnc" id="L399" title="All 2 branches missed.">		if (mEditor == null) {</span>
+<span class="nc" id="L400">			this.mEditor = new CryptoEditor(mHelper, mDelegate.edit());</span>
+<span class="nc" id="L401">			this.mEditor.setCache(mCache);</span>
+		}
+<span class="nc" id="L403">		return mEditor;</span>
+	}
+
+	/*
+	 * Inner classes ===============================================================================
+	 */
+
+	/**
+	 * Builder that may be used to create instances of {@link CryptoSharedPreferences} with a desired
+	 * configuration.
+	 *
+	 * &lt;h3&gt;Required parameters&lt;/h3&gt;
+	 * Parameters specified below are required in order to create a new instance of
+	 * {@link CryptoSharedPreferences} via {@link Builder#build()} successfully.
+	 * &lt;ul&gt;
+	 * &lt;li&gt;{@link #Builder(SharedPreferences)}&lt;/li&gt;
+	 * &lt;li&gt;{@link #valueCrypto(Crypto)}&lt;/li&gt;
+	 * &lt;/ul&gt;
+	 *
+	 * @author Martin Albedinsky
+	 */
+	public static final class Builder {
+
+		/**
+		 * Instance of shared preferences where should be persisted &lt;b&gt;encrypted&lt;/b&gt; preference values.
+		 */
+		final SharedPreferences preferences;
+
+		/**
+		 * Crypto implementation that should be used for &lt;b&gt;encryption&lt;/b&gt; and &lt;b&gt;decryption&lt;/b&gt; of
+		 * preference keys.
+		 */
+		Crypto keyCrypto;
+
+		/**
+		 * Crypto implementation that should be used for &lt;b&gt;encryption&lt;/b&gt; and &lt;b&gt;decryption&lt;/b&gt; of
+		 * preference values.
+		 */
+		Crypto valueCrypto;
+
+		/**
+		 * Cache implementation that should be used to store &lt;b&gt;decrypted&lt;/b&gt; preference values.
+		 */
+		SharedPreferencesCache cache;
+
+		/**
+		 * Creates a new instance of Builder with the given shared &lt;var&gt;preferences&lt;/var&gt; instance.
+		 *
+		 * @param preferences The preferences instance that will be used by {@link CryptoSharedPreferences}
+		 *                    for persistence of &lt;b&gt;encrypted&lt;/b&gt; values.
+		 */
+<span class="nc" id="L454">		public Builder(@NonNull final SharedPreferences preferences) {</span>
+<span class="nc" id="L455">			this.preferences = preferences;</span>
+<span class="nc" id="L456">		}</span>
+
+		/**
+		 * Specifies an implementation of {@link Crypto} that should be used by {@link CryptoSharedPreferences}
+		 * for &lt;b&gt;encryption&lt;/b&gt; and &lt;b&gt;decryption&lt;/b&gt; of preference keys for which are values persisted
+		 * in preferences specified via {@link #Builder(SharedPreferences)}.
+		 * &lt;p&gt;
+		 * &lt;b&gt;Note&lt;/b&gt;, that when key crypto is specified all {@link OnSharedPreferenceChangeListener}
+		 * listeners that are registered via {@link #registerOnSharedPreferenceChangeListener(OnSharedPreferenceChangeListener)}
+		 * will be notified with already &lt;b&gt;decrypted&lt;/b&gt; key of the changed preference. However any
+		 * change listener that is registered directly on the encrypted preferences instance will
+		 * be notified with &lt;b&gt;encrypted&lt;/b&gt; key of the changed preference. It is recommended to
+		 * use registration method of {@link CryptoSharedPreferences} so the listeners do not need
+		 * to deal with decryption of the preference keys nor values.
+		 * &lt;p&gt;
+		 * See &lt;b&gt;Keys Encryption&lt;/b&gt; section in description of {@link CryptoSharedPreferences} for
+		 * more information.
+		 *
+		 * @param crypto The desired crypto implementation. May be {@code null} to not encrypt nor
+		 *               decrypt preference keys.
+		 * @return This builder to allow methods chaining.
+		 * @see #valueCrypto(Crypto)
+		 */
+		public Builder keyCrypto(@Nullable final Crypto crypto) {
+<span class="nc" id="L480">			this.keyCrypto = crypto;</span>
+<span class="nc" id="L481">			return this;</span>
+		}
+
+		// todo: If encryption/decryption of preference keys shows up as a time consuming operation
+		// todo: allow to specify also cache for keys which would map decrypted keys to theirs
+		// todo: encrypted representation so we could possibly encrypt each key only once.
+
+		/**
+		 * Specifies an implementation of {@link Crypto} that should be used by {@link CryptoSharedPreferences}
+		 * for &lt;b&gt;encryption&lt;/b&gt; and &lt;b&gt;decryption&lt;/b&gt; of preference values persisted in preferences
+		 * specified via {@link #Builder(SharedPreferences)}.
+		 * &lt;p&gt;
+		 * If encryption and decryption of preference values shows up as a time consuming operation
+		 * that slows up putting and obtaining of those values from shared preferences a cache may
+		 * be specified via {@link #valueCache(SharedPreferencesCache)}. This cache will be then used
+		 * by {@link CryptoSharedPreferences} for storing of already &lt;b&gt;decrypted&lt;/b&gt; preference values
+		 * so such values may be obtained in a much faster fashion.
+		 * &lt;p&gt;
+		 * See &lt;b&gt;Values Encryption&lt;/b&gt; section in description of {@link CryptoSharedPreferences} for
+		 * more information.
+		 *
+		 * @param crypto The desired crypto implementation to be used for values encryption/decryption.
+		 * @return This builder to allow methods chaining.
+		 * @see #keyCrypto(Crypto)
+		 */
+		public Builder valueCrypto(@NonNull final Crypto crypto) {
+<span class="nc" id="L507">			this.valueCrypto = crypto;</span>
+<span class="nc" id="L508">			return this;</span>
+		}
+
+		/**
+		 * Specifies a cache that should be used by {@link CryptoSharedPreferences} to store already
+		 * &lt;b&gt;decrypted&lt;/b&gt; preference values in order to speed up obtaining process of such values
+		 * from shared preferences.
+		 * &lt;p&gt;
+		 * See &lt;b&gt;Caching&lt;/b&gt; section in description of {@link CryptoSharedPreferences} for more
+		 * information.
+		 *
+		 * @param cache The desired cache for decrypted preference values. May be {@code null} to not
+		 *              cache decrypted values.
+		 * @return This builder to allow methods chaining.
+		 * @see #valueCrypto(Crypto)
+		 */
+		public Builder valueCache(@Nullable final SharedPreferencesCache cache) {
+<span class="nc" id="L525">			this.cache = cache;</span>
+<span class="nc" id="L526">			return this;</span>
+		}
+
+		/**
+		 * Builds a new instance of CryptoSharedPreferences with the configuration specified for
+		 * this builder.
+		 *
+		 * @return Instance of preferences with &lt;b&gt;encryption&lt;/b&gt; and &lt;b&gt;decryption&lt;/b&gt; support ready
+		 * to be used.
+		 * @throws IllegalArgumentException If some of the required parameters is missing.
+		 */
+		@NonNull
+		public CryptoSharedPreferences build() {
+<span class="nc bnc" id="L539" title="All 2 branches missed.">			if (valueCrypto == null) {</span>
+<span class="nc" id="L540">				throw new IllegalArgumentException(&quot;No Crypto implementation for values encryption/decryption specified.&quot;);</span>
+			}
+<span class="nc" id="L542">			return new CryptoSharedPreferences(this);</span>
+		}
+	}
+
+	/**
+	 * Helper used by {@link CryptoSharedPreferences} to perform &lt;b&gt;encryption&lt;/b&gt; and &lt;b&gt;decryption&lt;/b&gt;
+	 * for preference keys and values.
+	 * &lt;p&gt;
+	 * &lt;b&gt;Note&lt;/b&gt;, that this class has not been made final on purpose so it may be easily mocked
+	 * in tests, thought it should not been extended.
+	 */
+	@VisibleForTesting
+	@SuppressWarnings(&quot;WeakerAccess&quot;)
+	static /*final*/ class CryptoHelper {
+
+		/**
+		 * Crypto implementation used to &lt;b&gt;encrypt&lt;/b&gt; and &lt;b&gt;decrypt&lt;/b&gt; preference keys.
+		 */
+		private final Crypto keyCrypto;
+
+		/**
+		 * Crypto implementation used to &lt;b&gt;encrypt&lt;/b&gt; and &lt;b&gt;decrypt&lt;/b&gt; preference values.
+		 */
+		private final Crypto valueCrypto;
+
+		/**
+		 * Creates a new instance of CryptoHelper with the given crypto for values and keys.
+		 *
+		 * @param keyCrypto   The crypto implementation that should be used by the helper to
+		 *                    &lt;b&gt;encrypt&lt;/b&gt; and &lt;b&gt;decrypt&lt;/b&gt; preference keys.
+		 * @param valueCrypto The crypto implementation that should be used by the helper to
+		 *                    &lt;b&gt;encrypt&lt;/b&gt; and &lt;b&gt;decrypt&lt;/b&gt; preference values.
+		 * @see #encryptValue(String)
+		 * @see #decryptKey(String)
+		 * @see #encryptValue(String)
+		 * @see #decryptValue(String)
+		 */
+<span class="fc" id="L579">		CryptoHelper(final Crypto keyCrypto, final Crypto valueCrypto) {</span>
+<span class="fc" id="L580">			this.valueCrypto = valueCrypto;</span>
+<span class="fc" id="L581">			this.keyCrypto = keyCrypto;</span>
+<span class="fc" id="L582">		}</span>
+
+		/**
+		 * Checks whether the given values are equal or not.
+		 *
+		 * @param firstValue  The first value to be checked.
+		 * @param secondValue The second value to be checked.
+		 * @return {@code True} if the given values are equal, {@code false} otherwise.
+		 * @see Object#equals(Object)
+		 */
+		static boolean areValuesEqual(final Object firstValue, final Object secondValue) {
+<span class="nc bnc" id="L593" title="All 4 branches missed.">			return firstValue != null &amp;&amp; firstValue.equals(secondValue);</span>
+		}
+
+		/**
+		 * Performs encryption of the given &lt;var&gt;key&lt;/var&gt; using the key {@link Crypto} specified
+		 * for this helper.
+		 *
+		 * @param key The key to encrypt.
+		 * @return Encrypted key or the same key if this helper does not have key Crypto specified.
+		 * @see #decryptKey(String)
+		 * @see #CryptoHelper(Crypto, Crypto)
+		 * @see Crypto#encrypt(byte[])
+		 */
+		String encryptKey(final String key) {
+<span class="nc bnc" id="L607" title="All 2 branches missed.">			return keyCrypto == null ? key : CryptoUtils.encrypt(key, keyCrypto);</span>
+		}
+
+		/**
+		 * Performs decryption of the given &lt;var&gt;key&lt;/var&gt; using the key {@link Crypto} specified
+		 * for this helper.
+		 *
+		 * @param key The key to decrypt.
+		 * @return Decrypted v or the same key if this helper does not have key Crypto specified.
+		 * @see #encryptKey(String)
+		 * @see #CryptoHelper(Crypto, Crypto)
+		 * @see Crypto#decrypt(byte[])
+		 */
+		String decryptKey(final String key) {
+<span class="pc bpc" id="L621" title="1 of 2 branches missed.">			return keyCrypto == null ? key : CryptoUtils.decrypt(key, keyCrypto);</span>
+		}
+
+		/**
+		 * Performs encryption of the given string &lt;var&gt;value&lt;/var&gt; using the value {@link Crypto}
+		 * specified for this helper.
+		 *
+		 * @param value The value to encrypt.
+		 * @return Encrypted value or the same value if this helper does not have value Crypto specified.
+		 * @see #decryptValue(String)
+		 * @see #CryptoHelper(Crypto, Crypto)
+		 * @see Crypto#encrypt(byte[])
+		 */
+		String encryptValue(final String value) {
+<span class="nc bnc" id="L635" title="All 2 branches missed.">			return valueCrypto == null ? value : CryptoUtils.encrypt(value, valueCrypto);</span>
+		}
+
+		/**
+		 * Performs decryption of the given string &lt;var&gt;value&lt;/var&gt; using the value {@link Crypto}
+		 * specified for this helper.
+		 *
+		 * @param value The value to decrypt.
+		 * @return Decrypted value or the same value if this helper does not have value Crypto specified.
+		 * @see #encryptValuesSet(Set)
+		 * @see #CryptoHelper(Crypto, Crypto)
+		 * @see Crypto#decrypt(byte[])
+		 */
+		String decryptValue(final String value) {
+<span class="nc bnc" id="L649" title="All 2 branches missed.">			return valueCrypto == null ? value : CryptoUtils.decrypt(value, valueCrypto);</span>
+		}
+
+		/**
+		 * Performs encryption of the given set of string &lt;var&gt;values&lt;/var&gt; using the value {@link Crypto}
+		 * specified for this helper.
+		 *
+		 * @param values The set of values to encrypt.
+		 * @return Set of the same size with encrypted values or with the same values if this helper
+		 * does not have value Crypto specified.
+		 * @see #decryptValuesSet(Set)
+		 * @see #CryptoHelper(Crypto, Crypto)
+		 * @see Crypto#encrypt(byte[])
+		 */
+		Set&lt;String&gt; encryptValuesSet(final Set&lt;String&gt; values) {
+<span class="nc bnc" id="L664" title="All 4 branches missed.">			if (valueCrypto == null || values == null) {</span>
+<span class="nc" id="L665">				return null;</span>
+			}
+<span class="nc" id="L667">			final Set&lt;String&gt; encryptedValues = new HashSet&lt;&gt;(values.size());</span>
+<span class="nc bnc" id="L668" title="All 2 branches missed.">			for (final String value : values) {</span>
+<span class="nc" id="L669">				encryptedValues.add(encryptValue(value));</span>
+<span class="nc" id="L670">			}</span>
+<span class="nc" id="L671">			return encryptedValues;</span>
+		}
+
+		/**
+		 * Performs decryption of the given set of string &lt;var&gt;values&lt;/var&gt; using the value {@link Crypto}
+		 * specified for this helper.
+		 *
+		 * @param values The set of values to decrypt.
+		 * @return Set of the same size with decrypted values or with the same values if this helper
+		 * does not have value Crypto specified.
+		 * @see #encryptValuesSet(Set)
+		 * @see #CryptoHelper(Crypto, Crypto)
+		 * @see Crypto#decrypt(byte[])
+		 */
+		Set&lt;String&gt; decryptValuesSet(final Set&lt;String&gt; values) {
+<span class="nc bnc" id="L686" title="All 4 branches missed.">			if (valueCrypto == null || values == null) {</span>
+<span class="nc" id="L687">				return null;</span>
+			}
+<span class="nc" id="L689">			final Set&lt;String&gt; decryptedValues = new HashSet&lt;&gt;(values.size());</span>
+<span class="nc bnc" id="L690" title="All 2 branches missed.">			for (final String value : values) {</span>
+<span class="nc" id="L691">				decryptedValues.add(decryptValue(value));</span>
+<span class="nc" id="L692">			}</span>
+<span class="nc" id="L693">			return decryptedValues;</span>
+		}
+	}
+
+	/**
+	 * A {@link SharedPreferences.Editor} implementation for {@link CryptoSharedPreferences} that
+	 * performs keys &lt;b&gt;encryption&lt;/b&gt; along with values &lt;b&gt;encryption&lt;/b&gt; whenever one of its
+	 * {@code put...(...)} method is called.
+	 */
+	@VisibleForTesting
+	@SuppressWarnings(&quot;WeakerAccess&quot;)
+	static final class CryptoEditor implements SharedPreferences.Editor {
+
+		/**
+		 * Helper used by this crypto editor to perform &lt;b&gt;encryption&lt;/b&gt; of keys along with
+		 * &lt;b&gt;encryption&lt;/b&gt; of values passed via one of {@code put...(...)} methods.
+		 */
+		private final CryptoHelper helper;
+
+		/**
+		 * Editor to which will this crypto editor delegate all its calls after it has performed all
+		 * necessary cryptographic operations.
+		 */
+		private final SharedPreferences.Editor delegate;
+
+		/**
+		 * Cache that is used to store decrypted preference values.
+		 */
+		private SharedPreferencesCache cache;
+
+		/**
+		 * Creates a new instance of CryptoEditor with the given &lt;var&gt;helper&lt;/var&gt; and preferences
+		 * editor &lt;var&gt;delegate&lt;/var&gt;.
+		 *
+		 * @param helper   Helper used for cryptographic operations.
+		 * @param delegate Editor to which should the new crypto editor delegate its calls after all
+		 *                 cryptographic operations has been performed.
+		 */
+<span class="fc" id="L731">		CryptoEditor(final CryptoHelper helper, final SharedPreferences.Editor delegate) {</span>
+<span class="fc" id="L732">			this.delegate = delegate;</span>
+<span class="fc" id="L733">			this.helper = helper;</span>
+<span class="fc" id="L734">		}</span>
+
+		/**
+		 * Sets a cache that is used to store decrypted preference values. The given &lt;var&gt;cache&lt;/var&gt;
+		 * will be used by this editor to invalidate values stored in that cache for each key of which
+		 * value will be updated by this editor via one of {@code put...(...)} methods.
+		 *
+		 * @param cache The cache used by the parent crypto preferences.
+		 * @see #invalidateCachedValue(String)
+		 */
+		void setCache(final SharedPreferencesCache cache) {
+<span class="nc" id="L745">			this.cache = cache;</span>
+<span class="nc" id="L746">		}</span>
+
+		/**
+		 * Invalidates value associated with the specified &lt;var&gt;key&lt;/var&gt; stored in the cache that
+		 * is attached to this editor via {@link #setCache(SharedPreferencesCache)}.
+		 *
+		 * @param key The key for which to invalidate/evict its associated value from the cache.
+		 */
+		private void invalidateCachedValue(final String key) {
+<span class="pc bpc" id="L755" title="1 of 2 branches missed.">			if (cache != null) cache.evict(key);</span>
+<span class="fc" id="L756">		}</span>
+
+		/**
+		 */
+		@Override
+		public SharedPreferences.Editor putString(final String key, @Nullable final String value) {
+<span class="fc" id="L762">			this.invalidateCachedValue(key);</span>
+<span class="fc" id="L763">			delegate.putString(helper.encryptKey(key), helper.encryptValue(value));</span>
+<span class="fc" id="L764">			return this;</span>
+		}
+
+		/**
+		 */
+		@Override
+		public Editor putStringSet(final String key, @Nullable final Set&lt;String&gt; values) {
+<span class="pc bpc" id="L771" title="1 of 2 branches missed.">			if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.HONEYCOMB) {</span>
+<span class="fc" id="L772">				this.invalidateCachedValue(key);</span>
+<span class="fc" id="L773">				delegate.putStringSet(helper.encryptKey(key), helper.encryptValuesSet(values));</span>
+			}
+<span class="fc" id="L775">			return this;</span>
+		}
+
+		/**
+		 */
+		@Override
+		public SharedPreferences.Editor putInt(final String key, final int value) {
+<span class="fc" id="L782">			this.invalidateCachedValue(key);</span>
+<span class="fc" id="L783">			delegate.putString(helper.encryptKey(key), helper.encryptValue(Integer.toString(value)));</span>
+<span class="fc" id="L784">			return this;</span>
+		}
+
+		/**
+		 */
+		@Override
+		public SharedPreferences.Editor putLong(final String key, final long value) {
+<span class="fc" id="L791">			this.invalidateCachedValue(key);</span>
+<span class="fc" id="L792">			delegate.putString(helper.encryptKey(key), helper.encryptValue(Long.toString(value)));</span>
+<span class="fc" id="L793">			return this;</span>
+		}
+
+		/**
+		 */
+		@Override
+		public SharedPreferences.Editor putFloat(final String key, final float value) {
+<span class="fc" id="L800">			this.invalidateCachedValue(key);</span>
+<span class="fc" id="L801">			delegate.putString(helper.encryptKey(key), helper.encryptValue(Float.toString(value)));</span>
+<span class="fc" id="L802">			return this;</span>
+		}
+
+		/**
+		 */
+		@Override
+		public SharedPreferences.Editor putBoolean(final String key, final boolean value) {
+<span class="fc" id="L809">			this.invalidateCachedValue(key);</span>
+<span class="fc" id="L810">			delegate.putString(helper.encryptKey(key), helper.encryptValue(Boolean.toString(value)));</span>
+<span class="fc" id="L811">			return this;</span>
+		}
+
+		/**
+		 */
+		@Override
+		public SharedPreferences.Editor remove(final String key) {
+<span class="fc" id="L818">			delegate.remove(key);</span>
+<span class="fc" id="L819">			return this;</span>
+		}
+
+		/**
+		 */
+		@Override
+		public SharedPreferences.Editor clear() {
+<span class="fc" id="L826">			delegate.clear();</span>
+<span class="fc" id="L827">			return this;</span>
+		}
+
+		/**
+		 */
+		@Override
+		public boolean commit() {
+<span class="fc" id="L834">			return delegate.commit();</span>
+		}
+
+		/**
+		 */
+		@Override
+		public void apply() {
+<span class="pc bpc" id="L841" title="1 of 2 branches missed.">			if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.GINGERBREAD) {</span>
+<span class="fc" id="L842">				delegate.apply();</span>
+			}
+<span class="fc" id="L844">		}</span>
+	}
+
+	/**
+	 * Registry for {@link OnSharedPreferenceChangeListener} used to properly dispatch preference
+	 * change callbacks with decrypted keys.
+	 */
+	@VisibleForTesting
+	@SuppressWarnings(&quot;WeakerAccess&quot;)
+	static final class ChangeListeners implements OnSharedPreferenceChangeListener {
+
+		/**
+		 * Helper used to decrypt encrypted keys for changed preferences.
+		 */
+		private final CryptoHelper helper;
+
+		/**
+		 * Instance of shared preferences that should be dispatched in
+		 * {@link OnSharedPreferenceChangeListener#onSharedPreferenceChanged(SharedPreferences, String)}
+		 * callback along with decrypted key.
+		 */
+		private final SharedPreferences preferences;
+
+		/**
+		 * List of registered {@link OnSharedPreferenceChangeListener}.
+		 */
+<span class="fc" id="L870">		private final List&lt;OnSharedPreferenceChangeListener&gt; listeners = new ArrayList&lt;&gt;(2);</span>
+
+		/**
+		 * Creates a new instance of ChangeListeners with the given &lt;var&gt;helper&lt;/var&gt;.
+		 *
+		 * @param helper      Helper used for cryptographic operations.
+		 * @param preferences Preferences that should be dispatched in callback of registered change
+		 *                    listeners along with decrypted key.
+		 */
+<span class="fc" id="L879">		ChangeListeners(final CryptoHelper helper, final SharedPreferences preferences) {</span>
+<span class="fc" id="L880">			this.helper = helper;</span>
+<span class="fc" id="L881">			this.preferences = preferences;</span>
+<span class="fc" id="L882">		}</span>
+
+		/**
+		 * Adds the given &lt;var&gt;listener&lt;/var&gt; into this registry of {@link OnSharedPreferenceChangeListener listeners}.
+		 *
+		 * @param listener The desired listener to register.
+		 * @see #unregister(OnSharedPreferenceChangeListener)
+		 */
+		void register(final OnSharedPreferenceChangeListener listener) {
+<span class="fc" id="L891">			synchronized (listeners) {</span>
+<span class="fc bfc" id="L892" title="All 2 branches covered.">				if (!listeners.contains(listener)) listeners.add(listener);</span>
+<span class="pc" id="L893">			}</span>
+<span class="fc" id="L894">		}</span>
+
+		/**
+		 * Removes the given &lt;var&gt;listener&lt;/var&gt; from this registry of {@link OnSharedPreferenceChangeListener listeners}.
+		 *
+		 * @param listener The desired listener to un-register.
+		 * @see #register(OnSharedPreferenceChangeListener)
+		 */
+		void unregister(final OnSharedPreferenceChangeListener listener) {
+<span class="fc" id="L903">			synchronized (listeners) {</span>
+<span class="fc" id="L904">				listeners.remove(listener);</span>
+<span class="pc" id="L905">			}</span>
+<span class="fc" id="L906">		}</span>
+
+		/**
+		 * Checks whether this listeners registry is empty or not.
+		 *
+		 * @return {@code True} if there are no listeners registered, {@code false} if there is at
+		 * least one listener registered.
+		 */
+		boolean isEmpty() {
+<span class="fc" id="L915">			return listeners.isEmpty();</span>
+		}
+
+		/**
+		 */
+		@Override
+		public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences, final String key) {
+<span class="fc" id="L922">			synchronized (listeners) {</span>
+<span class="fc bfc" id="L923" title="All 2 branches covered.">				if (!listeners.isEmpty()) {</span>
+<span class="fc" id="L924">					final String decryptedKey = helper.decryptKey(key);</span>
+<span class="fc bfc" id="L925" title="All 2 branches covered.">					for (final OnSharedPreferenceChangeListener listener : listeners) {</span>
+<span class="fc" id="L926">						listener.onSharedPreferenceChanged(preferences, decryptedKey);</span>
+<span class="fc" id="L927">					}</span>
+				}
+<span class="pc" id="L929">			}</span>
+<span class="fc" id="L930">		}</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span>Generated by the Android Gradle plugin 2.3.0</div></body></html>

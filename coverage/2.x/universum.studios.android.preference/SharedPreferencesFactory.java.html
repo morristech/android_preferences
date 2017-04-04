@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>SharedPreferencesFactory.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debugAndroidTest</a> &gt; <a href="index.source.html" class="el_package">universum.studios.android.preference</a> &gt; <span class="el_source">SharedPreferencesFactory.java</span></div><h1>SharedPreferencesFactory.java</h1><pre class="source lang-java linenums">/*
+ * =================================================================================================
+ *                             Copyright (C) 2017 Universum Studios
+ * =================================================================================================
+ *         Licensed under the Apache License, Version 2.0 or later (further &quot;License&quot; only).
+ * -------------------------------------------------------------------------------------------------
+ * You may use this file only in compliance with the License. More details and copy of this License 
+ * you may obtain at
+ * 
+ * 		http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * You can redistribute, modify or publish any part of the code written within this file but as it 
+ * is described in the License, the software distributed under the License is distributed on an 
+ * &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES or CONDITIONS OF ANY KIND.
+ * 
+ * See the License for the specific language governing permissions and limitations under the License.
+ * =================================================================================================
+ */
+package universum.studios.android.preference;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
+
+/**
+ * Simple interface for factories that may be used to create instances of {@link SharedPreferences}.
+ *
+ * @author Martin Albedinsky
+ */
+public interface SharedPreferencesFactory {
+
+	/*
+	 * Constants ===================================================================================
+	 */
+
+	/**
+	 * A {@link SharedPreferencesFactory} which may be used to create default shared preferences.
+	 *
+	 * @see PreferenceManager#getDefaultSharedPreferences(Context)
+	 */
+<span class="nc" id="L42">	SharedPreferencesFactory DEFAULT = new SharedPreferencesFactory() {</span>
+
+		/**
+		 */
+		@NonNull
+		@Override
+		public SharedPreferences createPreferences(@NonNull final Context context) {
+<span class="nc" id="L49">			return PreferenceManager.getDefaultSharedPreferences(context);</span>
+		}
+	};
+
+	/*
+	 * Methods =====================================================================================
+	 */
+
+	/**
+	 * Creates a new instance of SharedPreferences for the given &lt;var&gt;context&lt;/var&gt;.
+	 *
+	 * @param context Context used to create shared preferences.
+	 * @return Instance of SharedPreferences with name and file creation mode specific for implementation
+	 * of this factory.
+	 * @see Context#getSharedPreferences(String, int)
+	 */
+	@NonNull
+	SharedPreferences createPreferences(@NonNull Context context);
+
+	/*
+	 * Inner classes ===============================================================================
+	 */
+
+	/**
+	 * A simple implementation of {@link SharedPreferencesFactory} which may be used to create
+	 * instances of {@link SharedPreferences} with a desired name and file creation mode via either
+	 * {@link #SimpleFactory(String)} or {@link #SimpleFactory(String, int)}.
+	 *
+	 * @author Martin Albedinsky
+	 */
+	class SimpleFactory implements SharedPreferencesFactory {
+
+		/**
+		 * Name for the preferences file.
+		 */
+		private final String fileName;
+
+		/**
+		 * File creation mode for the preferences file.
+		 */
+		private final int fileMode;
+
+		/**
+		 * Creates a new instance of SimpleFactory with the specified &lt;var&gt;fileName&lt;/var&gt; and
+		 * {@link SharedPreferencesPolicy#FILE_MODE_PRIVATE)} as file mode for preferences file.
+		 *
+		 * @param fileName The desired name for preferences file.
+		 * @see #SimpleFactory(String, int)
+		 */
+		public SimpleFactory(@NonNull final String fileName) {
+<span class="nc" id="L99">			this(fileName, SharedPreferencesPolicy.FILE_MODE_PRIVATE);</span>
+<span class="nc" id="L100">		}</span>
+
+		/**
+		 * Creates a new instance of SimpleFactory with the specified &lt;var&gt;fileName&lt;/var&gt; and
+		 * &lt;var&gt;fileMode&lt;/var&gt; for preferences file.
+		 *
+		 * @param fileName The desired name for preferences file.
+		 * @param fileMode The desired creation mode for preferences file.
+		 */
+<span class="nc" id="L109">		public SimpleFactory(@NonNull final String fileName, @SharedPreferencesPolicy.FileMode final int fileMode) {</span>
+<span class="nc" id="L110">			this.fileName = fileName;</span>
+<span class="nc" id="L111">			this.fileMode = fileMode;</span>
+<span class="nc" id="L112">		}</span>
+
+		/**
+		 */
+		@NonNull
+		@Override
+		public SharedPreferences createPreferences(@NonNull final Context context) {
+<span class="nc" id="L119">			return context.getSharedPreferences(fileName, fileMode);</span>
+		}
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span>Generated by the Android Gradle plugin 2.3.0</div></body></html>

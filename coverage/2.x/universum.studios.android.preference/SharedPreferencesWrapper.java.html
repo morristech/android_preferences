@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>SharedPreferencesWrapper.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debugAndroidTest</a> &gt; <a href="index.source.html" class="el_package">universum.studios.android.preference</a> &gt; <span class="el_source">SharedPreferencesWrapper.java</span></div><h1>SharedPreferencesWrapper.java</h1><pre class="source lang-java linenums">/*
+ * =================================================================================================
+ *                             Copyright (C) 2017 Universum Studios
+ * =================================================================================================
+ *         Licensed under the Apache License, Version 2.0 or later (further &quot;License&quot; only).
+ * -------------------------------------------------------------------------------------------------
+ * You may use this file only in compliance with the License. More details and copy of this License 
+ * you may obtain at
+ * 
+ * 		http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * You can redistribute, modify or publish any part of the code written within this file but as it 
+ * is described in the License, the software distributed under the License is distributed on an 
+ * &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES or CONDITIONS OF ANY KIND.
+ * 
+ * See the License for the specific language governing permissions and limitations under the License.
+ * =================================================================================================
+ */
+package universum.studios.android.preference;
+
+import android.content.SharedPreferences;
+import android.os.Build;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
+import java.util.Map;
+import java.util.Set;
+
+/**
+ * A {@link SharedPreferences} implementation which may be used to wrap an instance of {@link SharedPreferences}.
+ * This wrapper class simply delegates all its calls to the wrapped preferences instance.
+ *
+ * @author Martin Albedinsky
+ */
+public class SharedPreferencesWrapper implements SharedPreferences {
+
+	/*
+	 * Constants ===================================================================================
+	 */
+
+	/**
+	 * Log TAG.
+	 */
+	// private static final String TAG = &quot;SharedPreferencesWrapper&quot;;
+
+	/*
+	 * Interface ===================================================================================
+	 */
+
+	/*
+	 * Static members ==============================================================================
+	 */
+
+	/*
+	 * Members =====================================================================================
+	 */
+
+	/**
+	 * Wrapped instance of SharedPreferences to which is this wrapper delegating all its calls.
+	 */
+	private final SharedPreferences mPreferences;
+
+	/*
+	 * Constructors ================================================================================
+	 */
+
+	/**
+	 * Creates a new instance of SharedPreferencesWrapper in order to wrap the given &lt;var&gt;preferences&lt;/var&gt;
+	 * instance.
+	 *
+	 * @param preferences The shared preferences to be wrapped.
+	 */
+<span class="fc" id="L73">	public SharedPreferencesWrapper(@NonNull final SharedPreferences preferences) {</span>
+<span class="fc" id="L74">		this.mPreferences = preferences;</span>
+<span class="fc" id="L75">	}</span>
+
+	/*
+	 * Methods =====================================================================================
+	 */
+
+	/**
+	 * Returns the wrapped SharedPreferences instance.
+	 *
+	 * @return Instance of SharedPreferences that are wrapped by this preferences wrapper.
+	 */
+	@NonNull
+	public final SharedPreferences getWrappedPreferences() {
+<span class="fc" id="L88">		return mPreferences;</span>
+	}
+
+	/**
+	 */
+	@Override
+	public void registerOnSharedPreferenceChangeListener(@NonNull final OnSharedPreferenceChangeListener listener) {
+<span class="fc" id="L95">		mPreferences.registerOnSharedPreferenceChangeListener(listener);</span>
+<span class="fc" id="L96">	}</span>
+
+	/**
+	 */
+	@Override
+	public void unregisterOnSharedPreferenceChangeListener(@NonNull final OnSharedPreferenceChangeListener listener) {
+<span class="fc" id="L102">		mPreferences.unregisterOnSharedPreferenceChangeListener(listener);</span>
+<span class="fc" id="L103">	}</span>
+
+	/**
+	 */
+	@Override
+	public Map&lt;String, ?&gt; getAll() {
+<span class="fc" id="L109">		return mPreferences.getAll();</span>
+	}
+
+	/**
+	 */
+	@Override
+	public boolean contains(@NonNull final String key) {
+<span class="fc" id="L116">		return mPreferences.contains(key);</span>
+	}
+
+	/**
+	 */
+	@Nullable
+	@Override
+	public String getString(@NonNull final String key, @Nullable final String defValue) {
+<span class="fc" id="L124">		return mPreferences.getString(key, defValue);</span>
+	}
+
+	/**
+	 * &lt;b&gt;Note&lt;/b&gt;, that for pre {@link Build.VERSION_CODES#HONEYCOMB HONEYCOMB} Android versions
+	 * this method does nothing and always returns {@code null}.
+	 */
+	@Nullable
+	@Override
+	public Set&lt;String&gt; getStringSet(@NonNull final String key, @Nullable final Set&lt;String&gt; defValues) {
+<span class="pc bpc" id="L134" title="1 of 2 branches missed.">		return Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.HONEYCOMB ? mPreferences.getStringSet(key, defValues) : null;</span>
+	}
+
+	/**
+	 */
+	@Override
+	public int getInt(@NonNull final String key, final int defValue) {
+<span class="fc" id="L141">		return mPreferences.getInt(key, defValue);</span>
+	}
+
+	/**
+	 */
+	@Override
+	public long getLong(@NonNull final String key, final long defValue) {
+<span class="fc" id="L148">		return mPreferences.getLong(key, defValue);</span>
+	}
+
+	/**
+	 */
+	@Override
+	public float getFloat(@NonNull final String key, final float defValue) {
+<span class="fc" id="L155">		return mPreferences.getFloat(key, defValue);</span>
+	}
+
+	/**
+	 */
+	@Override
+	public boolean getBoolean(@NonNull final String key, final boolean defValue) {
+<span class="fc" id="L162">		return mPreferences.getBoolean(key, defValue);</span>
+	}
+
+	/**
+	 */
+	@NonNull
+	@Override
+	public Editor edit() {
+<span class="fc" id="L170">		return mPreferences.edit();</span>
+	}
+
+	/*
+	 * Inner classes ===============================================================================
+	 */
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span>Generated by the Android Gradle plugin 2.3.0</div></body></html>
