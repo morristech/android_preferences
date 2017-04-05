@@ -140,7 +140,7 @@ public abstract class SharedPreference<T> {
 	}
 
 	/**
-	 * <b>This constructor has been deprecated and will be removed in the next release.</b>
+	 * <b>This constructor has been deprecated and will be removed in the next none-beta release.</b>
 	 * <p>
 	 * Creates a new instance of SharedPreference with the given key resource and default value.
 	 *
@@ -176,7 +176,7 @@ public abstract class SharedPreference<T> {
 	}
 
 	/**
-	 * <b>This method has been deprecated and will be removed in the next release.</b>
+	 * <b>This method has been deprecated and will be removed in the next none-beta release.</b>
 	 * <p>
 	 * Return the resource id of the key of this preference.
 	 *
@@ -190,7 +190,7 @@ public abstract class SharedPreference<T> {
 	}
 
 	/**
-	 * <b>This method has been deprecated and will be removed in the next release.</b>
+	 * <b>This method has been deprecated and will be removed in the next none-beta release.</b>
 	 * <p>
 	 * Attaches the key for this preference from the given resources using the current key's resource
 	 * id specified via {@link #SharedPreference(int, Object)}.
@@ -351,7 +351,7 @@ public abstract class SharedPreference<T> {
 	protected abstract T onGetFromPreferences(@NonNull SharedPreferences preferences);
 
 	/**
-	 * <b>This method has been deprecated and will be removed in the next release.</b>
+	 * <b>This method has been deprecated and will be removed in the next none-beta release.</b>
 	 * <p>
 	 * Retrieves the current value of this preference from the given shared preferences.
 	 *
@@ -368,7 +368,7 @@ public abstract class SharedPreference<T> {
 	}
 
 	/**
-	 * <b>This method has been deprecated and will be removed in the next release.</b>
+	 * <b>This method has been deprecated and will be removed in the next none-beta release.</b>
 	 * <p>
 	 * Ensures that the key of this preference is valid (not empty). If not throws an IllegalStateException.
 	 *
@@ -386,7 +386,7 @@ public abstract class SharedPreference<T> {
 	}
 
 	/**
-	 * <b>This method has been deprecated and will be removed in the next release.</b>
+	 * <b>This method has been deprecated and will be removed in the next none-beta release.</b>
 	 * <p>
 	 * Saves the current value of this preference into the given shared preferences.
 	 *

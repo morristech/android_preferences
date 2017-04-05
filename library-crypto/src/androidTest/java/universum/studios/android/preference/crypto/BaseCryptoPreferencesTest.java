@@ -41,7 +41,7 @@ abstract class BaseCryptoPreferencesTest extends BaseInstrumentedTest {
 		super.beforeTest();
 		this.mPreferences = mContext.getSharedPreferences(
 				mContext.getPackageName() + ":test_crypto_preferences",
-				SharedPreferencesPolicy.FILE_MODE_PRIVATE
+				SharedPreferencesPolicy.MODE_PRIVATE
 		);
 		this.mPreferencesFacade = new SimpleSharedPreferencesFacade.Builder<SimpleSharedPreferencesFacade.Builder>()
 				.preferences(mPreferences)

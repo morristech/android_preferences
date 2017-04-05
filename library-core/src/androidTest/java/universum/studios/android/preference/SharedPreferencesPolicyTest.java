@@ -45,8 +45,8 @@ public final class SharedPreferencesPolicyTest extends BaseInstrumentedTest {
 
 	@Test
 	public void testFileModes() {
-		assertThat(SharedPreferencesPolicy.FILE_MODE_PRIVATE, is(Context.MODE_PRIVATE));
-		assertThat(SharedPreferencesPolicy.FILE_MODE_APPEND, is(Context.MODE_APPEND));
+		assertThat(SharedPreferencesPolicy.MODE_PRIVATE, is(Context.MODE_PRIVATE));
+		assertThat(SharedPreferencesPolicy.MODE_APPEND, is(Context.MODE_APPEND));
 	}
 
 	@Test

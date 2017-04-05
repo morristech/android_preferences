@@ -27,7 +27,7 @@ import android.support.annotation.StringRes;
 import java.util.List;
 
 /**
- * <b>This class has been deprecated and will be removed in the next release.</b>
+ * <b>This class has been deprecated and will be removed in the next none-beta release.</b>
  * <p>
  * A {@link SharedPreference} implementation that may be used to persist a {@link List} of values
  * via {@link SharedPreferences}.
@@ -65,7 +65,7 @@ public final class ListPreference<T> extends SharedPreference<List<T>> {
 	}
 
 	/**
-	 * <b>This constructor has been deprecated and will be removed in the next release.</b>
+	 * <b>This constructor has been deprecated and will be removed in the next none-beta release.</b>
 	 * <p>
 	 * Creates a new instance of ListPreference.
 	 *
