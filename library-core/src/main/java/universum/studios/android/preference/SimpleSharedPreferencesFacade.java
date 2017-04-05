@@ -67,13 +67,26 @@ public class SimpleSharedPreferencesFacade implements SharedPreferencesFacade {
 	 */
 
 	/**
+	 * <b>This constructor has been deprecated and will be removed in the next none-beta release.</b>
+	 * <p>
 	 * Creates a new instance of SimpleSharedPreferencesFacade with configuration provided by the
 	 * specified <var>builder</var>.
 	 *
 	 * @param builder The builder used to configure the new preferences facade.
+	 * @deprecated Use {@link #SimpleSharedPreferencesFacade(SharedPreferences)} instead.
 	 */
+	@Deprecated
 	protected SimpleSharedPreferencesFacade(@NonNull Builder builder) {
-		this.mPreferences = builder.preferences;
+		this(builder.preferences);
+	}
+
+	/**
+	 * Creates a new instance of SimpleSharedPreferencesFacade for the specified <var>preferences</var>.
+	 *
+	 * @param preferences The instance of shared preferences to hide behind the new facade.
+	 */
+	public SimpleSharedPreferencesFacade(@NonNull final SharedPreferences preferences) {
+		this.mPreferences = preferences;
 	}
 
 	/*
@@ -84,7 +97,7 @@ public class SimpleSharedPreferencesFacade implements SharedPreferencesFacade {
 	 * Returns the {@link SharedPreferences} that are hidden behind this facade.
 	 *
 	 * @return The associated preferences.
-	 * @see Builder#preferences(SharedPreferences)
+	 * @see #SimpleSharedPreferencesFacade(SharedPreferences)
 	 */
 	@NonNull
 	public final SharedPreferences getPreferences() {
@@ -228,6 +241,8 @@ public class SimpleSharedPreferencesFacade implements SharedPreferencesFacade {
 	 */
 
 	/**
+	 * <b>This class has been deprecated and will be removed in the next none-beta release.</b>
+	 * <p>
 	 * Builder that may be used to create instances of {@link SimpleSharedPreferencesFacade} which
 	 * hide a desired shared <var>preferences</var> instance in order to support simple <var>putting</var>
 	 * and <var>obtaining</var> of values stored in such preferences.
@@ -241,7 +256,9 @@ public class SimpleSharedPreferencesFacade implements SharedPreferencesFacade {
 	 *
 	 * @param <B> Type of the builder used for methods chaining.
 	 * @author Martin Albedinsky
+	 * @deprecated Use {@link #SimpleSharedPreferencesFacade(SharedPreferences)} instead.
 	 */
+	@Deprecated
 	public static class Builder<B> {
 
 		/**
