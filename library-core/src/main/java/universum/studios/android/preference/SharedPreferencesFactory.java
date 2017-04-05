@@ -90,13 +90,13 @@ public interface SharedPreferencesFactory {
 
 		/**
 		 * Creates a new instance of SimpleFactory with the specified <var>fileName</var> and
-		 * {@link SharedPreferencesPolicy#FILE_MODE_PRIVATE)} as file mode for preferences file.
+		 * {@link SharedPreferencesPolicy#MODE_PRIVATE)} as file mode for preferences file.
 		 *
 		 * @param fileName The desired name for preferences file.
 		 * @see #SimpleFactory(String, int)
 		 */
 		public SimpleFactory(@NonNull final String fileName) {
-			this(fileName, SharedPreferencesPolicy.FILE_MODE_PRIVATE);
+			this(fileName, SharedPreferencesPolicy.MODE_PRIVATE);
 		}
 
 		/**
@@ -106,7 +106,7 @@ public interface SharedPreferencesFactory {
 		 * @param fileName The desired name for preferences file.
 		 * @param fileMode The desired creation mode for preferences file.
 		 */
-		public SimpleFactory(@NonNull final String fileName, @SharedPreferencesPolicy.FileMode final int fileMode) {
+		public SimpleFactory(@NonNull final String fileName, @SharedPreferencesPolicy.Mode final int fileMode) {
 			this.fileName = fileName;
 			this.fileMode = fileMode;
 		}

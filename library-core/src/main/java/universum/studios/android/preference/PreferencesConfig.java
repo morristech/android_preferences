@@ -21,7 +21,7 @@ package universum.studios.android.preference;
 import android.util.Log;
 
 /**
- * <b>This class has been deprecated and will be removed in the next release.</b>
+ * <b>This class has been deprecated and will be removed in the next none-beta release.</b>
  * <p>
  * Configuration options for the Preferences library.
  *

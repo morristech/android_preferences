@@ -51,7 +51,7 @@ public final class BooleanPreference extends SharedPreference<Boolean> {
 	}
 
 	/**
-	 * <b>This constructor has been deprecated and will be removed in the next release.</b>
+	 * <b>This constructor has been deprecated and will be removed in the next none-beta release.</b>
 	 * <p>
 	 * Creates a new instance of BooleanPreference.
 	 *

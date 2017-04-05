@@ -204,7 +204,7 @@ public final class CryptoSharedPreferences implements SharedPreferences {
 	 *
 	 * @param builder The builder used to configure the new crypto preferences.
 	 */
-	private CryptoSharedPreferences(final Builder builder) {
+	CryptoSharedPreferences(final Builder builder) {
 		this.mDelegate = builder.preferences;
 		this.mHelper = new CryptoHelper(builder.keyCrypto, builder.valueCrypto);
 		this.mChangeListeners = new ChangeListeners(mHelper, this);

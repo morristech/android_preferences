@@ -64,7 +64,7 @@ public final class CollectionPreference<T> extends SharedPreference<Collection<T
 	}
 
 	/**
-	 * <b>This constructor has been deprecated and will be removed in the next release.</b>
+	 * <b>This constructor has been deprecated and will be removed in the next none-beta release.</b>
 	 * <p>
 	 * Creates a new instance of ListPreference.
 	 *

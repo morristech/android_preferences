@@ -45,17 +45,48 @@ public final class SharedPreferencesPolicy {
 	/**
 	 * Copied flag from {@link Context#MODE_PRIVATE}.
 	 */
-	public static final int FILE_MODE_PRIVATE = Context.MODE_PRIVATE;
+	public static final int MODE_PRIVATE = Context.MODE_PRIVATE;
+
+	/**
+	 * Copied flag from {@link Context#MODE_PRIVATE}.
+	 *
+	 * @deprecated Use {@link #MODE_PRIVATE} instead.
+	 */
+	@Deprecated
+	public static final int FILE_MODE_PRIVATE = MODE_PRIVATE;
 
 	/**
 	 * Copied flag from {@link Context#MODE_APPEND}.
 	 */
-	public static final int FILE_MODE_APPEND = Context.MODE_APPEND;
+	public static final int MODE_APPEND = Context.MODE_APPEND;
+
+	/**
+	 * Copied flag from {@link Context#MODE_APPEND}.
+	 *
+	 * @deprecated Use {@link #MODE_APPEND} instead.
+	 */
+	@Deprecated
+	public static final int FILE_MODE_APPEND = MODE_APPEND;
 
 	/**
 	 * Defines an annotation for determining allowed file creation modes for {@code SharedPreferences}
 	 * file.
 	 */
+	@IntDef(flag = true, value = {
+			MODE_PRIVATE,
+			MODE_APPEND
+	})
+	@Retention(RetentionPolicy.SOURCE)
+	public @interface Mode {
+	}
+
+	/**
+	 * Defines an annotation for determining allowed file creation modes for {@code SharedPreferences}
+	 * file.
+	 *
+	 * @deprecated Use {@link Mode} instead.
+	 */
+	@Deprecated
 	@IntDef(flag = true, value = {
 			FILE_MODE_PRIVATE,
 			FILE_MODE_APPEND
