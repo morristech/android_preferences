@@ -20,19 +20,14 @@ package universum.studios.android.preference;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
-import android.text.TextUtils;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.util.Set;
 
 /**
- * Manager which implements {@link SharedPreferencesFacade} along with {@link SharedPreferencesHost}
+ * Manager which implements {@link SharedPreferencesFacade} along with {@link SharedPreferencesProvider}
  * in order to provide a simple API for putting and obtaining of values persisted within {@link SharedPreferences}.
  *
  * <h3>Shared preferences</h3>
@@ -70,7 +65,7 @@ import java.util.Set;
  *
  * @author Martin Albedinsky
  */
-public class PreferencesManager implements SharedPreferencesFacade, SharedPreferencesHost {
+public class PreferencesManager implements SharedPreferencesFacade, SharedPreferencesProvider {
 
 	/*
 	 * Constants ===================================================================================
@@ -80,59 +75,6 @@ public class PreferencesManager implements SharedPreferencesFacade, SharedPrefer
 	 * Log TAG.
 	 */
 	// private static final String TAG = "PreferencesManager";
-
-	/**
-	 * <b>This constant has been deprecated and will be removed in the next none-beta release.</b>
-	 * <p>
-	 * Wrapped mode: {@link Context#MODE_PRIVATE}
-	 *
-	 * @deprecated Use {@link SharedPreferencesPolicy#MODE_PRIVATE} instead.
-	 */
-	@Deprecated
-	public static final int MODE_PRIVATE = Context.MODE_PRIVATE;
-
-	/**
-	 * <b>This constant has been deprecated and will be removed in the next none-beta release.</b>
-	 * <p>
-	 * Wrapped mode: {@link Context#MODE_MULTI_PROCESS}
-	 *
-	 * @deprecated Deprecated due to deprecation in the framework. See {@link Context#MODE_MULTI_PROCESS}.
-	 */
-	@Deprecated
-	public static final int MODE_MULTI_PROCESS = 0x0004;
-
-	/**
-	 * <b>This constant has been deprecated and will be removed in the next none-beta release.</b>
-	 * <p>
-	 * Wrapped mode: {@link Context#MODE_ENABLE_WRITE_AHEAD_LOGGING}
-	 *
-	 * @deprecated This flag is appropriate only for database files.
-	 */
-	@Deprecated
-	public static final int MODE_ENABLE_WRITE_AHEAD_LOGGING = 0x0008;
-
-	/**
-	 * <b>This constant has been deprecated and will be removed in the next none-beta release.</b>
-	 * <p>
-	 * Wrapped mode: {@link Context#MODE_APPEND}
-	 *
-	 * @deprecated Use {@link SharedPreferencesPolicy#MODE_APPEND} instead.
-	 */
-	@Deprecated
-	public static final int MODE_APPEND = Context.MODE_APPEND;
-
-	/**
-	 * <b>This annotation has been deprecated and will be removed in the next none-beta release.</b>
-	 * <p>
-	 * Defines an annotation for determining set of allowed flags for {@link #setMode(int)} method.
-	 *
-	 * @deprecated Use {@link SharedPreferencesPolicy.Mode @SharedPreferencesPolicy.FileMode} instead.
-	 */
-	@Retention(RetentionPolicy.SOURCE)
-	@IntDef({MODE_PRIVATE, MODE_MULTI_PROCESS, MODE_ENABLE_WRITE_AHEAD_LOGGING, MODE_APPEND})
-	@Deprecated
-	public @interface Mode {
-	}
 
 	/*
 	 * Interface ===================================================================================
@@ -151,9 +93,7 @@ public class PreferencesManager implements SharedPreferencesFacade, SharedPrefer
 	 *
 	 * @deprecated Use {@link #getContext()} instead.
 	 */
-	@NonNull
-	@Deprecated
-	protected final Context mContext;
+	private final Context mContext;
 
 	/**
 	 * File name of shared preferences managed by this manager.
@@ -164,7 +104,7 @@ public class PreferencesManager implements SharedPreferencesFacade, SharedPrefer
 	 * File mode of shared preferences managed by this manager.
 	 */
 	@SharedPreferencesPolicy.Mode
-	private int mPreferencesMode;
+	private int mPreferencesMode = SharedPreferencesPolicy.MODE_PRIVATE;
 
 	/**
 	 * Facade to which is this manager delegating all put/get/remove requests.
@@ -196,65 +136,9 @@ public class PreferencesManager implements SharedPreferencesFacade, SharedPrefer
 	 *                and {@link #setSharedPreferencesMode(int)}.
 	 */
 	public PreferencesManager(@NonNull Context context) {
-		this(new Builder(context)
-				.preferences(context.getSharedPreferences(
-						SharedPreferencesPolicy.defaultPreferencesName(context),
-						SharedPreferencesPolicy.MODE_PRIVATE
-				))
-				.preferencesName(SharedPreferencesPolicy.defaultPreferencesName(context))
-		);
-	}
+		this.mContext = context;
+		this.mPreferencesName = SharedPreferencesPolicy.defaultPreferencesName(context);
 
-	/**
-	 * <b>This constructor has been deprecated and will be removed in the next none-beta release.</b>
-	 * <p>
-	 * Same as {@link #PreferencesManager(Context, String, int)} with {@link Context#MODE_PRIVATE}
-	 * creation mode.
-	 *
-	 * @deprecated Use {@link #PreferencesManager(Context)} instead.
-	 */
-	@Deprecated
-	public PreferencesManager(@NonNull Context context, @NonNull String preferencesName) {
-		this(new Builder(context)
-				.preferences(context.getSharedPreferences(preferencesName, SharedPreferencesPolicy.MODE_PRIVATE))
-				.preferencesName(preferencesName)
-		);
-	}
-
-	/**
-	 * <b>This constructor has been deprecated and will be removed in the next none-beta release.</b>
-	 * <p>
-	 * Creates a new instance of PreferencesManager with the given shared preferences name and
-	 * preferences file creation mode.
-	 *
-	 * @param context             Valid context to access shared preferences.
-	 * @param preferencesName     Name for shared preferences file.
-	 * @param preferencesFileMode Shared preferences will be created in this mode.
-	 * @deprecated Use {@link #PreferencesManager(Context)} instead.
-	 */
-	@Deprecated
-	public PreferencesManager(@NonNull Context context, @NonNull String preferencesName, @SharedPreferencesPolicy.FileMode int preferencesFileMode) {
-		this(new Builder(context)
-				.preferences(context.getSharedPreferences(preferencesName, preferencesFileMode))
-				.preferencesName(preferencesName)
-				.preferencesFileMode(preferencesFileMode)
-		);
-	}
-
-	/**
-	 * <b>This constructor has been deprecated and will be removed in the next none-beta release.</b>
-	 * <p>
-	 * Creates a new instance of PreferencesManager with configuration provided by the specified
-	 * <var>builder</var>.
-	 *
-	 * @param builder The builder used to configure the new preferences manager.
-	 * @deprecated Use {@link #PreferencesManager(Context)} instead.
-	 */
-	@Deprecated
-	protected PreferencesManager(@NonNull final Builder builder) {
-		this.mContext = builder.context;
-		this.mPreferencesName = builder.preferencesName;
-		this.mPreferencesMode = builder.preferencesFileMode;
 	}
 
 	/*
@@ -571,210 +455,7 @@ public class PreferencesManager implements SharedPreferencesFacade, SharedPrefer
 		return remove(preference.getKey());
 	}
 
-	// fixme: deprecated methods that should be removed in the next none-beta release.
-
-	/**
-	 * <b>This method has been deprecated and will be removed in the next none-beta release.</b>
-	 * <p>
-	 * Creates a default name for shared preferences (like the one created by {@link PreferenceManager}).
-	 *
-	 * @param context Context for which the name should be created.
-	 * @return Default name for shared preferences.
-	 * @deprecated Use {@link SharedPreferencesPolicy#defaultPreferencesName(Context)} instead.
-	 */
-	@NonNull
-	@Deprecated
-	public static String defaultSharedPreferencesName(@NonNull Context context) {
-		return SharedPreferencesPolicy.defaultPreferencesName(context);
-	}
-
-	/**
-	 * <b>This method has been deprecated and will be removed in the next none-beta release.</b>
-	 * <p>
-	 * Returns the name of {@link SharedPreferences} that are managed by this manager.
-	 *
-	 * @return The associated preference's name.
-	 * @deprecated Use {@link #getSharedPreferencesName()} instead.
-	 */
-	@NonNull
-	@Deprecated
-	public final String getPreferencesName() {
-		return getSharedPreferencesName();
-	}
-
-	/**
-	 * <b>This method has been deprecated and will be removed in the next none-beta release.</b>
-	 * <p>
-	 * Returns the file mode of {@link SharedPreferences} that are managed by this manager.
-	 *
-	 * @return The associated preference's file mode.
-	 * @deprecated Use {@link #getSharedPreferencesMode()}
-	 */
-	@Deprecated
-	public final int getPreferencesFileMode() {
-		return getSharedPreferencesMode();
-	}
-
-	/**
-	 * <b>This method has been deprecated and will be removed in the next none-beta release.</b>
-	 * <p>
-	 * Sets the actual file creation mode for shared preferences. This mode is used whenever the
-	 * instance of shared preferences is obtained to put/retrieve data to/from them.
-	 *
-	 * @param mode Preferences creation mode.
-	 * @see #getMode()
-	 * @deprecated The new implementation of preferences manager does not support changing of preferences
-	 * file mode after the manager has been initialized.
-	 */
-	@Deprecated
-	protected final void setMode(@Mode int mode) {
-		// Actual implementation of this manager does not support changing of preferences file mode.
-	}
-
-	/**
-	 * <b>This method has been deprecated and will be removed in the next none-beta release.</b>
-	 * <p>
-	 * Returns the actual file creation mode for shared preferences.
-	 *
-	 * @return The shared preferences file creation mode. {@link #MODE_PRIVATE} by default.
-	 * @see Context
-	 * @see #setMode(int)
-	 * @deprecated Use {@link #getPreferencesFileMode()} instead.
-	 */
-	@Deprecated
-	protected final int getMode() {
-		return getPreferencesFileMode();
-	}
-
-	/**
-	 * <b>This method has been deprecated and will be removed in the next none-beta release.</b>
-	 * <p>
-	 * Returns the {@link SharedPreferences} that are hidden behind this facade.
-	 *
-	 * @return The associated preferences.
-	 * @deprecated Use {@link #getSharedPreferences()} instead.
-	 */
-	@Deprecated
-	public final SharedPreferences getPreferences() {
-		return getSharedPreferences();
-	}
-
 	/*
 	 * Inner classes ===============================================================================
 	 */
-
-	/**
-	 * Builder that may be used to creates new instances of PreferencesManager with a desired configuration.
-	 *
-	 * <h3>Required parameters</h3>
-	 * <ul>
-	 * <li>{@code none}</li>
-	 * </ul>
-	 *
-	 * @author Martin Albedinsky
-	 * @deprecated Use {@link #PreferencesManager(Context)} instead along with {@link #setSharedPreferencesName(String)}
-	 * and {@link #setSharedPreferencesMode(int)}.
-	 */
-	@Deprecated
-	public static class Builder {
-
-		/**
-		 * See {@link PreferencesManager#mContext}.
-		 */
-		final Context context;
-
-		/**
-		 * See {@link PreferencesManager#mPreferencesName}.
-		 */
-		String preferencesName;
-
-		/**
-		 * See {@link PreferencesManager#mPreferencesMode}.
-		 */
-		@SharedPreferencesPolicy.Mode
-		int preferencesFileMode = SharedPreferencesPolicy.MODE_PRIVATE;
-
-		/**
-		 * See {@link PreferencesManager#mPreferencesFacade}.
-		 */
-		SharedPreferences preferences;
-
-		/**
-		 * Creates a new Builder with the specified <var>context</var>.
-		 *
-		 * @param context The context that is used to create default preferences instance for this
-		 *                builder if there is no explicit instance of preferences specified.
-		 */
-		public Builder(@NonNull final Context context) {
-			super();
-			this.context = context;
-			this.preferencesName = SharedPreferencesPolicy.defaultPreferencesName(context);
-		}
-
-		/**
-		 * Specifies a name for shared preferences that is used to create default preferences instance
-		 * in case when there is no explicit instance of preferences specified for this builder via
-		 * {@link #preferences(SharedPreferences)}.
-		 * <p>
-		 * Also the specified name may be used later in order to identify preferences instance via
-		 * {@link PreferencesManager#getPreferencesName()}.
-		 *
-		 * @param name The desired name for preferences. May be {@code null} in order to use default
-		 *             name for preferences.
-		 * @return This builder to allow methods chaining.
-		 * @see SharedPreferencesPolicy#defaultPreferencesName(Context)
-		 */
-		public Builder preferencesName(@Nullable final String name) {
-			this.preferencesName = name;
-			return this;
-		}
-
-		/**
-		 * Specifies a file mode for shared preferences that is used to create default preferences
-		 * instance in case when there is no explicit instance of preferences specified for this builder
-		 * via {@link #preferences(SharedPreferences)}.
-		 * <p>
-		 * Also the specified mode may be used later in order to identify preferences file mode via
-		 * {@link PreferencesManager#getPreferencesFileMode()}.
-		 *
-		 * @param fileMode The desired file mode for preferences. Should be one of modes defined by
-		 *                 {@link SharedPreferencesPolicy.Mode @SharedPreferencesPolicy.FileMode}
-		 *                 annotation.
-		 * @return This builder to allow methods chaining.
-		 */
-		public Builder preferencesFileMode(@SharedPreferencesPolicy.FileMode final int fileMode) {
-			this.preferencesFileMode = fileMode;
-			return this;
-		}
-
-
-		/**
-		 * Specifies a shared preferences instance that should be used by the new preferences manager.
-		 *
-		 * @param preferences The shared preferences for which to create new manager.
-		 * @return This builder to allow methods chaining.
-		 */
-		@SuppressWarnings("unchecked")
-		public Builder preferences(@NonNull final SharedPreferences preferences) {
-			this.preferences = preferences;
-			return this;
-		}
-
-		/**
-		 * Builds a new instance of PreferencesManager with the configuration specified for this builder.
-		 *
-		 * @return Instance of preferences manager ready to be used.
-		 * @throws IllegalArgumentException If some of the required parameters is missing.
-		 */
-		@NonNull
-		public PreferencesManager build() {
-			if (TextUtils.isEmpty(preferencesName)) {
-				throw new IllegalArgumentException("No preferences name specified.");
-			}
-			if (preferences == null) {
-				this.preferences = context.getSharedPreferences(preferencesName, preferencesFileMode);
-			}
-			return new PreferencesManager(this);
-		}
-	}
 }

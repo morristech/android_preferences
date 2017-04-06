@@ -1,6 +1,11 @@
 Change-Log
 ===============
 
+### [Release 2.0.0-beta2](https://github.com/universum-studios/android_preferences/releases/tag/2.0.0) ###
+> --.04.2017
+
+- Removed all deprecated components and methods from all previous **beta** releases.
+
 ### [Release 2.0.0-beta2](https://github.com/universum-studios/android_preferences/releases/tag/2.0.0-beta2) ###
 > 05.04.2017
 

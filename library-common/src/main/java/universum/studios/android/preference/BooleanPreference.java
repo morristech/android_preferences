@@ -22,7 +22,6 @@ import android.content.SharedPreferences;
 import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
 
 /**
  * A {@link SharedPreference} implementation that may be used to persist a {@link Boolean} value via
@@ -37,10 +36,6 @@ import android.support.annotation.StringRes;
  */
 public final class BooleanPreference extends SharedPreference<Boolean> {
 
-	/*
-	 * Constructors ================================================================================
-	 */
-
 	/**
 	 * Creates a new instance of BooleanPreference with the specified <var>key</var> and <var>defValue</var>.
 	 *
@@ -49,23 +44,6 @@ public final class BooleanPreference extends SharedPreference<Boolean> {
 	public BooleanPreference(@NonNull final String key, @NonNull final Boolean defValue) {
 		super(key, defValue);
 	}
-
-	/**
-	 * <b>This constructor has been deprecated and will be removed in the next none-beta release.</b>
-	 * <p>
-	 * Creates a new instance of BooleanPreference.
-	 *
-	 * @see SharedPreference#SharedPreference(int, Object)
-	 * @deprecated Use {@link #BooleanPreference(String, Boolean)} instead.
-	 */
-	@Deprecated
-	public BooleanPreference(@StringRes int keyResId, @NonNull Boolean defValue) {
-		super(keyResId, defValue);
-	}
-
-	/*
-	 * Methods =====================================================================================
-	 */
 
 	/**
 	 */

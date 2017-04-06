@@ -22,7 +22,6 @@ import android.content.SharedPreferences;
 import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
 import android.text.TextUtils;
 
 /**
@@ -39,10 +38,6 @@ import android.text.TextUtils;
  */
 public final class EnumPreference<E extends Enum> extends SharedPreference<E> {
 
-	/*
-	 * Constructors ================================================================================
-	 */
-
 	/**
 	 * Creates a new instance of EnumPreference with the specified <var>key</var> and <var>defValue</var>.
 	 *
@@ -51,23 +46,6 @@ public final class EnumPreference<E extends Enum> extends SharedPreference<E> {
 	public EnumPreference(@NonNull final String key, @Nullable final E defValue) {
 		super(key, defValue);
 	}
-
-	/**
-	 * <b>This constructor has been deprecated and will be removed in the next none-beta release.</b>
-	 * <p>
-	 * Creates a new instance of EnumPreference.
-	 *
-	 * @see SharedPreference#SharedPreference(int, Object)
-	 * @deprecated Use {@link #EnumPreference(String, Enum)} instead.
-	 */
-	@Deprecated
-	public EnumPreference(@StringRes int keyResId, @Nullable E defValue) {
-		super(keyResId, defValue);
-	}
-
-	/*
-	 * Methods =====================================================================================
-	 */
 
 	/**
 	 */

@@ -22,7 +22,6 @@ import android.content.SharedPreferences;
 import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
 
 /**
  * A {@link SharedPreference} implementation that may be used to persist a {@link Integer} value via
@@ -37,10 +36,6 @@ import android.support.annotation.StringRes;
  */
 public final class IntegerPreference extends SharedPreference<Integer> {
 
-	/*
-	 * Constructors ================================================================================
-	 */
-
 	/**
 	 * Creates a new instance of IntegerPreference with the specified <var>key</var> and <var>defValue</var>.
 	 *
@@ -49,23 +44,6 @@ public final class IntegerPreference extends SharedPreference<Integer> {
 	public IntegerPreference(@NonNull final String key, @NonNull final Integer defValue) {
 		super(key, defValue);
 	}
-
-	/**
-	 * <b>This constructor has been deprecated and will be removed in the next none-beta release.</b>
-	 * <p>
-	 * Creates a new instance of IntegerPreference.
-	 *
-	 * @see SharedPreference#SharedPreference(int, Object)
-	 * @deprecated Use {@link #IntegerPreference(String, Integer)} instead.
-	 */
-	@Deprecated
-	public IntegerPreference(@StringRes int keyResId, @NonNull Integer defValue) {
-		super(keyResId, defValue);
-	}
-
-	/*
-	 * Methods =====================================================================================
-	 */
 
 	/**
 	 */
