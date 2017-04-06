@@ -158,14 +158,14 @@ public final class PreferencesLogging {
 	 * Delegates to {@link Logger#wtf(String, String)}.
 	 */
 	public static void wtf(@NonNull final String tag, @NonNull final String msg) {
-		sLogger.w(tag, msg);
+		sLogger.wtf(tag, msg);
 	}
 
 	/**
 	 * Delegates to {@link Logger#wtf(String, Throwable)}.
 	 */
 	public static void wtf(@NonNull final String tag, @Nullable final Throwable tr) {
-		sLogger.w(tag, tr);
+		sLogger.wtf(tag, tr);
 	}
 
 	/**
