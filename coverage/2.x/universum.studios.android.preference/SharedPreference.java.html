@@ -19,23 +19,23 @@
 package universum.studios.android.preference;
 
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
 import android.text.TextUtils;
 
 /**
- * Base implementation of shared preference object which may be used to persist a desired value
- * via {@link SharedPreferences} and then retrieve it.
+ * Base implementation of shared preference object which may be used to persist a desired value in
+ * {@link SharedPreferences} and later obtain such value.
  * &lt;p&gt;
- * This class implements API necessary to persist its current value into {@link SharedPreferences}
- * via {@link #updateValue(Object)} followed by {@link #save(SharedPreferences)} and to retrieve such
- * persisted value from preferences via {@link #retrieve(SharedPreferences)} followed by {@link #getValue()}.
+ * This class provides API necessary to persist a desired preference value in {@link SharedPreferences}
+ * via {@link #updateValue(Object)} followed by {@link #putIntoPreferences(SharedPreferences)} and
+ * to obtain such persisted value from preferences via {@link #getFromPreferences(SharedPreferences)}.
+ * The current value that has been obtained from shared preferences for a particular preference may
+ * be obtained via {@link #getValue()}.
  * &lt;p&gt;
- * The key for shared preference must be passed via {@link #SharedPreference(String, Object)} constructor
- * and may be later obtained via {@link #getKey()}.
+ * The key for each shared preference is required to be specified via {@link #SharedPreference(String, Object)}
+ * constructor and may be later obtained via {@link #getKey()}.
  *
  * @param &lt;T&gt; Type of the value that can be persisted by this preference implementation.
  * @author Martin Albedinsky
@@ -88,8 +88,7 @@ public abstract class SharedPreference&lt;T&gt; {
 	/**
 	 * The key for which will be the value of this preference persisted within shared preferences.
 	 */
-	// todo: make this field final on next release
-<span class="pc" id="L92">	String mKey = &quot;&quot;;</span>
+	final String mKey;
 
 	/**
 	 * Default value of this preference for case when there is no value persisted within shared
@@ -110,14 +109,6 @@ public abstract class SharedPreference&lt;T&gt; {
 	 */
 	boolean mValueIsActual;
 
-	/**
-	 * Xml resource for the key.
-	 *
-	 * @deprecated Use {@link #mKey} instead.
-	 */
-<span class="pc" id="L118">	@Deprecated</span>
-	private int mKeyRes = -1;
-
 	/*
 	 * Constructors ================================================================================
 	 */
@@ -131,35 +122,13 @@ public abstract class SharedPreference&lt;T&gt; {
 	 *                 saved withing shared preference yet.
 	 * @throws IllegalArgumentException If the specified &lt;var&gt;key&lt;/var&gt; is empty.
 	 */
-<span class="fc" id="L134">	protected SharedPreference(@NonNull final String key, @Nullable final T defValue) {</span>
-<span class="fc bfc" id="L135" title="All 2 branches covered.">		if (TextUtils.isEmpty(key)) {</span>
-<span class="fc" id="L136">			throw new IllegalArgumentException(&quot;Preference key cannot be empty.&quot;);</span>
+<span class="fc" id="L125">	protected SharedPreference(@NonNull final String key, @Nullable final T defValue) {</span>
+<span class="fc bfc" id="L126" title="All 2 branches covered.">		if (TextUtils.isEmpty(key)) {</span>
+<span class="fc" id="L127">			throw new IllegalArgumentException(&quot;Preference key cannot be empty.&quot;);</span>
 		}
-<span class="fc" id="L138">		this.mKey = key;</span>
-<span class="fc" id="L139">		this.mDefaultValue = mValue = defValue;</span>
-<span class="fc" id="L140">	}</span>
-
-	/**
-	 * &lt;b&gt;This constructor has been deprecated and will be removed in the next release.&lt;/b&gt;
-	 * &lt;p&gt;
-	 * Creates a new instance of SharedPreference with the given key resource and default value.
-	 *
-	 * @param keyResId     Resource id of the desired key under which will be the value of this preference
-	 *                     mapped within shared preferences.
-	 * @param defaultValue Default value of this preference for case, when there is no value saved withing
-	 *                     shared preference yet.
-	 * @throws IllegalArgumentException If the specified &lt;var&gt;keyResId&lt;/var&gt; is invalid.
-	 * @see #attachKey(Resources)
-	 * @deprecated Use {@link #SharedPreference(String, Object)} instead.
-	 */
-	@Deprecated
-<span class="nc" id="L156">	protected SharedPreference(@StringRes int keyResId, @Nullable T defaultValue) {</span>
-<span class="nc bnc" id="L157" title="All 2 branches missed.">		if (keyResId &lt;= 0) {</span>
-<span class="nc" id="L158">			throw new IllegalArgumentException(&quot;Resource id(&quot; + keyResId + &quot;) for preference key is not valid.&quot;);</span>
-		}
-<span class="nc" id="L160">		this.mKeyRes = keyResId;</span>
-<span class="nc" id="L161">		this.mDefaultValue = defaultValue;</span>
-<span class="nc" id="L162">	}</span>
+<span class="fc" id="L129">		this.mKey = key;</span>
+<span class="fc" id="L130">		this.mDefaultValue = mValue = defValue;</span>
+<span class="fc" id="L131">	}</span>
 
 	/*
 	 * Methods =====================================================================================
@@ -172,43 +141,7 @@ public abstract class SharedPreference&lt;T&gt; {
 	 */
 	@NonNull
 	public final String getKey() {
-<span class="fc" id="L175">		return mKey;</span>
-	}
-
-	/**
-	 * &lt;b&gt;This method has been deprecated and will be removed in the next release.&lt;/b&gt;
-	 * &lt;p&gt;
-	 * Return the resource id of the key of this preference.
-	 *
-	 * @return Same resource id as passed to {@link #SharedPreference(int, Object)} constructor.
-	 * @deprecated Use {@link #getKey()} instead.
-	 */
-	@StringRes
-	@Deprecated
-	public final int getKeyRes() {
-<span class="nc" id="L189">		return mKeyRes;</span>
-	}
-
-	/**
-	 * &lt;b&gt;This method has been deprecated and will be removed in the next release.&lt;/b&gt;
-	 * &lt;p&gt;
-	 * Attaches the key for this preference from the given resources using the current key's resource
-	 * id specified via {@link #SharedPreference(int, Object)}.
-	 *
-	 * @param resources An application's resources to obtain key.
-	 * @return This preference to allow methods chaining.
-	 * @throws IllegalArgumentException If key obtained from the resources for the resource id is empty.
-	 * @deprecated Due to dropped support of keys specified via resource ids, this method becomes obsolete.
-	 */
-	@Deprecated
-	public SharedPreference&lt;T&gt; attachKey(@NonNull Resources resources) {
-<span class="nc bnc" id="L205" title="All 2 branches missed.">		if (mKeyRes != -1) {</span>
-<span class="nc" id="L206">			this.mKey = resources.getString(mKeyRes);</span>
-<span class="nc bnc" id="L207" title="All 2 branches missed.">			if (TextUtils.isEmpty(mKey)) {</span>
-<span class="nc" id="L208">				throw new IllegalArgumentException(&quot;Preference key cannot be empty.&quot;);</span>
-			}
-		}
-<span class="nc" id="L211">		return this;</span>
+<span class="fc" id="L144">		return mKey;</span>
 	}
 
 	/**
@@ -225,19 +158,19 @@ public abstract class SharedPreference&lt;T&gt; {
 	 */
 	@NonNull
 	public SharedPreferences.OnSharedPreferenceChangeListener createOnChangeListener(@NonNull final PreferenceChangeCallback&lt;T&gt; callback) {
-<span class="fc" id="L228">		return new SharedPreferences.OnSharedPreferenceChangeListener() {</span>
+<span class="fc" id="L161">		return new SharedPreferences.OnSharedPreferenceChangeListener() {</span>
 
 			/**
 			 */
 			@Override
 			public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences, String key) {
-<span class="nc bnc" id="L234" title="All 2 branches missed.">				if (mKey.equals(key)) {</span>
+<span class="nc bnc" id="L167" title="All 2 branches missed.">				if (mKey.equals(key)) {</span>
 					// Ensure that we have always the actual value.
-<span class="nc" id="L236">					mValueIsActual = false;</span>
-<span class="nc" id="L237">					getFromPreferences(sharedPreferences);</span>
-<span class="nc" id="L238">					callback.onPreferenceChanged(SharedPreference.this);</span>
+<span class="nc" id="L169">					mValueIsActual = false;</span>
+<span class="nc" id="L170">					getFromPreferences(sharedPreferences);</span>
+<span class="nc" id="L171">					callback.onPreferenceChanged(SharedPreference.this);</span>
 				}
-<span class="nc" id="L240">			}</span>
+<span class="nc" id="L173">			}</span>
 		};
 	}
 
@@ -249,7 +182,7 @@ public abstract class SharedPreference&lt;T&gt; {
 	 */
 	@Nullable
 	public final T getDefaultValue() {
-<span class="fc" id="L252">		return mDefaultValue;</span>
+<span class="fc" id="L185">		return mDefaultValue;</span>
 	}
 
 	/**
@@ -266,11 +199,11 @@ public abstract class SharedPreference&lt;T&gt; {
 	 * @see #getValue()
 	 */
 	public SharedPreference&lt;T&gt; updateValue(@Nullable final T newValue) {
-<span class="fc bfc" id="L269" title="All 4 branches covered.">		if (mValue == null || !mValue.equals(newValue)) {</span>
-<span class="fc" id="L270">			this.mValue = newValue;</span>
-<span class="fc" id="L271">			this.mValueIsActual = true;</span>
+<span class="fc bfc" id="L202" title="All 4 branches covered.">		if (mValue == null || !mValue.equals(newValue)) {</span>
+<span class="fc" id="L203">			this.mValue = newValue;</span>
+<span class="fc" id="L204">			this.mValueIsActual = true;</span>
 		}
-<span class="fc" id="L273">		return this;</span>
+<span class="fc" id="L206">		return this;</span>
 	}
 
 	/**
@@ -284,9 +217,8 @@ public abstract class SharedPreference&lt;T&gt; {
 	 * @see #getValue()
 	 */
 	public final boolean putIntoPreferences(@NonNull final SharedPreferences preferences) {
-<span class="fc" id="L287">		this.ensureValidKeyOrThrow();</span>
-<span class="fc" id="L288">		this.mValueIsActual = onPutIntoPreferences(preferences);</span>
-<span class="fc" id="L289">		return mValueIsActual;</span>
+<span class="fc" id="L220">		this.mValueIsActual = onPutIntoPreferences(preferences);</span>
+<span class="fc" id="L221">		return mValueIsActual;</span>
 	}
 
 	/**
@@ -314,7 +246,7 @@ public abstract class SharedPreference&lt;T&gt; {
 	 */
 	@Nullable
 	public final T getValue() {
-<span class="fc" id="L317">		return mValue;</span>
+<span class="fc" id="L249">		return mValue;</span>
 	}
 
 	/**
@@ -332,12 +264,11 @@ public abstract class SharedPreference&lt;T&gt; {
 	 * @see #putIntoPreferences(SharedPreferences)
 	 */
 	final T getFromPreferences(final SharedPreferences preferences) {
-<span class="fc" id="L335">		this.ensureValidKeyOrThrow();</span>
-<span class="fc bfc" id="L336" title="All 2 branches covered.">		if (!mValueIsActual) {</span>
-<span class="fc" id="L337">			this.mValue = onGetFromPreferences(preferences);</span>
-<span class="fc" id="L338">			this.mValueIsActual = true;</span>
+<span class="fc bfc" id="L267" title="All 2 branches covered.">		if (!mValueIsActual) {</span>
+<span class="fc" id="L268">			this.mValue = onGetFromPreferences(preferences);</span>
+<span class="fc" id="L269">			this.mValueIsActual = true;</span>
 		}
-<span class="fc" id="L340">		return mValue;</span>
+<span class="fc" id="L271">		return mValue;</span>
 	}
 
 	/**
@@ -351,67 +282,16 @@ public abstract class SharedPreference&lt;T&gt; {
 	protected abstract T onGetFromPreferences(@NonNull SharedPreferences preferences);
 
 	/**
-	 * &lt;b&gt;This method has been deprecated and will be removed in the next release.&lt;/b&gt;
-	 * &lt;p&gt;
-	 * Retrieves the current value of this preference from the given shared preferences.
-	 *
-	 * @param preferences The instance of shared preferences into which was the value of this preference
-	 *                    before saved.
-	 * @return This preference to allow methods chaining.
-	 * @see #getValue()
-	 * @deprecated Use {@link #getFromPreferences(SharedPreferences)} instead.
-	 */
-	@Deprecated
-	public SharedPreference&lt;T&gt; retrieve(@NonNull SharedPreferences preferences) {
-<span class="nc" id="L366">		getFromPreferences(preferences);</span>
-<span class="nc" id="L367">		return this;</span>
-	}
-
-	/**
-	 * &lt;b&gt;This method has been deprecated and will be removed in the next release.&lt;/b&gt;
-	 * &lt;p&gt;
-	 * Ensures that the key of this preference is valid (not empty). If not throws an IllegalStateException.
-	 *
-	 * @deprecated When support for key specified via resource id is dropped this method becomes obsolete.
-	 */
-	@Deprecated
-	private void ensureValidKeyOrThrow() {
-<span class="pc bpc" id="L379" title="1 of 2 branches missed.">		if (TextUtils.isEmpty(mKey)) {</span>
-<span class="nc" id="L380">			final String preferenceType = getClass().getSimpleName();</span>
-<span class="nc" id="L381">			throw new IllegalStateException(</span>
-					&quot;Key for preference(&quot; + preferenceType + &quot;) is not properly initialized. &quot;
-							+ &quot;Didn't you forget to set it up via SharedPreference.attachKey(Resources)?&quot;
-			);
-		}
-<span class="fc" id="L386">	}</span>
-
-	/**
-	 * &lt;b&gt;This method has been deprecated and will be removed in the next release.&lt;/b&gt;
-	 * &lt;p&gt;
-	 * Saves the current value of this preference into the given shared preferences.
-	 *
-	 * @param preferences The instance of shared preferences into which will be the current value of
-	 *                    this preference saved.
-	 * @return {@code True} if saving operation succeed, {@code false} otherwise.
-	 * @see #updateValue(Object)
-	 * @deprecated Use {@link #putIntoPreferences(SharedPreferences)} instead.
-	 */
-	@Deprecated
-	public boolean save(@NonNull SharedPreferences preferences) {
-<span class="nc" id="L401">		return putIntoPreferences(preferences);</span>
-	}
-
-	/**
 	 * Invalidates the actual value of this preference so next call to {@link #getFromPreferences(SharedPreferences)}
 	 * will obtain the actual value from the specified preferences in order to refresh it.
 	 */
 	final void invalidate() {
-<span class="fc" id="L409">		this.mValue = null;</span>
-<span class="fc" id="L410">		this.mValueIsActual = false;</span>
-<span class="fc" id="L411">	}</span>
+<span class="fc" id="L289">		this.mValue = null;</span>
+<span class="fc" id="L290">		this.mValueIsActual = false;</span>
+<span class="fc" id="L291">	}</span>
 
 	/*
 	 * Inner classes ===============================================================================
 	 */
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span>Generated by the Android Gradle plugin 2.3.0</div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span>Generated by the Android Gradle plugin 2.3.1</div></body></html>

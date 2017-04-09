@@ -22,7 +22,6 @@ import android.content.SharedPreferences;
 import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
 import android.text.TextUtils;
 
 import org.json.JSONArray;
@@ -49,7 +48,7 @@ public final class ArrayPreference&lt;T&gt; extends SharedPreference&lt;T&gt; {
 	/**
 	 * Pattern used to validate that a string contents represent an array value.
 	 */
-<span class="fc" id="L52">	private static final Pattern VALUE_PATTERN = Pattern.compile(&quot;^\\&lt;(.+)\\[\\]\\&gt;\\[(.*)\\]$&quot;);</span>
+<span class="fc" id="L51">	private static final Pattern VALUE_PATTERN = Pattern.compile(&quot;^\\&lt;(.+)\\[\\]\\&gt;\\[(.*)\\]$&quot;);</span>
 
 	/*
 	 * Constructors ================================================================================
@@ -62,24 +61,9 @@ public final class ArrayPreference&lt;T&gt; extends SharedPreference&lt;T&gt; {
 	 * @see SharedPreference#SharedPreference(String, Object)
 	 */
 	public ArrayPreference(@NonNull final String key, @Nullable final T defValue) {
-<span class="fc" id="L65">		super(key, defValue);</span>
-<span class="fc" id="L66">		assertIsArrayOrThrow(defValue);</span>
-<span class="fc" id="L67">	}</span>
-
-	/**
-	 * &lt;b&gt;This constructor has been deprecated and will be removed in the next release.&lt;/b&gt;
-	 * &lt;p&gt;
-	 * Creates a new instance of ArrayPreference.
-	 *
-	 * @throws IllegalArgumentException If the given &lt;var&gt;defValue&lt;/var&gt; is not actually an array.
-	 * @see SharedPreference#SharedPreference(int, Object)
-	 * @deprecated Use {@link #ArrayPreference(String, Object)} instead.
-	 */
-	@Deprecated
-	public ArrayPreference(@StringRes int keyResId, @Nullable T defValue) {
-<span class="nc" id="L80">		super(keyResId, defValue);</span>
-<span class="nc" id="L81">		assertIsArrayOrThrow(defValue);</span>
-<span class="nc" id="L82">	}</span>
+<span class="fc" id="L64">		super(key, defValue);</span>
+<span class="fc" id="L65">		assertIsArrayOrThrow(defValue);</span>
+<span class="fc" id="L66">	}</span>
 
 	/*
 	 * Methods =====================================================================================
@@ -92,10 +76,10 @@ public final class ArrayPreference&lt;T&gt; extends SharedPreference&lt;T&gt; {
 	 * @param value The value to be check if it is an array.
 	 */
 	private static void assertIsArrayOrThrow(final Object value) {
-<span class="fc bfc" id="L95" title="All 4 branches covered.">		if (value != null &amp;&amp; !value.getClass().isArray()) {</span>
-<span class="fc" id="L96">			throw new IllegalArgumentException(&quot;Not an array(&quot; + value.getClass().getSimpleName() + &quot;).&quot;);</span>
+<span class="fc bfc" id="L79" title="All 4 branches covered.">		if (value != null &amp;&amp; !value.getClass().isArray()) {</span>
+<span class="fc" id="L80">			throw new IllegalArgumentException(&quot;Not an array(&quot; + value.getClass().getSimpleName() + &quot;).&quot;);</span>
 		}
-<span class="fc" id="L98">	}</span>
+<span class="fc" id="L82">	}</span>
 
 	/**
 	 * @see #putIntoPreferences(SharedPreferences, String, Object)
@@ -103,7 +87,7 @@ public final class ArrayPreference&lt;T&gt; extends SharedPreference&lt;T&gt; {
 	@Override
 	@CheckResult
 	protected boolean onPutIntoPreferences(@NonNull final SharedPreferences preferences) {
-<span class="fc" id="L106">		return putIntoPreferences(preferences, mKey, mValue);</span>
+<span class="fc" id="L90">		return putIntoPreferences(preferences, mKey, mValue);</span>
 	}
 
 	/**
@@ -118,25 +102,25 @@ public final class ArrayPreference&lt;T&gt; extends SharedPreference&lt;T&gt; {
 	 */
 	@CheckResult
 	public static boolean putIntoPreferences(@NonNull final SharedPreferences preferences, @NonNull final String key, @Nullable final Object value) {
-<span class="fc bfc" id="L121" title="All 2 branches covered.">		if (value == null) {</span>
-<span class="fc" id="L122">			return preferences.edit().putString(key, null).commit();</span>
+<span class="fc bfc" id="L105" title="All 2 branches covered.">		if (value == null) {</span>
+<span class="fc" id="L106">			return preferences.edit().putString(key, null).commit();</span>
 		}
-<span class="fc" id="L124">		assertIsArrayOrThrow(value);</span>
-<span class="fc" id="L125">		final int n = Array.getLength(value);</span>
-<span class="fc" id="L126">		final JSONArray jsonArray = new JSONArray();</span>
-<span class="fc bfc" id="L127" title="All 2 branches covered.">		for (int i = 0; i &lt; n; i++) {</span>
-<span class="fc" id="L128">			jsonArray.put(Array.get(value, i));</span>
+<span class="fc" id="L108">		assertIsArrayOrThrow(value);</span>
+<span class="fc" id="L109">		final int n = Array.getLength(value);</span>
+<span class="fc" id="L110">		final JSONArray jsonArray = new JSONArray();</span>
+<span class="fc bfc" id="L111" title="All 2 branches covered.">		for (int i = 0; i &lt; n; i++) {</span>
+<span class="fc" id="L112">			jsonArray.put(Array.get(value, i));</span>
 		}
 		// Save also class of the array, so when obtaining it we will know exactly of which type it is.
-<span class="fc" id="L131">		final Class&lt;?&gt; arrayClass = resolveArrayClass(value);</span>
-<span class="fc bfc" id="L132" title="All 2 branches covered.">		if (arrayClass == null) {</span>
-<span class="fc" id="L133">			final String componentName = value.getClass().getComponentType().getSimpleName();</span>
-<span class="fc" id="L134">			throw new IllegalArgumentException(</span>
+<span class="fc" id="L115">		final Class&lt;?&gt; arrayClass = resolveArrayClass(value);</span>
+<span class="fc bfc" id="L116" title="All 2 branches covered.">		if (arrayClass == null) {</span>
+<span class="fc" id="L117">			final String componentName = value.getClass().getComponentType().getSimpleName();</span>
+<span class="fc" id="L118">			throw new IllegalArgumentException(</span>
 					&quot;Failed to put array of(&quot; + componentName + &quot;) into shared preferences. &quot; +
 							&quot;Only arrays of primitive types or theirs boxed representations including String are supported.&quot;
 			);
 		}
-<span class="fc" id="L139">		return preferences.edit().putString(key, &quot;&lt;&quot; + arrayClass.getSimpleName() + &quot;&gt;&quot; + jsonArray.toString()).commit();</span>
+<span class="fc" id="L123">		return preferences.edit().putString(key, &quot;&lt;&quot; + arrayClass.getSimpleName() + &quot;&gt;&quot; + jsonArray.toString()).commit();</span>
 	}
 
 	/**
@@ -147,40 +131,40 @@ public final class ArrayPreference&lt;T&gt; extends SharedPreference&lt;T&gt; {
 	 * preference.
 	 */
 	static Class&lt;?&gt; resolveArrayClass(final Object array) {
-<span class="fc bfc" id="L150" title="All 2 branches covered.">		if (array instanceof boolean[]) {</span>
-<span class="fc" id="L151">			return boolean[].class;</span>
-<span class="fc bfc" id="L152" title="All 2 branches covered.">		} else if (array instanceof byte[]) {</span>
-<span class="fc" id="L153">			return byte[].class;</span>
-<span class="fc bfc" id="L154" title="All 2 branches covered.">		} else if (array instanceof char[]) {</span>
-<span class="fc" id="L155">			return char[].class;</span>
-<span class="fc bfc" id="L156" title="All 2 branches covered.">		} else if (array instanceof short[]) {</span>
-<span class="fc" id="L157">			return short[].class;</span>
-<span class="fc bfc" id="L158" title="All 2 branches covered.">		} else if (array instanceof int[]) {</span>
-<span class="fc" id="L159">			return int[].class;</span>
-<span class="fc bfc" id="L160" title="All 2 branches covered.">		} else if (array instanceof float[]) {</span>
-<span class="fc" id="L161">			return float[].class;</span>
-<span class="fc bfc" id="L162" title="All 2 branches covered.">		} else if (array instanceof long[]) {</span>
-<span class="fc" id="L163">			return long[].class;</span>
-<span class="fc bfc" id="L164" title="All 2 branches covered.">		} else if (array instanceof double[]) {</span>
-<span class="fc" id="L165">			return double[].class;</span>
-<span class="fc bfc" id="L166" title="All 2 branches covered.">		} else if (array instanceof Boolean[]) {</span>
-<span class="fc" id="L167">			return Boolean[].class;</span>
-<span class="fc bfc" id="L168" title="All 2 branches covered.">		} else if (array instanceof Byte[]) {</span>
-<span class="fc" id="L169">			return Byte[].class;</span>
-<span class="fc bfc" id="L170" title="All 2 branches covered.">		} else if (array instanceof Short[]) {</span>
-<span class="fc" id="L171">			return Short[].class;</span>
-<span class="fc bfc" id="L172" title="All 2 branches covered.">		} else if (array instanceof Integer[]) {</span>
-<span class="fc" id="L173">			return Integer[].class;</span>
-<span class="fc bfc" id="L174" title="All 2 branches covered.">		} else if (array instanceof Float[]) {</span>
-<span class="fc" id="L175">			return Float[].class;</span>
-<span class="fc bfc" id="L176" title="All 2 branches covered.">		} else if (array instanceof Long[]) {</span>
-<span class="fc" id="L177">			return Long[].class;</span>
-<span class="fc bfc" id="L178" title="All 2 branches covered.">		} else if (array instanceof Double[]) {</span>
-<span class="fc" id="L179">			return Double[].class;</span>
-<span class="fc bfc" id="L180" title="All 2 branches covered.">		} else if (array instanceof String[]) {</span>
-<span class="fc" id="L181">			return String[].class;</span>
+<span class="fc bfc" id="L134" title="All 2 branches covered.">		if (array instanceof boolean[]) {</span>
+<span class="fc" id="L135">			return boolean[].class;</span>
+<span class="fc bfc" id="L136" title="All 2 branches covered.">		} else if (array instanceof byte[]) {</span>
+<span class="fc" id="L137">			return byte[].class;</span>
+<span class="fc bfc" id="L138" title="All 2 branches covered.">		} else if (array instanceof char[]) {</span>
+<span class="fc" id="L139">			return char[].class;</span>
+<span class="fc bfc" id="L140" title="All 2 branches covered.">		} else if (array instanceof short[]) {</span>
+<span class="fc" id="L141">			return short[].class;</span>
+<span class="fc bfc" id="L142" title="All 2 branches covered.">		} else if (array instanceof int[]) {</span>
+<span class="fc" id="L143">			return int[].class;</span>
+<span class="fc bfc" id="L144" title="All 2 branches covered.">		} else if (array instanceof float[]) {</span>
+<span class="fc" id="L145">			return float[].class;</span>
+<span class="fc bfc" id="L146" title="All 2 branches covered.">		} else if (array instanceof long[]) {</span>
+<span class="fc" id="L147">			return long[].class;</span>
+<span class="fc bfc" id="L148" title="All 2 branches covered.">		} else if (array instanceof double[]) {</span>
+<span class="fc" id="L149">			return double[].class;</span>
+<span class="fc bfc" id="L150" title="All 2 branches covered.">		} else if (array instanceof Boolean[]) {</span>
+<span class="fc" id="L151">			return Boolean[].class;</span>
+<span class="fc bfc" id="L152" title="All 2 branches covered.">		} else if (array instanceof Byte[]) {</span>
+<span class="fc" id="L153">			return Byte[].class;</span>
+<span class="fc bfc" id="L154" title="All 2 branches covered.">		} else if (array instanceof Short[]) {</span>
+<span class="fc" id="L155">			return Short[].class;</span>
+<span class="fc bfc" id="L156" title="All 2 branches covered.">		} else if (array instanceof Integer[]) {</span>
+<span class="fc" id="L157">			return Integer[].class;</span>
+<span class="fc bfc" id="L158" title="All 2 branches covered.">		} else if (array instanceof Float[]) {</span>
+<span class="fc" id="L159">			return Float[].class;</span>
+<span class="fc bfc" id="L160" title="All 2 branches covered.">		} else if (array instanceof Long[]) {</span>
+<span class="fc" id="L161">			return Long[].class;</span>
+<span class="fc bfc" id="L162" title="All 2 branches covered.">		} else if (array instanceof Double[]) {</span>
+<span class="fc" id="L163">			return Double[].class;</span>
+<span class="fc bfc" id="L164" title="All 2 branches covered.">		} else if (array instanceof String[]) {</span>
+<span class="fc" id="L165">			return String[].class;</span>
 		}
-<span class="fc" id="L183">		return null;</span>
+<span class="fc" id="L167">		return null;</span>
 	}
 
 	/**
@@ -190,7 +174,7 @@ public final class ArrayPreference&lt;T&gt; extends SharedPreference&lt;T&gt; {
 	@Override
 	@SuppressWarnings(&quot;unchecked&quot;)
 	protected T onGetFromPreferences(@NonNull final SharedPreferences preferences) {
-<span class="fc" id="L193">		return getFromPreferences(preferences, mKey, mDefaultValue);</span>
+<span class="fc" id="L177">		return getFromPreferences(preferences, mKey, mDefaultValue);</span>
 	}
 
 	/**
@@ -211,42 +195,42 @@ public final class ArrayPreference&lt;T&gt; extends SharedPreference&lt;T&gt; {
 	 */
 	@SuppressWarnings(&quot;unchecked&quot;)
 	public static &lt;A&gt; A getFromPreferences(@NonNull final SharedPreferences preferences, @NonNull final String key, @Nullable final Object defValue) {
-<span class="fc" id="L214">		Object array = defValue;</span>
-<span class="fc" id="L215">		final String value = preferences.getString(key, null);</span>
-<span class="fc bfc" id="L216" title="All 2 branches covered.">		if (!TextUtils.isEmpty(value)) {</span>
-<span class="fc" id="L217">			final Matcher valueMatcher = VALUE_PATTERN.matcher(value);</span>
-<span class="fc bfc" id="L218" title="All 2 branches covered.">			if (valueMatcher.reset(value).matches()) {</span>
-<span class="fc" id="L219">				final String arrayClassName = valueMatcher.group(1) + &quot;[]&quot;;</span>
-<span class="fc" id="L220">				final Class&lt;?&gt; arrayClass = resolveArrayClassByName(arrayClassName);</span>
-<span class="fc bfc" id="L221" title="All 2 branches covered.">				if (arrayClass == null) {</span>
-<span class="fc" id="L222">					final String componentName = arrayClassName.substring(0, arrayClassName.length() - 2);</span>
-<span class="fc" id="L223">					throw new IllegalArgumentException(</span>
+<span class="fc" id="L198">		Object array = defValue;</span>
+<span class="fc" id="L199">		final String value = preferences.getString(key, null);</span>
+<span class="fc bfc" id="L200" title="All 2 branches covered.">		if (!TextUtils.isEmpty(value)) {</span>
+<span class="fc" id="L201">			final Matcher valueMatcher = VALUE_PATTERN.matcher(value);</span>
+<span class="fc bfc" id="L202" title="All 2 branches covered.">			if (valueMatcher.reset(value).matches()) {</span>
+<span class="fc" id="L203">				final String arrayClassName = valueMatcher.group(1) + &quot;[]&quot;;</span>
+<span class="fc" id="L204">				final Class&lt;?&gt; arrayClass = resolveArrayClassByName(arrayClassName);</span>
+<span class="fc bfc" id="L205" title="All 2 branches covered.">				if (arrayClass == null) {</span>
+<span class="fc" id="L206">					final String componentName = arrayClassName.substring(0, arrayClassName.length() - 2);</span>
+<span class="fc" id="L207">					throw new IllegalArgumentException(</span>
 							&quot;Failed to obtain an array of(&quot; + componentName + &quot;) for the key(&quot; + key + &quot;) from shared preferences. &quot; +
 									&quot;Only arrays of primitive types or theirs boxed representations including String are supported.&quot;
 					);
 				}
-<span class="fc" id="L228">				final String jsonArrayValue = &quot;[&quot; + valueMatcher.group(2) + &quot;]&quot;;</span>
+<span class="fc" id="L212">				final String jsonArrayValue = &quot;[&quot; + valueMatcher.group(2) + &quot;]&quot;;</span>
 				JSONArray jsonArray;
 				try {
-<span class="fc" id="L231">					jsonArray = new JSONArray(jsonArrayValue);</span>
-<span class="nc" id="L232">				} catch (JSONException e) {</span>
-<span class="nc" id="L233">					throw new ClassCastException(</span>
+<span class="fc" id="L215">					jsonArray = new JSONArray(jsonArrayValue);</span>
+<span class="nc" id="L216">				} catch (JSONException e) {</span>
+<span class="nc" id="L217">					throw new ClassCastException(</span>
 							&quot;Cannot obtain an array for the key(&quot; + key + &quot;) from shared preferences. &quot; +
 									&quot;Value(&quot; + jsonArrayValue + &quot;) is not an array!&quot;
 					);
-<span class="fc" id="L237">				}</span>
-<span class="fc" id="L238">				final int n = jsonArray.length();</span>
-<span class="fc" id="L239">				array = createArrayInSize(arrayClass.getComponentType(), n);</span>
-<span class="fc bfc" id="L240" title="All 2 branches covered.">				for (int i = 0; i &lt; n; i++) {</span>
-<span class="fc" id="L241">					setArrayValueAt(arrayClass, array, i, jsonArray.opt(i));</span>
+<span class="fc" id="L221">				}</span>
+<span class="fc" id="L222">				final int n = jsonArray.length();</span>
+<span class="fc" id="L223">				array = createArrayInSize(arrayClass.getComponentType(), n);</span>
+<span class="fc bfc" id="L224" title="All 2 branches covered.">				for (int i = 0; i &lt; n; i++) {</span>
+<span class="fc" id="L225">					setArrayValueAt(arrayClass, array, i, jsonArray.opt(i));</span>
 				}
-<span class="fc" id="L243">			} else {</span>
-<span class="fc" id="L244">				throw new IllegalStateException(</span>
+<span class="fc" id="L227">			} else {</span>
+<span class="fc" id="L228">				throw new IllegalStateException(</span>
 						&quot;Trying to obtain an array for the key(&quot; + key + &quot;) from shared preferences not saved by the Preferences library.&quot;
 				);
 			}
 		}
-<span class="fc" id="L249">		return (A) array;</span>
+<span class="fc" id="L233">		return (A) array;</span>
 	}
 
 	/**
@@ -258,11 +242,11 @@ public final class ArrayPreference&lt;T&gt; extends SharedPreference&lt;T&gt; {
 	 */
 	@Nullable
 	static String extractArrayValueFromPreferenceValue(final String value) {
-<span class="nc" id="L261">		final Matcher matcher = VALUE_PATTERN.matcher(value);</span>
-<span class="nc bnc" id="L262" title="All 4 branches missed.">		if (!TextUtils.isEmpty(value) &amp;&amp; matcher.matches()) {</span>
-<span class="nc" id="L263">			return matcher.group(2);</span>
+<span class="nc" id="L245">		final Matcher matcher = VALUE_PATTERN.matcher(value);</span>
+<span class="nc bnc" id="L246" title="All 4 branches missed.">		if (!TextUtils.isEmpty(value) &amp;&amp; matcher.matches()) {</span>
+<span class="nc" id="L247">			return matcher.group(2);</span>
 		}
-<span class="nc" id="L265">		return null;</span>
+<span class="nc" id="L249">		return null;</span>
 	}
 
 	/**
@@ -274,22 +258,22 @@ public final class ArrayPreference&lt;T&gt; extends SharedPreference&lt;T&gt; {
 	 * @param value      The value to update.
 	 */
 	private static void setArrayValueAt(final Class&lt;?&gt; arrayClass, final Object array, final int index, final Object value) {
-<span class="pc bpc" id="L277" title="1 of 2 branches missed.">		if (value == null) {</span>
-<span class="nc" id="L278">			Array.set(array, index, null);</span>
-<span class="nc" id="L279">			return;</span>
+<span class="pc bpc" id="L261" title="1 of 2 branches missed.">		if (value == null) {</span>
+<span class="nc" id="L262">			Array.set(array, index, null);</span>
+<span class="nc" id="L263">			return;</span>
 		}
-<span class="fc bfc" id="L281" title="All 4 branches covered.">		if (byte[].class.equals(arrayClass) || Byte[].class.equals(arrayClass)) {</span>
-<span class="fc" id="L282">			Array.set(array, index, Byte.valueOf(value.toString()));</span>
-<span class="fc bfc" id="L283" title="All 4 branches covered.">		} else if (short[].class.equals(arrayClass) || Short[].class.equals(arrayClass)) {</span>
-<span class="fc" id="L284">			Array.set(array, index, Short.valueOf(value.toString()));</span>
-<span class="fc bfc" id="L285" title="All 4 branches covered.">		} else if (float[].class.equals(arrayClass) || Float[].class.equals(arrayClass)) {</span>
-<span class="fc" id="L286">			Array.set(array, index, Float.valueOf(value.toString()));</span>
-<span class="fc bfc" id="L287" title="All 4 branches covered.">		} else if (long[].class.equals(arrayClass) || Long[].class.equals(arrayClass)) {</span>
-<span class="fc" id="L288">			Array.set(array, index, Long.valueOf(value.toString()));</span>
+<span class="fc bfc" id="L265" title="All 4 branches covered.">		if (byte[].class.equals(arrayClass) || Byte[].class.equals(arrayClass)) {</span>
+<span class="fc" id="L266">			Array.set(array, index, Byte.valueOf(value.toString()));</span>
+<span class="fc bfc" id="L267" title="All 4 branches covered.">		} else if (short[].class.equals(arrayClass) || Short[].class.equals(arrayClass)) {</span>
+<span class="fc" id="L268">			Array.set(array, index, Short.valueOf(value.toString()));</span>
+<span class="fc bfc" id="L269" title="All 4 branches covered.">		} else if (float[].class.equals(arrayClass) || Float[].class.equals(arrayClass)) {</span>
+<span class="fc" id="L270">			Array.set(array, index, Float.valueOf(value.toString()));</span>
+<span class="fc bfc" id="L271" title="All 4 branches covered.">		} else if (long[].class.equals(arrayClass) || Long[].class.equals(arrayClass)) {</span>
+<span class="fc" id="L272">			Array.set(array, index, Long.valueOf(value.toString()));</span>
 		} else {
-<span class="fc" id="L290">			Array.set(array, index, value);</span>
+<span class="fc" id="L274">			Array.set(array, index, value);</span>
 		}
-<span class="fc" id="L292">	}</span>
+<span class="fc" id="L276">	}</span>
 
 	/**
 	 * Resolves array class for the specified &lt;var&gt;arrayClassName&lt;/var&gt;.
@@ -299,41 +283,41 @@ public final class ArrayPreference&lt;T&gt; extends SharedPreference&lt;T&gt; {
 	 * class name is associated with an array that is not supported by this preference.
 	 */
 	static Class&lt;?&gt; resolveArrayClassByName(final String arrayClassName) {
-<span class="pc bpc" id="L302" title="16 of 66 branches missed.">		switch (arrayClassName) {</span>
+<span class="pc bpc" id="L286" title="16 of 66 branches missed.">		switch (arrayClassName) {</span>
 			case &quot;boolean[]&quot;:
-<span class="fc" id="L304">				return boolean[].class;</span>
+<span class="fc" id="L288">				return boolean[].class;</span>
 			case &quot;byte[]&quot;:
-<span class="fc" id="L306">				return byte[].class;</span>
+<span class="fc" id="L290">				return byte[].class;</span>
 			case &quot;char[]&quot;:
-<span class="fc" id="L308">				return char[].class;</span>
+<span class="fc" id="L292">				return char[].class;</span>
 			case &quot;short[]&quot;:
-<span class="fc" id="L310">				return short[].class;</span>
+<span class="fc" id="L294">				return short[].class;</span>
 			case &quot;int[]&quot;:
-<span class="fc" id="L312">				return int[].class;</span>
+<span class="fc" id="L296">				return int[].class;</span>
 			case &quot;float[]&quot;:
-<span class="fc" id="L314">				return float[].class;</span>
+<span class="fc" id="L298">				return float[].class;</span>
 			case &quot;long[]&quot;:
-<span class="fc" id="L316">				return long[].class;</span>
+<span class="fc" id="L300">				return long[].class;</span>
 			case &quot;double[]&quot;:
-<span class="fc" id="L318">				return double[].class;</span>
+<span class="fc" id="L302">				return double[].class;</span>
 			case &quot;Boolean[]&quot;:
-<span class="fc" id="L320">				return Boolean[].class;</span>
+<span class="fc" id="L304">				return Boolean[].class;</span>
 			case &quot;Byte[]&quot;:
-<span class="fc" id="L322">				return Byte[].class;</span>
+<span class="fc" id="L306">				return Byte[].class;</span>
 			case &quot;Short[]&quot;:
-<span class="fc" id="L324">				return Short[].class;</span>
+<span class="fc" id="L308">				return Short[].class;</span>
 			case &quot;Integer[]&quot;:
-<span class="fc" id="L326">				return Integer[].class;</span>
+<span class="fc" id="L310">				return Integer[].class;</span>
 			case &quot;Float[]&quot;:
-<span class="fc" id="L328">				return Float[].class;</span>
+<span class="fc" id="L312">				return Float[].class;</span>
 			case &quot;Long[]&quot;:
-<span class="fc" id="L330">				return Long[].class;</span>
+<span class="fc" id="L314">				return Long[].class;</span>
 			case &quot;Double[]&quot;:
-<span class="fc" id="L332">				return Double[].class;</span>
+<span class="fc" id="L316">				return Double[].class;</span>
 			case &quot;String[]&quot;:
-<span class="fc" id="L334">				return String[].class;</span>
+<span class="fc" id="L318">				return String[].class;</span>
 			default:
-<span class="fc" id="L336">				return null;</span>
+<span class="fc" id="L320">				return null;</span>
 		}
 	}
 
@@ -345,40 +329,40 @@ public final class ArrayPreference&lt;T&gt; extends SharedPreference&lt;T&gt; {
 	 * @return New instance of the requested array.
 	 */
 	static Object createArrayInSize(final Class&lt;?&gt; componentClass, final int size) {
-<span class="fc bfc" id="L348" title="All 2 branches covered.">		if (boolean.class.equals(componentClass)) {</span>
-<span class="fc" id="L349">			return new boolean[size];</span>
-<span class="fc bfc" id="L350" title="All 2 branches covered.">		} else if (byte.class.equals(componentClass)) {</span>
-<span class="fc" id="L351">			return new byte[size];</span>
-<span class="pc bpc" id="L352" title="1 of 2 branches missed.">		} else if (char.class.equals(componentClass)) {</span>
-<span class="nc" id="L353">			return new char[size];</span>
-<span class="fc bfc" id="L354" title="All 2 branches covered.">		} else if (short.class.equals(componentClass)) {</span>
-<span class="fc" id="L355">			return new short[size];</span>
-<span class="fc bfc" id="L356" title="All 2 branches covered.">		} else if (int.class.equals(componentClass)) {</span>
-<span class="fc" id="L357">			return new int[size];</span>
-<span class="fc bfc" id="L358" title="All 2 branches covered.">		} else if (float.class.equals(componentClass)) {</span>
-<span class="fc" id="L359">			return new float[size];</span>
-<span class="fc bfc" id="L360" title="All 2 branches covered.">		} else if (long.class.equals(componentClass)) {</span>
-<span class="fc" id="L361">			return new long[size];</span>
-<span class="fc bfc" id="L362" title="All 2 branches covered.">		} else if (double.class.equals(componentClass)) {</span>
-<span class="fc" id="L363">			return new double[size];</span>
-<span class="fc bfc" id="L364" title="All 2 branches covered.">		} else if (Boolean.class.equals(componentClass)) {</span>
-<span class="fc" id="L365">			return new Boolean[size];</span>
-<span class="fc bfc" id="L366" title="All 2 branches covered.">		} else if (Byte.class.equals(componentClass)) {</span>
-<span class="fc" id="L367">			return new Byte[size];</span>
-<span class="fc bfc" id="L368" title="All 2 branches covered.">		} else if (Short.class.equals(componentClass)) {</span>
-<span class="fc" id="L369">			return new Short[size];</span>
-<span class="fc bfc" id="L370" title="All 2 branches covered.">		} else if (Integer.class.equals(componentClass)) {</span>
-<span class="fc" id="L371">			return new Integer[size];</span>
-<span class="fc bfc" id="L372" title="All 2 branches covered.">		} else if (Float.class.equals(componentClass)) {</span>
-<span class="fc" id="L373">			return new Float[size];</span>
-<span class="fc bfc" id="L374" title="All 2 branches covered.">		} else if (Long.class.equals(componentClass)) {</span>
-<span class="fc" id="L375">			return new Long[size];</span>
-<span class="fc bfc" id="L376" title="All 2 branches covered.">		} else if (Double.class.equals(componentClass)) {</span>
-<span class="fc" id="L377">			return new Double[size];</span>
-<span class="fc bfc" id="L378" title="All 2 branches covered.">		} else if (String.class.equals(componentClass)) {</span>
-<span class="fc" id="L379">			return new String[size];</span>
+<span class="fc bfc" id="L332" title="All 2 branches covered.">		if (boolean.class.equals(componentClass)) {</span>
+<span class="fc" id="L333">			return new boolean[size];</span>
+<span class="fc bfc" id="L334" title="All 2 branches covered.">		} else if (byte.class.equals(componentClass)) {</span>
+<span class="fc" id="L335">			return new byte[size];</span>
+<span class="pc bpc" id="L336" title="1 of 2 branches missed.">		} else if (char.class.equals(componentClass)) {</span>
+<span class="nc" id="L337">			return new char[size];</span>
+<span class="fc bfc" id="L338" title="All 2 branches covered.">		} else if (short.class.equals(componentClass)) {</span>
+<span class="fc" id="L339">			return new short[size];</span>
+<span class="fc bfc" id="L340" title="All 2 branches covered.">		} else if (int.class.equals(componentClass)) {</span>
+<span class="fc" id="L341">			return new int[size];</span>
+<span class="fc bfc" id="L342" title="All 2 branches covered.">		} else if (float.class.equals(componentClass)) {</span>
+<span class="fc" id="L343">			return new float[size];</span>
+<span class="fc bfc" id="L344" title="All 2 branches covered.">		} else if (long.class.equals(componentClass)) {</span>
+<span class="fc" id="L345">			return new long[size];</span>
+<span class="fc bfc" id="L346" title="All 2 branches covered.">		} else if (double.class.equals(componentClass)) {</span>
+<span class="fc" id="L347">			return new double[size];</span>
+<span class="fc bfc" id="L348" title="All 2 branches covered.">		} else if (Boolean.class.equals(componentClass)) {</span>
+<span class="fc" id="L349">			return new Boolean[size];</span>
+<span class="fc bfc" id="L350" title="All 2 branches covered.">		} else if (Byte.class.equals(componentClass)) {</span>
+<span class="fc" id="L351">			return new Byte[size];</span>
+<span class="fc bfc" id="L352" title="All 2 branches covered.">		} else if (Short.class.equals(componentClass)) {</span>
+<span class="fc" id="L353">			return new Short[size];</span>
+<span class="fc bfc" id="L354" title="All 2 branches covered.">		} else if (Integer.class.equals(componentClass)) {</span>
+<span class="fc" id="L355">			return new Integer[size];</span>
+<span class="fc bfc" id="L356" title="All 2 branches covered.">		} else if (Float.class.equals(componentClass)) {</span>
+<span class="fc" id="L357">			return new Float[size];</span>
+<span class="fc bfc" id="L358" title="All 2 branches covered.">		} else if (Long.class.equals(componentClass)) {</span>
+<span class="fc" id="L359">			return new Long[size];</span>
+<span class="fc bfc" id="L360" title="All 2 branches covered.">		} else if (Double.class.equals(componentClass)) {</span>
+<span class="fc" id="L361">			return new Double[size];</span>
+<span class="fc bfc" id="L362" title="All 2 branches covered.">		} else if (String.class.equals(componentClass)) {</span>
+<span class="fc" id="L363">			return new String[size];</span>
 		}
-<span class="fc" id="L381">		return null;</span>
+<span class="fc" id="L365">		return null;</span>
 	}
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span>Generated by the Android Gradle plugin 2.3.0</div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span>Generated by the Android Gradle plugin 2.3.1</div></body></html>

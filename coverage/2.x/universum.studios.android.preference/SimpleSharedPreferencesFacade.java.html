@@ -29,7 +29,7 @@ import java.util.Set;
 /**
  * Simple implementation of {@link SharedPreferencesFacade} which supports simple &lt;var&gt;obtaining&lt;/var&gt;
  * and &lt;var&gt;putting&lt;/var&gt; of values persisted in {@link SharedPreferences} with which is facade created
- * via {@link SimpleSharedPreferencesFacade.Builder} builder.
+ * via {@link #SimpleSharedPreferencesFacade(SharedPreferences)} constructor.
  *
  * @author Martin Albedinsky
  */
@@ -67,14 +67,13 @@ public class SimpleSharedPreferencesFacade implements SharedPreferencesFacade {
 	 */
 
 	/**
-	 * Creates a new instance of SimpleSharedPreferencesFacade with configuration provided by the
-	 * specified &lt;var&gt;builder&lt;/var&gt;.
+	 * Creates a new instance of SimpleSharedPreferencesFacade for the specified &lt;var&gt;preferences&lt;/var&gt;.
 	 *
-	 * @param builder The builder used to configure the new preferences facade.
+	 * @param preferences The instance of shared preferences to hide behind the new facade.
 	 */
-<span class="fc" id="L75">	protected SimpleSharedPreferencesFacade(@NonNull Builder builder) {</span>
-<span class="fc" id="L76">		this.mPreferences = builder.preferences;</span>
-<span class="fc" id="L77">	}</span>
+<span class="fc" id="L74">	public SimpleSharedPreferencesFacade(@NonNull final SharedPreferences preferences) {</span>
+<span class="fc" id="L75">		this.mPreferences = preferences;</span>
+<span class="fc" id="L76">	}</span>
 
 	/*
 	 * Methods =====================================================================================
@@ -84,39 +83,39 @@ public class SimpleSharedPreferencesFacade implements SharedPreferencesFacade {
 	 * Returns the {@link SharedPreferences} that are hidden behind this facade.
 	 *
 	 * @return The associated preferences.
-	 * @see Builder#preferences(SharedPreferences)
+	 * @see #SimpleSharedPreferencesFacade(SharedPreferences)
 	 */
 	@NonNull
 	public final SharedPreferences getPreferences() {
-<span class="fc" id="L91">		return mPreferences;</span>
+<span class="fc" id="L90">		return mPreferences;</span>
 	}
 
 	/**
 	 */
 	@Override
 	public void registerOnSharedPreferenceChangeListener(@NonNull final SharedPreferences.OnSharedPreferenceChangeListener listener) {
-<span class="fc" id="L98">		mPreferences.registerOnSharedPreferenceChangeListener(listener);</span>
-<span class="fc" id="L99">	}</span>
+<span class="fc" id="L97">		mPreferences.registerOnSharedPreferenceChangeListener(listener);</span>
+<span class="fc" id="L98">	}</span>
 
 	/**
 	 */
 	@Override
 	public void unregisterOnSharedPreferenceChangeListener(@NonNull final SharedPreferences.OnSharedPreferenceChangeListener listener) {
-<span class="fc" id="L105">		mPreferences.unregisterOnSharedPreferenceChangeListener(listener);</span>
-<span class="fc" id="L106">	}</span>
+<span class="fc" id="L104">		mPreferences.unregisterOnSharedPreferenceChangeListener(listener);</span>
+<span class="fc" id="L105">	}</span>
 
 	/**
 	 */
 	@Override
 	public boolean contains(@NonNull final String key) {
-<span class="fc" id="L112">		return mPreferences.contains(key);</span>
+<span class="fc" id="L111">		return mPreferences.contains(key);</span>
 	}
 
 	/**
 	 */
 	@Override
 	public boolean putString(@NonNull final String key, @Nullable final String value) {
-<span class="fc" id="L119">		return mPreferences.edit().putString(key, value).commit();</span>
+<span class="fc" id="L118">		return mPreferences.edit().putString(key, value).commit();</span>
 	}
 
 	/**
@@ -124,7 +123,7 @@ public class SimpleSharedPreferencesFacade implements SharedPreferencesFacade {
 	@Nullable
 	@Override
 	public String getString(@NonNull final String key, @Nullable final String defValue) {
-<span class="fc" id="L127">		return mPreferences.getString(key, defValue);</span>
+<span class="fc" id="L126">		return mPreferences.getString(key, defValue);</span>
 	}
 
 	/**
@@ -133,7 +132,7 @@ public class SimpleSharedPreferencesFacade implements SharedPreferencesFacade {
 	 */
 	@Override
 	public boolean putStringSet(@NonNull final String key, @Nullable final Set&lt;String&gt; values) {
-<span class="pc bpc" id="L136" title="2 of 4 branches missed.">		return Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.HONEYCOMB &amp;&amp; mPreferences.edit().putStringSet(key, values).commit();</span>
+<span class="pc bpc" id="L135" title="1 of 4 branches missed.">		return Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.HONEYCOMB &amp;&amp; mPreferences.edit().putStringSet(key, values).commit();</span>
 	}
 
 	/**
@@ -143,138 +142,88 @@ public class SimpleSharedPreferencesFacade implements SharedPreferencesFacade {
 	@Nullable
 	@Override
 	public Set&lt;String&gt; getStringSet(@NonNull final String key, @Nullable final Set&lt;String&gt; defValues) {
-<span class="pc bpc" id="L146" title="1 of 2 branches missed.">		return Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.HONEYCOMB ? mPreferences.getStringSet(key, defValues) : null;</span>
+<span class="pc bpc" id="L145" title="1 of 2 branches missed.">		return Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.HONEYCOMB ? mPreferences.getStringSet(key, defValues) : null;</span>
 	}
 
 	/**
 	 */
 	@Override
 	public boolean putInt(@NonNull final String key, final int value) {
-<span class="fc" id="L153">		return mPreferences.edit().putInt(key, value).commit();</span>
+<span class="fc" id="L152">		return mPreferences.edit().putInt(key, value).commit();</span>
 	}
 
 	/**
 	 */
 	@Override
 	public int getInt(@NonNull final String key, final int defValue) {
-<span class="fc" id="L160">		return mPreferences.getInt(key, defValue);</span>
+<span class="fc" id="L159">		return mPreferences.getInt(key, defValue);</span>
 	}
 
 	/**
 	 */
 	@Override
 	public boolean putFloat(@NonNull final String key, final float value) {
-<span class="fc" id="L167">		return mPreferences.edit().putFloat(key, value).commit();</span>
+<span class="fc" id="L166">		return mPreferences.edit().putFloat(key, value).commit();</span>
 	}
 
 	/**
 	 */
 	@Override
 	public float getFloat(@NonNull final String key, final float defValue) {
-<span class="fc" id="L174">		return mPreferences.getFloat(key, defValue);</span>
+<span class="fc" id="L173">		return mPreferences.getFloat(key, defValue);</span>
 	}
 
 	/**
 	 */
 	@Override
 	public boolean putLong(@NonNull final String key, final long value) {
-<span class="fc" id="L181">		return mPreferences.edit().putLong(key, value).commit();</span>
+<span class="fc" id="L180">		return mPreferences.edit().putLong(key, value).commit();</span>
 	}
 
 	/**
 	 */
 	@Override
 	public long getLong(@NonNull final String key, final long defValue) {
-<span class="fc" id="L188">		return mPreferences.getLong(key, defValue);</span>
+<span class="fc" id="L187">		return mPreferences.getLong(key, defValue);</span>
 	}
 
 	/**
 	 */
 	@Override
 	public boolean putBoolean(@NonNull final String key, final boolean value) {
-<span class="fc" id="L195">		return mPreferences.edit().putBoolean(key, value).commit();</span>
+<span class="fc" id="L194">		return mPreferences.edit().putBoolean(key, value).commit();</span>
 	}
 
 	/**
 	 */
 	@Override
 	public boolean getBoolean(@NonNull final String key, final boolean defValue) {
-<span class="fc" id="L202">		return mPreferences.getBoolean(key, defValue);</span>
+<span class="fc" id="L201">		return mPreferences.getBoolean(key, defValue);</span>
 	}
 
 	/**
 	 */
 	@Override
 	public boolean remove(@NonNull final String key) {
-<span class="fc" id="L209">		return mPreferences.edit().remove(key).commit();</span>
+<span class="fc" id="L208">		return mPreferences.edit().remove(key).commit();</span>
 	}
 
 	/**
 	 */
 	@Override
 	public int removeAll() {
-<span class="fc" id="L216">		final Map&lt;String, ?&gt; values = mPreferences.getAll();</span>
-<span class="fc" id="L217">		int result = 0;</span>
-<span class="fc bfc" id="L218" title="All 2 branches covered.">		if (!values.isEmpty()) {</span>
-<span class="fc bfc" id="L219" title="All 2 branches covered.">			for (final Map.Entry&lt;String, ?&gt; entry : values.entrySet()) {</span>
-<span class="pc bpc" id="L220" title="1 of 2 branches missed.">				if (mPreferences.edit().remove(entry.getKey()).commit()) result++;</span>
-<span class="fc" id="L221">			}</span>
+<span class="fc" id="L215">		final Map&lt;String, ?&gt; values = mPreferences.getAll();</span>
+<span class="fc" id="L216">		int result = 0;</span>
+<span class="fc bfc" id="L217" title="All 2 branches covered.">		if (!values.isEmpty()) {</span>
+<span class="fc bfc" id="L218" title="All 2 branches covered.">			for (final Map.Entry&lt;String, ?&gt; entry : values.entrySet()) {</span>
+<span class="fc bfc" id="L219" title="All 2 branches covered.">				if (mPreferences.edit().remove(entry.getKey()).commit()) result++;</span>
+<span class="fc" id="L220">			}</span>
 		}
-<span class="fc" id="L223">		return result;</span>
+<span class="fc" id="L222">		return result;</span>
 	}
 
 	/*
 	 * Inner classes ===============================================================================
 	 */
-
-	/**
-	 * Builder that may be used to create instances of {@link SimpleSharedPreferencesFacade} which
-	 * hide a desired shared &lt;var&gt;preferences&lt;/var&gt; instance in order to support simple &lt;var&gt;putting&lt;/var&gt;
-	 * and &lt;var&gt;obtaining&lt;/var&gt; of values stored in such preferences.
-	 *
-	 * &lt;h3&gt;Required parameters&lt;/h3&gt;
-	 * Parameters specified below are required in order to create a new instance of
-	 * {@link SimpleSharedPreferencesFacade} via {@link Builder#build()} successfully.
-	 * &lt;ul&gt;
-	 * &lt;li&gt;{@link #preferences(SharedPreferences)}&lt;/li&gt;
-	 * &lt;/ul&gt;
-	 *
-	 * @param &lt;B&gt; Type of the builder used for methods chaining.
-	 * @author Martin Albedinsky
-	 */
-<span class="fc" id="L245">	public static class Builder&lt;B&gt; {</span>
-
-		/**
-		 * See {@link SimpleSharedPreferencesFacade#mPreferences}.
-		 */
-		SharedPreferences preferences;
-
-		/**
-		 * Specifies a shared preferences instance that should be hidden behind facade.
-		 *
-		 * @param preferences The shared preferences for which to create new facade.
-		 * @return This builder to allow methods chaining.
-		 */
-		@SuppressWarnings(&quot;unchecked&quot;)
-		public B preferences(@NonNull final SharedPreferences preferences) {
-<span class="fc" id="L260">			this.preferences = preferences;</span>
-<span class="fc" id="L261">			return (B) this;</span>
-		}
-
-		/**
-		 * Builds a new instance of SimpleSharedPreferencesFacade with the configuration specified
-		 * for this builder.
-		 *
-		 * @return Instance of preferences facade ready to be used.
-		 * @throws IllegalArgumentException If some of the required parameters is missing.
-		 */
-		@NonNull
-		public SimpleSharedPreferencesFacade build() {
-<span class="pc bpc" id="L273" title="1 of 2 branches missed.">			if (preferences == null) {</span>
-<span class="nc" id="L274">				throw new IllegalArgumentException(&quot;No preferences specified.&quot;);</span>
-			}
-<span class="fc" id="L276">			return new SimpleSharedPreferencesFacade(this);</span>
-		}
-	}
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span>Generated by the Android Gradle plugin 2.3.0</div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span>Generated by the Android Gradle plugin 2.3.1</div></body></html>
