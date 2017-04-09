@@ -22,11 +22,9 @@ import android.content.SharedPreferences;
 import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * A {@link SharedPreference} implementation that may be used to persist a {@link Collection} of values
@@ -60,22 +58,6 @@ public final class CollectionPreference<T> extends SharedPreference<Collection<T
 	 */
 	public CollectionPreference(@NonNull final String key, @NonNull final Class<T> componentType, @Nullable final Collection<T> defValue) {
 		super(key, defValue);
-		this.mComponentType = componentType;
-	}
-
-	/**
-	 * <b>This constructor has been deprecated and will be removed in the next none-beta release.</b>
-	 * <p>
-	 * Creates a new instance of ListPreference.
-	 *
-	 * @param componentType Class of components that will be presented within a collection that may
-	 *                      by persisted by the new preference.
-	 * @see SharedPreference#SharedPreference(int, Object)
-	 * @deprecated Use {@link #CollectionPreference(String, Class, Collection)} instead.
-	 */
-	@Deprecated
-	CollectionPreference(@StringRes int keyResId, @NonNull Class<T> componentType, @Nullable List<T> defValue) {
-		super(keyResId, defValue);
 		this.mComponentType = componentType;
 	}
 

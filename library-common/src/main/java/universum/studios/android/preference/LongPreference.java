@@ -22,7 +22,6 @@ import android.content.SharedPreferences;
 import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
 
 /**
  * A {@link SharedPreference} implementation that may be used to persist a {@link Long} value via
@@ -37,10 +36,6 @@ import android.support.annotation.StringRes;
  */
 public final class LongPreference extends SharedPreference<Long> {
 
-	/*
-	 * Constructors ================================================================================
-	 */
-
 	/**
 	 * Creates a new instance of LongPreference with the specified <var>key</var> and <var>defValue</var>.
 	 *
@@ -49,23 +44,6 @@ public final class LongPreference extends SharedPreference<Long> {
 	public LongPreference(@NonNull final String key, @NonNull final Long defValue) {
 		super(key, defValue);
 	}
-
-	/**
-	 * <b>This constructor has been deprecated and will be removed in the next none-beta release.</b>
-	 * <p>
-	 * Creates a new instance of LongPreference.
-	 *
-	 * @see SharedPreference#SharedPreference(int, Object)
-	 * @deprecated Use {@link #LongPreference(String, Long)} instead.
-	 */
-	@Deprecated
-	public LongPreference(@StringRes final int keyResId, @NonNull final Long defValue) {
-		super(keyResId, defValue);
-	}
-
-	/*
-	 * Methods =====================================================================================
-	 */
 
 	/**
 	 */

@@ -22,7 +22,6 @@ import android.content.SharedPreferences;
 import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
 import android.text.TextUtils;
 
 import org.json.JSONArray;
@@ -63,21 +62,6 @@ public final class ArrayPreference<T> extends SharedPreference<T> {
 	 */
 	public ArrayPreference(@NonNull final String key, @Nullable final T defValue) {
 		super(key, defValue);
-		assertIsArrayOrThrow(defValue);
-	}
-
-	/**
-	 * <b>This constructor has been deprecated and will be removed in the next none-beta release.</b>
-	 * <p>
-	 * Creates a new instance of ArrayPreference.
-	 *
-	 * @throws IllegalArgumentException If the given <var>defValue</var> is not actually an array.
-	 * @see SharedPreference#SharedPreference(int, Object)
-	 * @deprecated Use {@link #ArrayPreference(String, Object)} instead.
-	 */
-	@Deprecated
-	public ArrayPreference(@StringRes int keyResId, @Nullable T defValue) {
-		super(keyResId, defValue);
 		assertIsArrayOrThrow(defValue);
 	}
 

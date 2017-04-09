@@ -29,7 +29,7 @@ import java.util.Set;
 /**
  * Simple implementation of {@link SharedPreferencesFacade} which supports simple <var>obtaining</var>
  * and <var>putting</var> of values persisted in {@link SharedPreferences} with which is facade created
- * via {@link SimpleSharedPreferencesFacade.Builder} builder.
+ * via {@link #SimpleSharedPreferencesFacade(SharedPreferences)} constructor.
  *
  * @author Martin Albedinsky
  */
@@ -65,20 +65,6 @@ public class SimpleSharedPreferencesFacade implements SharedPreferencesFacade {
 	/*
 	 * Constructors ================================================================================
 	 */
-
-	/**
-	 * <b>This constructor has been deprecated and will be removed in the next none-beta release.</b>
-	 * <p>
-	 * Creates a new instance of SimpleSharedPreferencesFacade with configuration provided by the
-	 * specified <var>builder</var>.
-	 *
-	 * @param builder The builder used to configure the new preferences facade.
-	 * @deprecated Use {@link #SimpleSharedPreferencesFacade(SharedPreferences)} instead.
-	 */
-	@Deprecated
-	protected SimpleSharedPreferencesFacade(@NonNull Builder builder) {
-		this(builder.preferences);
-	}
 
 	/**
 	 * Creates a new instance of SimpleSharedPreferencesFacade for the specified <var>preferences</var>.
@@ -239,58 +225,4 @@ public class SimpleSharedPreferencesFacade implements SharedPreferencesFacade {
 	/*
 	 * Inner classes ===============================================================================
 	 */
-
-	/**
-	 * <b>This class has been deprecated and will be removed in the next none-beta release.</b>
-	 * <p>
-	 * Builder that may be used to create instances of {@link SimpleSharedPreferencesFacade} which
-	 * hide a desired shared <var>preferences</var> instance in order to support simple <var>putting</var>
-	 * and <var>obtaining</var> of values stored in such preferences.
-	 *
-	 * <h3>Required parameters</h3>
-	 * Parameters specified below are required in order to create a new instance of
-	 * {@link SimpleSharedPreferencesFacade} via {@link Builder#build()} successfully.
-	 * <ul>
-	 * <li>{@link #preferences(SharedPreferences)}</li>
-	 * </ul>
-	 *
-	 * @param <B> Type of the builder used for methods chaining.
-	 * @author Martin Albedinsky
-	 * @deprecated Use {@link #SimpleSharedPreferencesFacade(SharedPreferences)} instead.
-	 */
-	@Deprecated
-	public static class Builder<B> {
-
-		/**
-		 * See {@link SimpleSharedPreferencesFacade#mPreferences}.
-		 */
-		SharedPreferences preferences;
-
-		/**
-		 * Specifies a shared preferences instance that should be hidden behind facade.
-		 *
-		 * @param preferences The shared preferences for which to create new facade.
-		 * @return This builder to allow methods chaining.
-		 */
-		@SuppressWarnings("unchecked")
-		public B preferences(@NonNull final SharedPreferences preferences) {
-			this.preferences = preferences;
-			return (B) this;
-		}
-
-		/**
-		 * Builds a new instance of SimpleSharedPreferencesFacade with the configuration specified
-		 * for this builder.
-		 *
-		 * @return Instance of preferences facade ready to be used.
-		 * @throws IllegalArgumentException If some of the required parameters is missing.
-		 */
-		@NonNull
-		public SimpleSharedPreferencesFacade build() {
-			if (preferences == null) {
-				throw new IllegalArgumentException("No preferences specified.");
-			}
-			return new SimpleSharedPreferencesFacade(this);
-		}
-	}
 }

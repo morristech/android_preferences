@@ -19,23 +19,23 @@
 package universum.studios.android.preference;
 
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
 import android.text.TextUtils;
 
 /**
- * Base implementation of shared preference object which may be used to persist a desired value
- * via {@link SharedPreferences} and then retrieve it.
+ * Base implementation of shared preference object which may be used to persist a desired value in
+ * {@link SharedPreferences} and later obtain such value.
  * <p>
- * This class implements API necessary to persist its current value into {@link SharedPreferences}
- * via {@link #updateValue(Object)} followed by {@link #save(SharedPreferences)} and to retrieve such
- * persisted value from preferences via {@link #retrieve(SharedPreferences)} followed by {@link #getValue()}.
+ * This class provides API necessary to persist a desired preference value in {@link SharedPreferences}
+ * via {@link #updateValue(Object)} followed by {@link #putIntoPreferences(SharedPreferences)} and
+ * to obtain such persisted value from preferences via {@link #getFromPreferences(SharedPreferences)}.
+ * The current value that has been obtained from shared preferences for a particular preference may
+ * be obtained via {@link #getValue()}.
  * <p>
- * The key for shared preference must be passed via {@link #SharedPreference(String, Object)} constructor
- * and may be later obtained via {@link #getKey()}.
+ * The key for each shared preference is required to be specified via {@link #SharedPreference(String, Object)}
+ * constructor and may be later obtained via {@link #getKey()}.
  *
  * @param <T> Type of the value that can be persisted by this preference implementation.
  * @author Martin Albedinsky
@@ -88,8 +88,7 @@ public abstract class SharedPreference<T> {
 	/**
 	 * The key for which will be the value of this preference persisted within shared preferences.
 	 */
-	// todo: make this field final on next release
-	String mKey = "";
+	final String mKey;
 
 	/**
 	 * Default value of this preference for case when there is no value persisted within shared
@@ -109,14 +108,6 @@ public abstract class SharedPreference<T> {
 	 * shared preferences.
 	 */
 	boolean mValueIsActual;
-
-	/**
-	 * Xml resource for the key.
-	 *
-	 * @deprecated Use {@link #mKey} instead.
-	 */
-	@Deprecated
-	private int mKeyRes = -1;
 
 	/*
 	 * Constructors ================================================================================
@@ -139,28 +130,6 @@ public abstract class SharedPreference<T> {
 		this.mDefaultValue = mValue = defValue;
 	}
 
-	/**
-	 * <b>This constructor has been deprecated and will be removed in the next none-beta release.</b>
-	 * <p>
-	 * Creates a new instance of SharedPreference with the given key resource and default value.
-	 *
-	 * @param keyResId     Resource id of the desired key under which will be the value of this preference
-	 *                     mapped within shared preferences.
-	 * @param defaultValue Default value of this preference for case, when there is no value saved withing
-	 *                     shared preference yet.
-	 * @throws IllegalArgumentException If the specified <var>keyResId</var> is invalid.
-	 * @see #attachKey(Resources)
-	 * @deprecated Use {@link #SharedPreference(String, Object)} instead.
-	 */
-	@Deprecated
-	protected SharedPreference(@StringRes int keyResId, @Nullable T defaultValue) {
-		if (keyResId <= 0) {
-			throw new IllegalArgumentException("Resource id(" + keyResId + ") for preference key is not valid.");
-		}
-		this.mKeyRes = keyResId;
-		this.mDefaultValue = defaultValue;
-	}
-
 	/*
 	 * Methods =====================================================================================
 	 */
@@ -173,42 +142,6 @@ public abstract class SharedPreference<T> {
 	@NonNull
 	public final String getKey() {
 		return mKey;
-	}
-
-	/**
-	 * <b>This method has been deprecated and will be removed in the next none-beta release.</b>
-	 * <p>
-	 * Return the resource id of the key of this preference.
-	 *
-	 * @return Same resource id as passed to {@link #SharedPreference(int, Object)} constructor.
-	 * @deprecated Use {@link #getKey()} instead.
-	 */
-	@StringRes
-	@Deprecated
-	public final int getKeyRes() {
-		return mKeyRes;
-	}
-
-	/**
-	 * <b>This method has been deprecated and will be removed in the next none-beta release.</b>
-	 * <p>
-	 * Attaches the key for this preference from the given resources using the current key's resource
-	 * id specified via {@link #SharedPreference(int, Object)}.
-	 *
-	 * @param resources An application's resources to obtain key.
-	 * @return This preference to allow methods chaining.
-	 * @throws IllegalArgumentException If key obtained from the resources for the resource id is empty.
-	 * @deprecated Due to dropped support of keys specified via resource ids, this method becomes obsolete.
-	 */
-	@Deprecated
-	public SharedPreference<T> attachKey(@NonNull Resources resources) {
-		if (mKeyRes != -1) {
-			this.mKey = resources.getString(mKeyRes);
-			if (TextUtils.isEmpty(mKey)) {
-				throw new IllegalArgumentException("Preference key cannot be empty.");
-			}
-		}
-		return this;
 	}
 
 	/**
@@ -284,7 +217,6 @@ public abstract class SharedPreference<T> {
 	 * @see #getValue()
 	 */
 	public final boolean putIntoPreferences(@NonNull final SharedPreferences preferences) {
-		this.ensureValidKeyOrThrow();
 		this.mValueIsActual = onPutIntoPreferences(preferences);
 		return mValueIsActual;
 	}
@@ -332,7 +264,6 @@ public abstract class SharedPreference<T> {
 	 * @see #putIntoPreferences(SharedPreferences)
 	 */
 	final T getFromPreferences(final SharedPreferences preferences) {
-		this.ensureValidKeyOrThrow();
 		if (!mValueIsActual) {
 			this.mValue = onGetFromPreferences(preferences);
 			this.mValueIsActual = true;
@@ -349,57 +280,6 @@ public abstract class SharedPreference<T> {
 	 */
 	@Nullable
 	protected abstract T onGetFromPreferences(@NonNull SharedPreferences preferences);
-
-	/**
-	 * <b>This method has been deprecated and will be removed in the next none-beta release.</b>
-	 * <p>
-	 * Retrieves the current value of this preference from the given shared preferences.
-	 *
-	 * @param preferences The instance of shared preferences into which was the value of this preference
-	 *                    before saved.
-	 * @return This preference to allow methods chaining.
-	 * @see #getValue()
-	 * @deprecated Use {@link #getFromPreferences(SharedPreferences)} instead.
-	 */
-	@Deprecated
-	public SharedPreference<T> retrieve(@NonNull SharedPreferences preferences) {
-		getFromPreferences(preferences);
-		return this;
-	}
-
-	/**
-	 * <b>This method has been deprecated and will be removed in the next none-beta release.</b>
-	 * <p>
-	 * Ensures that the key of this preference is valid (not empty). If not throws an IllegalStateException.
-	 *
-	 * @deprecated When support for key specified via resource id is dropped this method becomes obsolete.
-	 */
-	@Deprecated
-	private void ensureValidKeyOrThrow() {
-		if (TextUtils.isEmpty(mKey)) {
-			final String preferenceType = getClass().getSimpleName();
-			throw new IllegalStateException(
-					"Key for preference(" + preferenceType + ") is not properly initialized. "
-							+ "Didn't you forget to set it up via SharedPreference.attachKey(Resources)?"
-			);
-		}
-	}
-
-	/**
-	 * <b>This method has been deprecated and will be removed in the next none-beta release.</b>
-	 * <p>
-	 * Saves the current value of this preference into the given shared preferences.
-	 *
-	 * @param preferences The instance of shared preferences into which will be the current value of
-	 *                    this preference saved.
-	 * @return {@code True} if saving operation succeed, {@code false} otherwise.
-	 * @see #updateValue(Object)
-	 * @deprecated Use {@link #putIntoPreferences(SharedPreferences)} instead.
-	 */
-	@Deprecated
-	public boolean save(@NonNull SharedPreferences preferences) {
-		return putIntoPreferences(preferences);
-	}
 
 	/**
 	 * Invalidates the actual value of this preference so next call to {@link #getFromPreferences(SharedPreferences)}

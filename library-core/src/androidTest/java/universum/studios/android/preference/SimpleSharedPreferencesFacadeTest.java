@@ -64,7 +64,7 @@ public final class SimpleSharedPreferencesFacadeTest extends BaseInstrumentedTes
 		this.mMockPreferences = mock(SharedPreferences.class);
 		this.mMockPreferencesEditor = mock(SharedPreferences.Editor.class);
 		when(mMockPreferences.edit()).thenReturn(mMockPreferencesEditor);
-		this.mFacade = new SimpleSharedPreferencesFacade.Builder<SimpleSharedPreferencesFacade.Builder>().preferences(mMockPreferences).build();
+		this.mFacade = new SimpleSharedPreferencesFacade(mMockPreferences);
 	}
 
 	@Override

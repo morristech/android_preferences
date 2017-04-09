@@ -1,11 +1,16 @@
 Change-Log
 ===============
 
+### [Release 2.0.0-beta2](https://github.com/universum-studios/android_preferences/releases/tag/2.0.0) ###
+> 09.04.2017
+
+- Removed all deprecated components and methods from all previous **beta** releases.
+
 ### [Release 2.0.0-beta2](https://github.com/universum-studios/android_preferences/releases/tag/2.0.0-beta2) ###
 > 05.04.2017
 
 - Refactored implementation of `PreferencesManager`. Now only implements `SharedPreferencesFacade`
-  along with `SharedPreferencesHost` and may be created via simple constructor taking only `Context`
+  along with `SharedPreferencesProvider` and may be created via simple constructor taking only `Context`
   as parameter. Desired configuration related to preferences file name and mode may be specified via
   `setSharedPreferencesName(String)` and `setSharedPreferencesMode(int)`.
 - Refactored implementation of `SimpleSharedPreferencesFacade`. Instance of simple facade may be now
