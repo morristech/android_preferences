@@ -90,8 +90,6 @@ public class PreferencesManager implements SharedPreferencesFacade, SharedPrefer
 
 	/**
 	 * Context with which has been this manager created.
-	 *
-	 * @deprecated Use {@link #getContext()} instead.
 	 */
 	private final Context mContext;
 
