@@ -62,8 +62,7 @@ public final class PreferencesManagerTest extends BaseInstrumentedTest {
 		this.mManager = new PreferencesManager(mContext);
 		this.mPreference = new BooleanPreference("PREFERENCE.Boolean", true);
 		// Ensure that we have a clean slate before each test.
-		this.mManager.remove(PREF_KEY);
-		this.mManager.removePreference(mPreference);
+		this.mManager.removeAll();
 	}
 
 	@Override
