@@ -4,6 +4,7 @@ Preferences
 [![Build Status](https://travis-ci.org/universum-studios/android_preferences.svg?branch=master)](https://travis-ci.org/universum-studios/android_preferences)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/91c3d1fb4ee541daa46fd2a62ba7d910)](https://www.codacy.com/app/universum-studios/android_preferences?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=universum-studios/android_preferences&amp;utm_campaign=Badge_Grade)
 [![Codacy Badge](https://api.codacy.com/project/badge/Coverage/91c3d1fb4ee541daa46fd2a62ba7d910)](https://www.codacy.com/app/universum-studios/android_preferences?utm_source=github.com&utm_medium=referral&utm_content=universum-studios/android_preferences&utm_campaign=Badge_Coverage)
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Preferences-green.svg?style=flat)](https://android-arsenal.com/details/1/5555)
 
 Simply accessible and secure shared preferences for the Android platform.
 
